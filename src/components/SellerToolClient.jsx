@@ -24,7 +24,6 @@ import {
   PackageX,
   ReceiptText,
   RotateCcw,
-  Scissors,
   ShieldAlert,
   Sparkles,
   Sun,
@@ -327,13 +326,15 @@ const labelCopy = {
     uploadHelp: "Select the label PDF downloaded from your marketplace seller panel. The current workflow processes it locally in the browser.",
     uploadFallback: "The PDF stays in your browser and is not uploaded to a server.",
     uploadLabel: (platform) => `Upload a ${marketLabel(platform)} label PDF`,
-    createMeesho: "Create 4-up PDF",
+    layoutLabel: "Labels per A4 page",
+    flipkartWorkflowNote: "Shipping and billing pages are detected with the standard Flipkart label layout.",
+    createMeesho: (count) => `Create ${count}-up PDF`,
     splitFlipkart: "Split and crop PDF",
     meeshoOutput: "Meesho output",
     flipkartOutput: "Flipkart output",
     shippingPdf: "Shipping PDF",
     billingPdf: "Billing PDF 4x6",
-    checkMeesho: "Every 4 input pages are fitted onto one A4 output page.",
+    checkMeesho: (count) => `Every ${count} input pages are fitted onto one A4 output page with compact spacing.`,
     checkFlipkart: "Each original page is cropped into one shipping page and one 4x6 portrait billing page.",
     privateCheck: "The original PDF does not leave your browser.",
     downloadCheck: "Generated PDFs are downloaded directly from the browser.",
@@ -346,13 +347,15 @@ const labelCopy = {
     uploadHelp: "सेलर पैनल से डाउनलोड किया हुआ लेबल PDF सेलेक्ट करो. Current workflow PDF को ब्राउज़र में locally प्रोसेस करता है.",
     uploadFallback: "PDF आपके ब्राउज़र में रहती है और सर्वर पर अपलोड नहीं होती.",
     uploadLabel: (platform) => `${marketLabel(platform)} लेबल PDF अपलोड करो`,
-    createMeesho: "4-up PDF क्रिएट करो",
+    layoutLabel: "A4 page पर labels",
+    flipkartWorkflowNote: "Shipping और billing pages standard Flipkart label layout से detect होते हैं.",
+    createMeesho: (count) => `${count}-up PDF क्रिएट करो`,
     splitFlipkart: "PDF split और crop करो",
     meeshoOutput: "मीशो आउटपुट",
     flipkartOutput: "फ्लिपकार्ट आउटपुट",
     shippingPdf: "शिपिंग PDF",
     billingPdf: "बिलिंग PDF 4x6",
-    checkMeesho: "हर 4 input pages एक A4 output page पर fit होते हैं.",
+    checkMeesho: (count) => `हर ${count} input pages compact spacing के साथ एक A4 output page पर fit होते हैं.`,
     checkFlipkart: "हर original page से एक शिपिंग page और एक 4x6 portrait बिलिंग page crop होता है.",
     privateCheck: "Original PDF ब्राउज़र से बाहर नहीं जाती.",
     downloadCheck: "Generated PDFs direct ब्राउज़र से डाउनलोड होते हैं.",
@@ -393,6 +396,10 @@ const gstCopy = {
     generate: "Generate GST Summary",
     analyzing: "Analyzing...",
     required: "required",
+    comingTitle: (platform) => `${marketLabel(platform)} GST workspace`,
+    comingBody: (platform) => platform === "overall"
+      ? "Overall GST will combine marketplace-wise summaries once each marketplace workflow is configured."
+      : `${marketLabel(platform)} GST uploads will be added here. Use the Meesho tab for portal-ready GSTR-1 values today.`,
   },
   hi: {
     kicker: "जीएसटी एनालिसिस",
@@ -427,6 +434,10 @@ const gstCopy = {
     generate: "GST Summary generate करो",
     analyzing: "Analyze हो रहा है...",
     required: "जरूरी",
+    comingTitle: (platform) => `${marketLabel(platform)} जीएसटी workspace`,
+    comingBody: (platform) => platform === "overall"
+      ? "Overall GST हर marketplace की summary को combine करेगा जब workflows configured होंगे."
+      : `${marketLabel(platform)} GST uploads यहां add होंगे. अभी portal-ready GSTR-1 values के लिए मीशो tab use करो.`,
   },
 };
 
@@ -1762,24 +1773,28 @@ async function readPdf(file) {
   };
 }
 
-async function buildMeeshoFourUp(file) {
+async function buildMeeshoLayout(file, labelsPerPage = 4) {
   const source = await PDFDocument.load(await file.arrayBuffer(), { ignoreEncryption: true });
   const output = await PDFDocument.create();
   const pages = source.getPages();
-  const margin = 18;
-  const gap = 12;
-  const slotWidth = (A4.width - margin * 2 - gap) / 2;
-  const slotHeight = (A4.height - margin * 2 - gap) / 2;
-  const slots = [
-    { x: margin, y: margin + slotHeight + gap },
-    { x: margin + slotWidth + gap, y: margin + slotHeight + gap },
-    { x: margin, y: margin },
-    { x: margin + slotWidth + gap, y: margin },
-  ];
+  const layout = labelsPerPage === 6
+    ? { columns: 2, rows: 3, margin: 10, gapX: 6, gapY: 6 }
+    : { columns: 2, rows: 2, margin: 18, gapX: 12, gapY: 12 };
+  const slotWidth = (A4.width - layout.margin * 2 - layout.gapX * (layout.columns - 1)) / layout.columns;
+  const slotHeight = (A4.height - layout.margin * 2 - layout.gapY * (layout.rows - 1)) / layout.rows;
+  const slots = Array.from({ length: labelsPerPage }, (_, index) => {
+    const column = index % layout.columns;
+    const rowFromTop = Math.floor(index / layout.columns);
+    const rowFromBottom = layout.rows - rowFromTop - 1;
+    return {
+      x: layout.margin + column * (slotWidth + layout.gapX),
+      y: layout.margin + rowFromBottom * (slotHeight + layout.gapY),
+    };
+  });
 
-  for (let i = 0; i < pages.length; i += 4) {
+  for (let i = 0; i < pages.length; i += labelsPerPage) {
     const page = output.addPage([A4.width, A4.height]);
-    for (let offset = 0; offset < 4; offset += 1) {
+    for (let offset = 0; offset < labelsPerPage; offset += 1) {
       const sourcePage = pages[i + offset];
       if (!sourcePage) continue;
       const embedded = await output.embedPage(sourcePage);
@@ -2025,7 +2040,7 @@ function LabelFormatTool() {
   const { lang } = useLanguage();
   const t = labelCopy[lang] || labelCopy.en;
   const [platform, setPlatform] = useState("meesho");
-  const [splitMode, setSplitMode] = useState("horizontal");
+  const [meeshoLayout, setMeeshoLayout] = useState(4);
   const [file, setFile] = useState(null);
   const [meta, setMeta] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -2063,13 +2078,17 @@ function LabelFormatTool() {
     try {
       trackEvent("label_process_start", {
         platform,
-        split_mode: platform === "flipkart" ? splitMode : "four_up",
+        split_mode: platform === "flipkart" ? "standard_shipping_billing" : `${meeshoLayout}_up`,
       });
       if (platform === "meesho") {
-        const bytes = await buildMeeshoFourUp(file);
-        setOutputs([{ label: "Meesho 4-up A4 PDF", filename: "meesho-labels-4-up.pdf", bytes }]);
+        const bytes = await buildMeeshoLayout(file, meeshoLayout);
+        setOutputs([{
+          label: `Meesho ${meeshoLayout}-up A4 PDF`,
+          filename: `meesho-labels-${meeshoLayout}-up.pdf`,
+          bytes,
+        }]);
       } else if (platform === "flipkart") {
-        const result = await buildFlipkartSplit(file, splitMode);
+        const result = await buildFlipkartSplit(file, "horizontal");
         setOutputs([
           { label: "Flipkart Shipping Labels", filename: "flipkart-shipping-labels.pdf", bytes: result.shipping },
           { label: "Flipkart Billing Labels", filename: "flipkart-billing-labels.pdf", bytes: result.billing },
@@ -2080,7 +2099,7 @@ function LabelFormatTool() {
       setToast("PDF ready. Download buttons are visible here.");
       trackEvent("label_process_complete", {
         platform,
-        split_mode: platform === "flipkart" ? splitMode : "four_up",
+        split_mode: platform === "flipkart" ? "standard_shipping_billing" : `${meeshoLayout}_up`,
       });
     } catch (err) {
       setError(err.message || "PDF process failed.");
@@ -2124,27 +2143,29 @@ function LabelFormatTool() {
           </label>
 
           {platform === "flipkart" && (
-            <div className="split-options">
-              <button className={splitMode === "horizontal" ? "active" : ""} onClick={() => {
-                trackEvent("label_split_mode_select", { split_mode: "horizontal" });
-                setSplitMode("horizontal");
-              }}>
-                <Scissors size={16} />
-                Top / Bottom split
-              </button>
-              <button className={splitMode === "vertical" ? "active" : ""} onClick={() => {
-                trackEvent("label_split_mode_select", { split_mode: "vertical" });
-                setSplitMode("vertical");
-              }}>
-                <Scissors size={16} />
-                Left / Right split
-              </button>
+            <div className="workflow-note">
+              {t.flipkartWorkflowNote}
             </div>
+          )}
+
+          {platform === "meesho" && (
+            <label className="layout-select">
+              <span>{t.layoutLabel}</span>
+              <select value={meeshoLayout} onChange={(event) => {
+                const nextLayout = Number(event.target.value);
+                setMeeshoLayout(nextLayout);
+                setOutputs(null);
+                trackEvent("label_layout_select", { platform: "meesho", labels_per_page: nextLayout });
+              }}>
+                <option value={4}>4 labels</option>
+                <option value={6}>6 labels</option>
+              </select>
+            </label>
           )}
 
           {error && <div className="error"><AlertTriangle size={18} />{error}</div>}
           <button className="primary-action label-process" onClick={process} disabled={busy}>
-            {busy ? "Processing..." : platform === "meesho" ? t.createMeesho : t.splitFlipkart}
+            {busy ? "Processing..." : platform === "meesho" ? t.createMeesho(meeshoLayout) : t.splitFlipkart}
           </button>
           {outputs && (
             <div className="download-panel inline">
@@ -2175,8 +2196,10 @@ function LabelFormatTool() {
           <h2>{platform === "meesho" ? t.meeshoOutput : t.flipkartOutput}</h2>
           <div className="label-mock">
             {platform === "meesho" ? (
-              <div className="mock-grid">
-                <span>Label 1</span><span>Label 2</span><span>Label 3</span><span>Label 4</span>
+              <div className={`mock-grid ${meeshoLayout === 6 ? "six-up" : ""}`}>
+                {Array.from({ length: meeshoLayout }, (_, index) => (
+                  <span key={index}>Label {index + 1}</span>
+                ))}
               </div>
             ) : (
               <div className="mock-doc-pair">
@@ -2186,7 +2209,7 @@ function LabelFormatTool() {
             )}
           </div>
           <div className="label-checklist">
-            <CheckLine text={platform === "meesho" ? t.checkMeesho : t.checkFlipkart} />
+            <CheckLine text={platform === "meesho" ? t.checkMeesho(meeshoLayout) : t.checkFlipkart} />
             <CheckLine text={t.privateCheck} />
             <CheckLine text={t.downloadCheck} />
           </div>
@@ -2198,8 +2221,8 @@ function LabelFormatTool() {
 }
 
 function GstAnalysis({ lang }) {
-  const platform = "meesho";
   const t = gstCopy[lang] || gstCopy.en;
+  const [platform, setPlatform] = useState("meesho");
   const [files, setFiles] = useState({});
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -2250,31 +2273,53 @@ function GstAnalysis({ lang }) {
           <h1>{t.title}</h1>
           <p>{t.intro}</p>
         </div>
+        <div className="platform-switch">
+          {["overall", "meesho", "flipkart", "amazon"].map((id) => (
+            <button key={id} className={platform === id ? "active" : ""} onClick={() => {
+              setPlatform(id);
+              setResult(null);
+              setError("");
+              trackEvent("marketplace_tab_select", {
+                module: "gst",
+                marketplace: id,
+              });
+            }}>{marketLabel(id)}</button>
+          ))}
+        </div>
       </div>
 
-      <section className="gst-layout">
-        <div className="gst-upload-panel">
-          <h2>{t.docsTitle} <HelpTip text={t.docsHelp} /></h2>
-          <label className="state-field">
-            <span className="field-title"><span>{t.homeStateLabel}</span> <HelpTip text={t.homeStateHelp} /></span>
-            <select value={homeState} onChange={(event) => setHomeState(event.target.value)}>
-              <option value="">{t.homeStateAuto}</option>
-              {GST_STATE_OPTIONS.map((state) => <option key={state} value={state}>{state}</option>)}
-            </select>
-          </label>
-          <DocUpload title={t.gstReport} hint={t.gstReportHint} help={t.gstReportHelp} requiredLabel={t.required} file={files.gstReport} onFile={(file) => onFile("gstReport", file)} required />
-          <DocUpload title={t.taxInvoice} hint={t.taxInvoiceHint} help={t.taxInvoiceHelp} requiredLabel={t.required} file={files.taxInvoice} onFile={(file) => onFile("taxInvoice", file)} required />
-          <DocUpload title={t.supplierInvoice} hint={t.supplierInvoiceHint} help={t.supplierInvoiceHelp} requiredLabel={t.required} file={files.supplierInvoice} onFile={(file) => onFile("supplierInvoice", file)} />
-          <DocUpload title={t.commission} hint={t.commissionHint} help={t.commissionHelp} requiredLabel={t.required} file={files.commissionBackup} onFile={(file) => onFile("commissionBackup", file)} />
-          {error && <div className="error"><AlertTriangle size={18} />{error}</div>}
-          <button className="primary-action" onClick={analyze} disabled={busy}>{busy ? t.analyzing : t.generate}</button>
-        </div>
-        <div className="gst-guidance">
-          <h2>{t.moduleTitle} <HelpTip text={t.moduleHelp} /></h2>
-          {t.checks.map((text) => <CheckLine key={text} text={text} />)}
-        </div>
-      </section>
-      {result && <GstResult result={result} />}
+      {platform === "meesho" ? (
+        <>
+          <section className="gst-layout">
+            <div className="gst-upload-panel">
+              <h2>{t.docsTitle} <HelpTip text={t.docsHelp} /></h2>
+              <label className="state-field">
+                <span className="field-title"><span>{t.homeStateLabel}</span> <HelpTip text={t.homeStateHelp} /></span>
+                <select value={homeState} onChange={(event) => setHomeState(event.target.value)}>
+                  <option value="">{t.homeStateAuto}</option>
+                  {GST_STATE_OPTIONS.map((state) => <option key={state} value={state}>{state}</option>)}
+                </select>
+              </label>
+              <DocUpload title={t.gstReport} hint={t.gstReportHint} help={t.gstReportHelp} requiredLabel={t.required} file={files.gstReport} onFile={(file) => onFile("gstReport", file)} required />
+              <DocUpload title={t.taxInvoice} hint={t.taxInvoiceHint} help={t.taxInvoiceHelp} requiredLabel={t.required} file={files.taxInvoice} onFile={(file) => onFile("taxInvoice", file)} required />
+              <DocUpload title={t.supplierInvoice} hint={t.supplierInvoiceHint} help={t.supplierInvoiceHelp} requiredLabel={t.required} file={files.supplierInvoice} onFile={(file) => onFile("supplierInvoice", file)} />
+              <DocUpload title={t.commission} hint={t.commissionHint} help={t.commissionHelp} requiredLabel={t.required} file={files.commissionBackup} onFile={(file) => onFile("commissionBackup", file)} />
+              {error && <div className="error"><AlertTriangle size={18} />{error}</div>}
+              <button className="primary-action" onClick={analyze} disabled={busy}>{busy ? t.analyzing : t.generate}</button>
+            </div>
+            <div className="gst-guidance">
+              <h2>{t.moduleTitle} <HelpTip text={t.moduleHelp} /></h2>
+              {t.checks.map((text) => <CheckLine key={text} text={text} />)}
+            </div>
+          </section>
+          {result && <GstResult result={result} />}
+        </>
+      ) : (
+        <section className="portal-card gst-coming-soon">
+          <h2>{t.comingTitle(platform)}</h2>
+          <p>{t.comingBody(platform)}</p>
+        </section>
+      )}
     </section>
   );
 }
