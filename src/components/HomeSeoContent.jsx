@@ -3,30 +3,33 @@
 import { useLanguage } from "./LanguageProvider";
 import { absoluteUrl } from "../lib/site";
 
+const seoLinks = ["/flipkart-label-crop", "/meesho-label-4-in-1", "/#tool"];
+
 const homeCopy = {
   en: {
     kicker: "Free ecommerce seller tools",
-    h1: "Flipkart label cropper, Meesho 4-in-1 labels, performance insights, and marketplace data analysis",
+    h1: "Flipkart label cropper, Meesho 4-up, 6-up and thermal label tools, GST helper, and seller analytics",
     intro:
-      "Browser-based tools for label PDF formatting, ecommerce performance analytics, GST analysis, recommerce seller workflows, and marketplace report preparation.",
+      "Browser-based tools for Flipkart label cropping, Meesho A4 and 4x6 thermal label PDFs, ecommerce performance analytics, GST analysis, and marketplace report preparation.",
     flipkart: "Flipkart label crop",
-    meesho: "Meesho 4-in-1 label",
+    meesho: "Meesho label maker",
     analytics: "Seller analytics",
     why: "Why sellers use it",
-    whyTitle: "PDF tools and data analysis built for Indian marketplace sellers",
+    whyTitle: "Label PDF tools, GST helpers, and data analysis for Indian marketplace sellers",
     features: [
-      ["Flipkart shipping label cropper", "Upload Flipkart label PDFs and download separate shipping and 4x6 billing PDFs that are easier to print."],
-      ["Meesho 4-in-1 label maker", "Convert Meesho labels into a compact 4-per-page A4 layout for faster packing workflows."],
+      ["Flipkart shipping label cropper", "Upload Flipkart label PDFs and download separate shipping and 4x6 portrait billing PDFs for cleaner packing and printing."],
+      ["Meesho 4-up, 6-up and thermal labels", "Convert Meesho labels into 4-per-page or 6-per-page A4 PDFs, or crop each label into a 4x6 thermal printer PDF."],
       ["Private browser processing", "PDFs and reports are processed in your browser. Files do not need to be uploaded to a server."],
-      ["Seller analytics workspace", "Analyze marketplace orders, payments, ads, returns, GST tables, performance insights, and seller data in one app."],
+      ["GST and seller analytics workspace", "Prepare Meesho GSTR-1 values, review marketplace orders, payments, ads, returns, performance trends, and seller data in one app."],
     ],
     search: "Search-focused tools",
-    searchTitle: "Popular seller label workflows",
+    searchTitle: "Popular marketplace seller workflows",
     searchText:
-      "These pages target high-intent seller searches such as Flipkart label crop, Meesho label 4 in 1, seller shipping label PDF, 4x6 label printer PDF, ecommerce seller insights tools, performance analytics, and marketplace data analysis.",
+      "These pages target high-intent seller searches such as Flipkart label crop, Meesho label 4 in 1, Meesho 6 labels per page, Meesho thermal label PDF, seller shipping label PDF, 4x6 label printer PDF, GSTR-1 helper, ecommerce seller insights tools, performance analytics, and marketplace data analysis.",
     links: [
       ["Flipkart Label Crop Tool", "Crop Flipkart label PDFs into a clean shipping label and a separate 4x6 portrait billing PDF for label printers."],
-      ["Meesho Label 4 in 1 Page Tool", "Convert Meesho shipping label PDFs into a 4-in-1 A4 layout so four labels fit on one printable page."],
+      ["Meesho Label Maker", "Convert Meesho shipping label PDFs into 4-up, 6-up, or cropped 4x6 thermal label PDFs for different printer workflows."],
+      ["GST and Performance Tools", "Use marketplace reports to prepare GST helper values and analyze sales, returns, ads, payouts, and performance trends."],
     ],
     info: "Site information",
     infoTitle: "Privacy, support, and legal pages",
@@ -39,27 +42,28 @@ const homeCopy = {
   },
   hi: {
     kicker: "फ्री ecommerce seller tools",
-    h1: "फ्लिपकार्ट label cropper, मीशो 4-in-1 labels, performance insights और marketplace data analysis",
+    h1: "फ्लिपकार्ट label cropper, मीशो 4-up, 6-up और thermal label tools, GST helper और seller analytics",
     intro:
-      "Browser-based tools जिससे label PDF formatting, ecommerce performance analytics, GST analysis, recommerce seller workflows और marketplace report preparation easy होता है.",
+      "Browser-based tools जिससे फ्लिपकार्ट label crop, मीशो A4 और 4x6 thermal label PDFs, ecommerce performance analytics, GST analysis और marketplace report preparation easy होता है.",
     flipkart: "फ्लिपकार्ट label crop",
-    meesho: "मीशो 4-in-1 label",
+    meesho: "मीशो label maker",
     analytics: "Seller analytics",
     why: "Sellers इसे क्यों use करते हैं",
-    whyTitle: "Indian marketplace sellers के लिए PDF tools और data analysis",
+    whyTitle: "Indian marketplace sellers के लिए label PDF tools, GST helpers और data analysis",
     features: [
-      ["फ्लिपकार्ट shipping label cropper", "फ्लिपकार्ट label PDFs upload करो और separate shipping plus 4x6 billing PDFs download करो जो print करने में easy हैं."],
-      ["मीशो 4-in-1 label maker", "मीशो labels को compact 4-per-page A4 layout में convert करो, packing workflow faster होता है."],
+      ["फ्लिपकार्ट shipping label cropper", "फ्लिपकार्ट label PDFs upload करो और clean shipping plus separate 4x6 portrait billing PDFs download करो."],
+      ["मीशो 4-up, 6-up और thermal labels", "मीशो labels को 4-per-page या 6-per-page A4 PDFs में convert करो, या हर label को 4x6 thermal printer PDF में crop करो."],
       ["Private browser processing", "PDFs और reports browser में process होते हैं. Files server पर upload करने की जरूरत नहीं होती."],
-      ["Seller analytics workspace", "Marketplace ऑर्डर, payments, ads, returns, GST tables, performance insights और seller data एक app में analyze करो."],
+      ["GST और seller analytics workspace", "मीशो GSTR-1 values prepare करो और marketplace ऑर्डर, payments, ads, returns, performance trends और seller data analyze करो."],
     ],
     search: "Search-focused tools",
-    searchTitle: "Popular seller label workflows",
+    searchTitle: "Popular marketplace seller workflows",
     searchText:
-      "ये pages high-intent seller searches के लिए हैं जैसे फ्लिपकार्ट label crop, मीशो label 4 in 1, seller shipping label PDF, 4x6 label printer PDF, ecommerce seller insights tools, performance analytics और marketplace data analysis.",
+      "ये pages high-intent seller searches के लिए हैं जैसे फ्लिपकार्ट label crop, मीशो label 4 in 1, मीशो 6 labels per page, मीशो thermal label PDF, seller shipping label PDF, 4x6 label printer PDF, GSTR-1 helper, ecommerce seller insights tools, performance analytics और marketplace data analysis.",
     links: [
       ["फ्लिपकार्ट Label Crop Tool", "फ्लिपकार्ट label PDFs को clean shipping label और separate 4x6 portrait billing PDF में crop करो."],
-      ["मीशो Label 4 in 1 Page Tool", "मीशो shipping label PDFs को 4-in-1 A4 layout में convert करो, ताकि four labels one printable page पर fit हो सकें."],
+      ["मीशो Label Maker", "मीशो shipping label PDFs को 4-up, 6-up या cropped 4x6 thermal label PDFs में convert करो."],
+      ["GST और Performance Tools", "Marketplace reports से GST helper values prepare करो और sales, returns, ads, payouts, performance trends analyze करो."],
     ],
     info: "Site information",
     infoTitle: "Privacy, support और legal pages",
@@ -114,7 +118,7 @@ export default function HomeSeoContent() {
         </div>
         <div className="seo-link-list">
           {t.links.map(([title, text], index) => (
-            <a key={title} href={absoluteUrl(index === 0 ? "/flipkart-label-crop" : "/meesho-label-4-in-1")}>
+            <a key={title} href={absoluteUrl(seoLinks[index] || "/#tool")}>
               <strong>{title}</strong>
               <span>{text}</span>
             </a>

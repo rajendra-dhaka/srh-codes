@@ -7,7 +7,7 @@ export const site = {
   contactEmail: "shree.anjaneya.1304@gmail.com",
   jurisdiction: "Rajasthan, India",
   description:
-    "Free browser-based ecommerce seller tools for Flipkart label crop, Meesho 4-in-1 label PDFs, performance insights, GST analysis, and marketplace data analysis.",
+    "Free browser-based ecommerce seller tools for Flipkart label crop, Meesho 4-up, 6-up and thermal label PDFs, GST helper values, performance insights, and marketplace data analysis.",
   url: siteUrl,
   keywords: [
     "flipkart label crop",
@@ -15,11 +15,18 @@ export const site = {
     "flipkart invoice crop",
     "meesho label 4 in 1",
     "meesho label 4 per page",
+    "meesho label 6 per page",
+    "meesho 6 up labels",
+    "meesho thermal label pdf",
+    "meesho 4x6 label",
     "meesho shipping label pdf",
+    "meesho label crop",
     "ecommerce label cropper",
     "seller shipping label tool",
     "marketplace label pdf tool",
     "label printer 4x6 pdf",
+    "gst helper for sellers",
+    "gstr 1 helper",
     "ecommerce seller insights tools",
     "seller performance analytics",
     "marketplace data analysis",
@@ -34,7 +41,7 @@ export const landingFeatures = [
   },
   {
     title: "Meesho 4-in-1 label maker",
-    text: "Convert Meesho labels into a compact 4-per-page A4 layout for faster packing workflows.",
+    text: "Convert Meesho labels into 4-up or 6-up A4 PDFs, or generate cropped 4x6 thermal printer PDFs.",
   },
   {
     title: "Private browser processing",
@@ -42,7 +49,7 @@ export const landingFeatures = [
   },
   {
     title: "Seller analytics workspace",
-    text: "Analyze marketplace orders, payments, ads, returns, GST tables, performance insights, and seller data in one app.",
+    text: "Analyze marketplace orders, payments, ads, returns, GST helper tables, performance insights, and seller data in one app.",
   },
 ];
 
@@ -77,29 +84,32 @@ export const keywordPages = [
   },
   {
     slug: "meesho-label-4-in-1",
-    title: "Meesho Label 4 in 1 Page Tool",
-    h1: "Meesho Label 4-in-1 PDF Maker",
+    title: "Meesho Label Maker - 4-in-1, 6-up and Thermal 4x6 PDF Tool",
+    h1: "Meesho Label Maker for 4-up, 6-up and Thermal 4x6 PDFs",
     description:
-      "Convert Meesho shipping label PDFs into a 4-in-1 A4 layout so four labels fit on one printable page.",
+      "Convert Meesho shipping label PDFs into 4-in-1 A4 pages, 6 labels per page, or cropped 4x6 thermal label PDFs.",
     primaryKeyword: "meesho label 4 in 1",
     related: [
       "meesho label 4 per page",
+      "meesho label 6 per page",
+      "meesho thermal label pdf",
+      "meesho 4x6 label",
       "meesho shipping label pdf",
       "meesho label print 4 in 1",
       "meesho label maker",
     ],
     sections: [
       {
-        title: "Fit four Meesho labels on one page",
-        text: "Upload the label PDF, generate a clean A4 output, and print four labels per page for low-volume packing work.",
+        title: "Fit four or six Meesho labels on one page",
+        text: "Upload the label PDF and generate a clean A4 output with either four labels or six compact labels per page.",
       },
       {
-        title: "Simple PDF workflow",
-        text: "The converter keeps the original label pages intact and scales them into a printable 2x2 layout.",
+        title: "Create cropped thermal 4x6 labels",
+        text: "Thermal mode removes extra blank space from each Meesho label and fits one label per 4x6 printer page without stretching the ratio.",
       },
       {
         title: "Useful for marketplace sellers",
-        text: "The same workspace also supports performance analysis, GST summaries, and marketplace report workflows.",
+        text: "The same workspace also supports Flipkart label crop, performance analysis, GST summaries, and marketplace report workflows.",
       },
     ],
   },

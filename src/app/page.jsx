@@ -3,9 +3,9 @@ import HomeSeoContent from "../components/HomeSeoContent";
 import { absoluteUrl, site } from "../lib/site";
 
 export const metadata = {
-  title: "Free Flipkart Label Cropper and Meesho 4-in-1 Label Tool",
+  title: "Free Flipkart Label Cropper, Meesho 4-up, 6-up and Thermal Label Tool",
   description:
-    "Crop Flipkart shipping labels, create Meesho 4-in-1 label PDFs, and analyze ecommerce seller performance, GST, and marketplace data with free browser-based tools.",
+    "Crop Flipkart shipping labels, create Meesho 4-up, 6-up and thermal 4x6 label PDFs, and analyze ecommerce seller performance, GST, and marketplace data.",
   alternates: {
     canonical: absoluteUrl("/"),
   },
@@ -27,7 +27,9 @@ function JsonLd() {
     },
     featureList: [
       "Flipkart label crop",
-      "Meesho 4-in-1 label PDF",
+      "Meesho 4-up label PDF",
+      "Meesho 6-up label PDF",
+      "Meesho thermal 4x6 label PDF",
       "Shipping and billing PDF split",
       "GST report summary",
       "Marketplace performance analysis",

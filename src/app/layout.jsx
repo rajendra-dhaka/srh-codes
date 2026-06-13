@@ -7,7 +7,7 @@ import { site, absoluteUrl } from "../lib/site";
 export const metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} - Flipkart Label Cropper and Meesho 4-in-1 Label Tool`,
+    default: `${site.name} - Flipkart, Meesho Label, GST and Seller Analytics Tools`,
     template: `%s | ${site.name}`,
   },
   description: site.description,
@@ -20,12 +20,12 @@ export const metadata = {
     type: "website",
     url: absoluteUrl("/"),
     siteName: site.name,
-    title: `${site.name} - Free Seller PDF and GST Tools`,
+    title: `${site.name} - Free Label PDF, GST and Seller Analytics Tools`,
     description: site.description,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${site.name} - Free Seller PDF and GST Tools`,
+    title: `${site.name} - Free Label PDF, GST and Seller Analytics Tools`,
     description: site.description,
   },
   robots: {
