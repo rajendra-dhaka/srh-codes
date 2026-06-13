@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Papa from "papaparse";
 import JSZip from "jszip";
-import { PDFDocument } from "pdf-lib";
+import { degrees, PDFDocument } from "pdf-lib";
 import {
   AlertTriangle,
   BarChart3,
@@ -1778,7 +1778,7 @@ async function buildMeeshoLayout(file, labelsPerPage = 4) {
   const output = await PDFDocument.create();
   const pages = source.getPages();
   const layout = labelsPerPage === 6
-    ? { columns: 2, rows: 3, margin: 10, gapX: 6, gapY: 6 }
+    ? { columns: 2, rows: 3, margin: 10, gapX: 8, gapY: 8, rotate: true }
     : { columns: 2, rows: 2, margin: 18, gapX: 12, gapY: 12 };
   const slotWidth = (A4.width - layout.margin * 2 - layout.gapX * (layout.columns - 1)) / layout.columns;
   const slotHeight = (A4.height - layout.margin * 2 - layout.gapY * (layout.rows - 1)) / layout.rows;
@@ -1799,16 +1799,30 @@ async function buildMeeshoLayout(file, labelsPerPage = 4) {
       if (!sourcePage) continue;
       const embedded = await output.embedPage(sourcePage);
       const { width, height } = sourcePage.getSize();
-      const scale = Math.min(slotWidth / width, slotHeight / height);
+      const sourceWidth = layout.rotate ? height : width;
+      const sourceHeight = layout.rotate ? width : height;
+      const scale = Math.min(slotWidth / sourceWidth, slotHeight / sourceHeight);
       const drawWidth = width * scale;
       const drawHeight = height * scale;
       const slot = slots[offset];
-      page.drawPage(embedded, {
-        x: slot.x + (slotWidth - drawWidth) / 2,
-        y: slot.y + (slotHeight - drawHeight) / 2,
-        width: drawWidth,
-        height: drawHeight,
-      });
+      if (layout.rotate) {
+        const rotatedWidth = drawHeight;
+        const rotatedHeight = drawWidth;
+        page.drawPage(embedded, {
+          x: slot.x + (slotWidth - rotatedWidth) / 2 + rotatedWidth,
+          y: slot.y + (slotHeight - rotatedHeight) / 2,
+          width: drawWidth,
+          height: drawHeight,
+          rotate: degrees(90),
+        });
+      } else {
+        page.drawPage(embedded, {
+          x: slot.x + (slotWidth - drawWidth) / 2,
+          y: slot.y + (slotHeight - drawHeight) / 2,
+          width: drawWidth,
+          height: drawHeight,
+        });
+      }
     }
   }
   return output.save();
