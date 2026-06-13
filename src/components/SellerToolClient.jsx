@@ -1778,7 +1778,7 @@ async function buildMeeshoLayout(file, labelsPerPage = 4) {
   const output = await PDFDocument.create();
   const pages = source.getPages();
   const layout = labelsPerPage === 6
-    ? { columns: 2, rows: 3, margin: 10, gapX: 8, gapY: 8, rotate: true }
+    ? { columns: 2, rows: 3, margin: 10, gapX: 8, gapY: 8, rotate: true, cropBottomWhitespace: true }
     : { columns: 2, rows: 2, margin: 18, gapX: 12, gapY: 12 };
   const slotWidth = (A4.width - layout.margin * 2 - layout.gapX * (layout.columns - 1)) / layout.columns;
   const slotHeight = (A4.height - layout.margin * 2 - layout.gapY * (layout.rows - 1)) / layout.rows;
@@ -1797,13 +1797,23 @@ async function buildMeeshoLayout(file, labelsPerPage = 4) {
     for (let offset = 0; offset < labelsPerPage; offset += 1) {
       const sourcePage = pages[i + offset];
       if (!sourcePage) continue;
-      const embedded = await output.embedPage(sourcePage);
       const { width, height } = sourcePage.getSize();
-      const sourceWidth = layout.rotate ? height : width;
-      const sourceHeight = layout.rotate ? width : height;
+      const cropBox = layout.cropBottomWhitespace
+        ? {
+            left: width * 0.012,
+            bottom: height * 0.24,
+            right: width * 0.988,
+            top: height * 0.992,
+          }
+        : null;
+      const embedded = cropBox ? await output.embedPage(sourcePage, cropBox) : await output.embedPage(sourcePage);
+      const croppedWidth = cropBox ? cropBox.right - cropBox.left : width;
+      const croppedHeight = cropBox ? cropBox.top - cropBox.bottom : height;
+      const sourceWidth = layout.rotate ? croppedHeight : croppedWidth;
+      const sourceHeight = layout.rotate ? croppedWidth : croppedHeight;
       const scale = Math.min(slotWidth / sourceWidth, slotHeight / sourceHeight);
-      const drawWidth = width * scale;
-      const drawHeight = height * scale;
+      const drawWidth = croppedWidth * scale;
+      const drawHeight = croppedHeight * scale;
       const slot = slots[offset];
       if (layout.rotate) {
         const rotatedWidth = drawHeight;
