@@ -421,10 +421,15 @@ main {
   display: grid;
   place-items: center;
   border-radius: 8px;
-  background: linear-gradient(135deg, #22c55e, #06b6d4);
-  color: #ffffff;
-  font-weight: 900;
-  font-size: 13px;
+  overflow: hidden;
+  background: transparent;
+  box-shadow: 0 10px 24px rgba(6, 182, 212, 0.18);
+}
+
+.brand-mark img {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .brand-block strong,

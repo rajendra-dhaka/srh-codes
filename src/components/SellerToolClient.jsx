@@ -1965,7 +1965,7 @@ export default function SellerToolClient() {
       <TrustNotice />
       <header className="mobile-shellbar">
         <div className="mobile-brand">
-          <div className="brand-mark">SRH</div>
+          <BrandMark />
           <div>
             <strong>SRH CODES</strong>
             <span>Seller Tools</span>
@@ -1985,7 +1985,7 @@ export default function SellerToolClient() {
       <aside id="primary-navigation" className={drawerOpen ? "super-sidebar open" : "super-sidebar"}>
         <div className="drawer-head">
           <div className="brand-block">
-            <div className="brand-mark">SRH</div>
+            <BrandMark />
             <div>
               <strong>SRH CODES</strong>
               <span>Seller Tools</span>
@@ -1996,7 +1996,7 @@ export default function SellerToolClient() {
           </button>
         </div>
         <div className="brand-block desktop-brand">
-          <div className="brand-mark">SRH</div>
+          <BrandMark />
           <div>
             <strong>SRH CODES</strong>
             <span>Seller Tools</span>
@@ -2048,6 +2048,14 @@ export default function SellerToolClient() {
         {section === "labels" && <LabelFormatTool />}
       </main>
     </div>
+  );
+}
+
+function BrandMark() {
+  return (
+    <span className="brand-mark" aria-hidden="true">
+      <img src="/brand/srh-logo.svg" alt="" width="44" height="44" />
+    </span>
   );
 }
 

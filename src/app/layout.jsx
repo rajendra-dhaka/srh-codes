@@ -13,6 +13,15 @@ export const metadata = {
   description: site.description,
   applicationName: site.name,
   keywords: site.keywords,
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/brand/srh-logo.svg", type: "image/svg+xml", sizes: "512x512" },
+    ],
+    shortcut: "/favicon.svg",
+    apple: [{ url: "/brand/srh-logo.svg", type: "image/svg+xml", sizes: "512x512" }],
+  },
+  manifest: "/manifest.webmanifest",
   alternates: {
     canonical: absoluteUrl("/"),
   },
@@ -22,11 +31,20 @@ export const metadata = {
     siteName: site.name,
     title: `${site.name} - Free Label PDF, GST and Seller Analytics Tools`,
     description: site.description,
+    images: [
+      {
+        url: absoluteUrl("/opengraph-image"),
+        width: 1200,
+        height: 630,
+        alt: `${site.name} seller tools preview`,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: `${site.name} - Free Label PDF, GST and Seller Analytics Tools`,
     description: site.description,
+    images: [absoluteUrl("/twitter-image")],
   },
   robots: {
     index: true,
