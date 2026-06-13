@@ -52,7 +52,47 @@ import { useLanguage } from "./LanguageProvider";
 import { trackEvent } from "../lib/analytics";
 
 const palette = ["#2563eb", "#00a6a6", "#f59e0b", "#ef4444", "#7c3aed", "#16a34a", "#475569"];
-const HOME_STATE = "RAJASTHAN";
+const DEFAULT_HOME_STATE = "RAJASTHAN";
+const GST_STATE_BY_CODE = {
+  "01": "JAMMU AND KASHMIR",
+  "02": "HIMACHAL PRADESH",
+  "03": "PUNJAB",
+  "04": "CHANDIGARH",
+  "05": "UTTARAKHAND",
+  "06": "HARYANA",
+  "07": "DELHI",
+  "08": "RAJASTHAN",
+  "09": "UTTAR PRADESH",
+  "10": "BIHAR",
+  "11": "SIKKIM",
+  "12": "ARUNACHAL PRADESH",
+  "13": "NAGALAND",
+  "14": "MANIPUR",
+  "15": "MIZORAM",
+  "16": "TRIPURA",
+  "17": "MEGHALAYA",
+  "18": "ASSAM",
+  "19": "WEST BENGAL",
+  "20": "JHARKHAND",
+  "21": "ODISHA",
+  "22": "CHHATTISGARH",
+  "23": "MADHYA PRADESH",
+  "24": "GUJARAT",
+  "25": "DAMAN AND DIU",
+  "26": "DADRA AND NAGAR HAVELI",
+  "27": "MAHARASHTRA",
+  "29": "KARNATAKA",
+  "30": "GOA",
+  "31": "LAKSHADWEEP",
+  "32": "KERALA",
+  "33": "TAMIL NADU",
+  "34": "PUDUCHERRY",
+  "35": "ANDAMAN AND NICOBAR ISLANDS",
+  "36": "TELANGANA",
+  "37": "ANDHRA PRADESH",
+  "38": "LADAKH",
+};
+const GST_STATE_OPTIONS = Array.from(new Set(Object.values(GST_STATE_BY_CODE))).sort();
 const marketplaces = [
   { id: "overall", label: "Overall" },
   { id: "meesho", label: "Meesho" },
@@ -326,6 +366,9 @@ const gstCopy = {
     intro: "Upload Meesho reports to calculate B2C sales, HSN summary, document counts, and ECO values for GSTR-1.",
     docsTitle: "Meesho required documents",
     docsHelp: "Download these reports from Meesho Supplier Panel. GST Report ZIP is mandatory; Tax Invoice ZIP is needed for Table 13 document series.",
+    homeStateLabel: "Seller home GST state",
+    homeStateHelp: "Used to split local B2C supplies into CGST/SGST and interstate supplies into IGST. If you leave it blank, the tool tries to infer it from seller GSTIN in the uploaded report.",
+    homeStateAuto: "Auto from report",
     gstReport: "GST Report ZIP",
     gstReportHint: "gst_...zip with tcs_sales.xlsx and tcs_sales_return.xlsx",
     gstReportHelp: "Mandatory Meesho GST report. It contains sales and sales-return sheets used for Table 7 and HSN values.",
@@ -342,7 +385,7 @@ const gstCopy = {
     moduleHelp: "These calculations are helpers. Please review numbers before filing on the GST portal.",
     checks: [
       "Calculates net taxable value after deducting returns from sales.",
-      "Splits Rajasthan supplies into CGST/SGST and other states into IGST.",
+      "Splits local supplies into CGST/SGST and interstate supplies into IGST using the seller home state.",
       "Builds row-wise values for the B2C HSN Summary.",
       "Uses tax invoice details to calculate Table 13 document counts.",
       "Prepares the Meesho net value for Table 14 ECO u/s 52.",
@@ -357,6 +400,9 @@ const gstCopy = {
     intro: "मीशो रिपोर्ट्स अपलोड करो और GSTR-1 पोर्टल के लिए B2C सेल्स, HSN summary, document counts और ECO values निकालो.",
     docsTitle: "मीशो required documents",
     docsHelp: "ये रिपोर्ट्स मीशो Supplier Panel से डाउनलोड करो. जीएसटी Report ZIP mandatory है; Tax Invoice ZIP Table 13 document series के लिए चाहिए.",
+    homeStateLabel: "Seller home GST state",
+    homeStateHelp: "Local B2C supplies को CGST/SGST और interstate supplies को IGST में split करने के लिए use होता है. Blank छोड़ने पर tool uploaded report में seller GSTIN से state infer करने की कोशिश करता है.",
+    homeStateAuto: "Report से auto",
     gstReport: "जीएसटी Report ZIP",
     gstReportHint: "gst_...zip जिसमें tcs_sales.xlsx और tcs_sales_return.xlsx होती हैं",
     gstReportHelp: "Mandatory मीशो जीएसटी report. इसमें सेल्स और सेल्स-रिटर्न sheets होती हैं जो Table 7 और HSN values के लिए use होती हैं.",
@@ -373,7 +419,7 @@ const gstCopy = {
     moduleHelp: "ये calculations helpers हैं. GST portal पर file करने से पहले numbers review करो.",
     checks: [
       "सेल्स से रिटर्न deduct करके net taxable value calculate करता है.",
-      "Rajasthan supplies को CGST/SGST और other states को IGST में split करता है.",
+      "Seller home state के हिसाब से local supplies को CGST/SGST और interstate supplies को IGST में split करता है.",
       "B2C HSN Summary के लिए row-wise values बनाता है.",
       "Tax invoice details से Table 13 document counts calculate करता है.",
       "Table 14 ECO u/s 52 के लिए मीशो net value prepare करता है.",
@@ -816,6 +862,29 @@ function parseNumberish(value) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function normalizeStateName(value) {
+  return String(value || "").trim().toUpperCase();
+}
+
+function stateFromGstin(value) {
+  const gstin = String(value || "").trim().toUpperCase();
+  if (!/^[0-9]{2}[A-Z0-9]{13}$/.test(gstin)) return "";
+  return GST_STATE_BY_CODE[gstin.slice(0, 2)] || "";
+}
+
+function inferHomeStateFromRows(rows) {
+  const preferredKeys = ["seller", "supplier", "gstin", "gst_in", "gst"];
+  for (const row of rows) {
+    for (const [key, value] of Object.entries(row || {})) {
+      const normalizedKey = String(key).toLowerCase();
+      if (!preferredKeys.some((part) => normalizedKey.includes(part))) continue;
+      const state = stateFromGstin(value);
+      if (state) return state;
+    }
+  }
+  return "";
+}
+
 async function parseXlsxWorkbook(buffer) {
   const zip = await JSZip.loadAsync(buffer);
   const shared = await sharedStrings(zip);
@@ -907,8 +976,11 @@ async function parseMeeshoTaxInvoice(file) {
   return rowsToObjects(workbook.Invoice_Info || Object.values(workbook)[0] || []);
 }
 
-function summarizeMeeshoGst(gstReport, docsRows = []) {
+function summarizeMeeshoGst(gstReport, docsRows = [], selectedHomeState = "") {
   if (!gstReport?.sales?.length) return null;
+  const inferredHomeState = inferHomeStateFromRows([...gstReport.sales, ...gstReport.returns]);
+  const homeState = normalizeStateName(selectedHomeState || inferredHomeState || DEFAULT_HOME_STATE);
+  const homeStateSource = selectedHomeState ? "manual selection" : inferredHomeState ? "report GSTIN" : "default setting";
   const stateMap = new Map();
   const hsnMap = new Map();
   const ensure = (map, key, seed) => {
@@ -917,7 +989,7 @@ function summarizeMeeshoGst(gstReport, docsRows = []) {
   };
   const addRows = (rows, sign, bucket) => {
     rows.forEach((row) => {
-      const state = String(row.end_customer_state_new || "UNKNOWN").trim().toUpperCase();
+      const state = normalizeStateName(row.end_customer_state_new || "UNKNOWN");
       const hsn = String(row.hsn_code || "UNKNOWN").trim();
       const taxable = parseNumberish(row.total_taxable_sale_value);
       const tax = parseNumberish(row.tax_amount);
@@ -933,7 +1005,7 @@ function summarizeMeeshoGst(gstReport, docsRows = []) {
       hsnItem.qty += sign * qty;
       hsnItem.totalValue += sign * invoice;
       hsnItem.taxable += sign * taxable;
-      if (state === HOME_STATE) {
+      if (state === homeState) {
         hsnItem.cgst += sign * tax / 2;
         hsnItem.sgst += sign * tax / 2;
       } else {
@@ -948,7 +1020,7 @@ function summarizeMeeshoGst(gstReport, docsRows = []) {
   const totals = states.reduce((sum, row) => {
     sum.taxable += row.net;
     sum.tax += row.tax;
-    if (row.state === HOME_STATE) {
+    if (row.state === homeState) {
       sum.cgst += row.tax / 2;
       sum.sgst += row.tax / 2;
     } else {
@@ -974,7 +1046,7 @@ function summarizeMeeshoGst(gstReport, docsRows = []) {
     from: sortInvoiceSeries(invoices)[0] || "",
     to: sortInvoiceSeries(invoices).at(-1) || "",
   }));
-  return { states, hsn, totals, gross, returns, rows: { sales: gstReport.sales.length, returns: gstReport.returns.length, matchedReturns, returnIds: returnIds.size }, docSummary };
+  return { states, hsn, totals, gross, returns, homeState, homeStateSource, rows: { sales: gstReport.sales.length, returns: gstReport.returns.length, matchedReturns, returnIds: returnIds.size }, docSummary };
 }
 
 function sortInvoiceSeries(values) {
@@ -2132,6 +2204,7 @@ function GstAnalysis({ lang }) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState(null);
+  const [homeState, setHomeState] = useState("");
 
   const onFile = async (key, file) => {
     setFiles((state) => ({ ...state, [key]: file }));
@@ -2155,10 +2228,11 @@ function GstAnalysis({ lang }) {
       if (!files.gstReport) throw new Error("Meesho GST Report ZIP is required.");
       const gstReport = await parseMeeshoGstReport(files.gstReport);
       const docsRows = files.taxInvoice ? await parseMeeshoTaxInvoice(files.taxInvoice) : [];
-      setResult(summarizeMeeshoGst(gstReport, docsRows));
+      setResult(summarizeMeeshoGst(gstReport, docsRows, homeState));
       trackEvent("gst_analysis_complete", {
         marketplace: platform,
         has_tax_invoice: Boolean(files.taxInvoice),
+        home_state: homeState || "auto",
       });
     } catch (err) {
       setError(err.message || "GST analysis failed.");
@@ -2181,6 +2255,13 @@ function GstAnalysis({ lang }) {
       <section className="gst-layout">
         <div className="gst-upload-panel">
           <h2>{t.docsTitle} <HelpTip text={t.docsHelp} /></h2>
+          <label className="state-field">
+            <span className="field-title"><span>{t.homeStateLabel}</span> <HelpTip text={t.homeStateHelp} /></span>
+            <select value={homeState} onChange={(event) => setHomeState(event.target.value)}>
+              <option value="">{t.homeStateAuto}</option>
+              {GST_STATE_OPTIONS.map((state) => <option key={state} value={state}>{state}</option>)}
+            </select>
+          </label>
           <DocUpload title={t.gstReport} hint={t.gstReportHint} help={t.gstReportHelp} requiredLabel={t.required} file={files.gstReport} onFile={(file) => onFile("gstReport", file)} required />
           <DocUpload title={t.taxInvoice} hint={t.taxInvoiceHint} help={t.taxInvoiceHelp} requiredLabel={t.required} file={files.taxInvoice} onFile={(file) => onFile("taxInvoice", file)} required />
           <DocUpload title={t.supplierInvoice} hint={t.supplierInvoiceHint} help={t.supplierInvoiceHelp} requiredLabel={t.required} file={files.supplierInvoice} onFile={(file) => onFile("supplierInvoice", file)} />
@@ -2229,9 +2310,9 @@ function GstResult({ result }) {
     state: row.state,
     rate: 18,
     taxable: row.net,
-    igst: row.state === HOME_STATE ? 0 : row.tax,
-    cgst: row.state === HOME_STATE ? row.tax / 2 : 0,
-    sgst: row.state === HOME_STATE ? row.tax / 2 : 0,
+    igst: row.state === result.homeState ? 0 : row.tax,
+    cgst: row.state === result.homeState ? row.tax / 2 : 0,
+    sgst: row.state === result.homeState ? row.tax / 2 : 0,
     cess: 0,
   }));
   const table14 = {
@@ -2254,7 +2335,7 @@ function GstResult({ result }) {
 
       <section className="portal-card">
         <h2>Table 7 - B2C Others</h2>
-        <p>Add these rows state-wise in the portal. Rajasthan is reported as CGST/SGST; all other states are reported as IGST.</p>
+        <p>Add these rows state-wise in the portal. Local supplies for seller home state ({result.homeState}) are reported as CGST/SGST; other states are reported as IGST. Home state source: {result.homeStateSource}.</p>
         <CompactTable rows={table7Rows} columns={["state", "rate", "taxable", "igst", "cgst", "sgst", "cess"]} />
       </section>
 

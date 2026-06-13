@@ -715,8 +715,9 @@ main {
 }
 
 .help-tip-icon {
-  display: inline-grid;
-  place-items: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 18px;
   height: 18px;
   border-radius: 999px;
@@ -724,6 +725,8 @@ main {
   color: #0369a1;
   font-size: 12px;
   font-weight: 950;
+  line-height: 18px;
+  text-align: center;
   cursor: help;
 }
 
@@ -771,6 +774,27 @@ main {
 .doc-upload .field-title em {
   flex: 0 0 auto;
   margin-left: 0;
+}
+
+.state-field {
+  display: grid;
+  gap: 9px;
+  padding: 15px 17px;
+  border: 1px solid #d9e6f4;
+  border-radius: 8px;
+  background: #f8fbff;
+}
+
+.state-field select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 13px;
+  border: 1px solid #cbd8e8;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #17324d;
+  font: inherit;
+  font-weight: 800;
 }
 
 .module-header h1 .help-tip-wrap,
@@ -2612,9 +2636,16 @@ tr:nth-child(even) td {
 .theme-dark .mini-row,
 .theme-dark .summary-main,
 .theme-dark .summary-split > div,
-.theme-dark .note-box {
+.theme-dark .note-box,
+.theme-dark .state-field {
   background: #111c2e;
   border-color: #2f4058;
+}
+
+.theme-dark .state-field select {
+  background: #172033;
+  border-color: #2f4058;
+  color: #eef6ff;
 }
 
 .theme-dark .search-pill input {
