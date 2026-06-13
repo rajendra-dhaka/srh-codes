@@ -1409,9 +1409,21 @@ main {
   padding: 7px;
 }
 
+.mock-thermal {
+  width: min(190px, 72%);
+  aspect-ratio: 2 / 3;
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 14px 32px rgba(23, 50, 77, 0.14);
+}
+
 .mock-grid span,
 .mock-split span,
-.mock-doc-pair span {
+.mock-doc-pair span,
+.mock-thermal span {
   display: grid;
   place-items: center;
   border: 1px dashed #9db2cb;
@@ -2678,6 +2690,7 @@ tr:nth-child(even) td {
 .theme-dark .label-mock,
 .theme-dark .mock-grid,
 .theme-dark .mock-split,
+.theme-dark .mock-thermal,
 .theme-dark .mini-metric,
 .theme-dark .mini-row,
 .theme-dark .summary-main,
@@ -2777,7 +2790,8 @@ tr:nth-child(even) td {
 
 .theme-dark .mock-grid span,
 .theme-dark .mock-split span,
-.theme-dark .mock-doc-pair span {
+.theme-dark .mock-doc-pair span,
+.theme-dark .mock-thermal span {
   background: #172033;
   border-color: #2f4058;
   color: #cbd5e1;

@@ -326,15 +326,20 @@ const labelCopy = {
     uploadHelp: "Select the label PDF downloaded from your marketplace seller panel. The current workflow processes it locally in the browser.",
     uploadFallback: "The PDF stays in your browser and is not uploaded to a server.",
     uploadLabel: (platform) => `Upload a ${marketLabel(platform)} label PDF`,
+    printerLabel: "Printer type",
+    normalPrinter: "Normal page printer",
+    thermalPrinter: "Thermal 4x6 printer",
     layoutLabel: "Labels per A4 page",
     flipkartWorkflowNote: "Shipping and billing pages are detected with the standard Flipkart label layout.",
     createMeesho: (count) => `Create ${count}-up PDF`,
+    createThermal: "Create thermal PDF",
     splitFlipkart: "Split and crop PDF",
     meeshoOutput: "Meesho output",
     flipkartOutput: "Flipkart output",
     shippingPdf: "Shipping PDF",
     billingPdf: "Billing PDF 4x6",
     checkMeesho: (count) => `Every ${count} input pages are fitted onto one A4 output page with compact spacing.`,
+    checkThermal: "Each Meesho page is cropped to remove blank space and fitted onto one 4x6 thermal label page.",
     checkFlipkart: "Each original page is cropped into one shipping page and one 4x6 portrait billing page.",
     privateCheck: "The original PDF does not leave your browser.",
     downloadCheck: "Generated PDFs are downloaded directly from the browser.",
@@ -347,15 +352,20 @@ const labelCopy = {
     uploadHelp: "सेलर पैनल से डाउनलोड किया हुआ लेबल PDF सेलेक्ट करो. Current workflow PDF को ब्राउज़र में locally प्रोसेस करता है.",
     uploadFallback: "PDF आपके ब्राउज़र में रहती है और सर्वर पर अपलोड नहीं होती.",
     uploadLabel: (platform) => `${marketLabel(platform)} लेबल PDF अपलोड करो`,
+    printerLabel: "Printer type",
+    normalPrinter: "Normal page printer",
+    thermalPrinter: "Thermal 4x6 printer",
     layoutLabel: "A4 page पर labels",
     flipkartWorkflowNote: "Shipping और billing pages standard Flipkart label layout से detect होते हैं.",
     createMeesho: (count) => `${count}-up PDF क्रिएट करो`,
+    createThermal: "Thermal PDF क्रिएट करो",
     splitFlipkart: "PDF split और crop करो",
     meeshoOutput: "मीशो आउटपुट",
     flipkartOutput: "फ्लिपकार्ट आउटपुट",
     shippingPdf: "शिपिंग PDF",
     billingPdf: "बिलिंग PDF 4x6",
     checkMeesho: (count) => `हर ${count} input pages compact spacing के साथ एक A4 output page पर fit होते हैं.`,
+    checkThermal: "हर मीशो page का blank space crop करके उसे एक 4x6 thermal label page पर fit करता है.",
     checkFlipkart: "हर original page से एक शिपिंग page और एक 4x6 portrait बिलिंग page crop होता है.",
     privateCheck: "Original PDF ब्राउज़र से बाहर नहीं जाती.",
     downloadCheck: "Generated PDFs direct ब्राउज़र से डाउनलोड होते हैं.",
@@ -1763,6 +1773,7 @@ function actionTips(a, lang) {
 }
 
 const A4 = { width: 595, height: 842 };
+const THERMAL_4X6 = { width: 288, height: 432 };
 
 async function readPdf(file) {
   const source = await PDFDocument.load(await file.arrayBuffer(), { ignoreEncryption: true });
@@ -1799,12 +1810,7 @@ async function buildMeeshoLayout(file, labelsPerPage = 4) {
       if (!sourcePage) continue;
       const { width, height } = sourcePage.getSize();
       const cropBox = layout.cropBottomWhitespace
-        ? {
-            left: width * 0.012,
-            bottom: height * 0.24,
-            right: width * 0.988,
-            top: height * 0.992,
-          }
+        ? meeshoFilledCropBox(width, height)
         : null;
       const embedded = cropBox ? await output.embedPage(sourcePage, cropBox) : await output.embedPage(sourcePage);
       const croppedWidth = cropBox ? cropBox.right - cropBox.left : width;
@@ -1835,6 +1841,43 @@ async function buildMeeshoLayout(file, labelsPerPage = 4) {
       }
     }
   }
+  return output.save();
+}
+
+function meeshoFilledCropBox(width, height) {
+  return {
+    left: width * 0.012,
+    bottom: height * 0.24,
+    right: width * 0.988,
+    top: height * 0.992,
+  };
+}
+
+async function buildMeeshoThermal(file) {
+  const source = await PDFDocument.load(await file.arrayBuffer(), { ignoreEncryption: true });
+  const output = await PDFDocument.create();
+
+  for (const sourcePage of source.getPages()) {
+    const { width, height } = sourcePage.getSize();
+    const cropBox = meeshoFilledCropBox(width, height);
+    const embedded = await output.embedPage(sourcePage, cropBox);
+    const page = output.addPage([THERMAL_4X6.width, THERMAL_4X6.height]);
+    const margin = 6;
+    const availableWidth = THERMAL_4X6.width - margin * 2;
+    const availableHeight = THERMAL_4X6.height - margin * 2;
+    const croppedWidth = cropBox.right - cropBox.left;
+    const croppedHeight = cropBox.top - cropBox.bottom;
+    const scale = Math.min(availableWidth / croppedWidth, availableHeight / croppedHeight);
+    const drawWidth = croppedWidth * scale;
+    const drawHeight = croppedHeight * scale;
+    page.drawPage(embedded, {
+      x: margin + (availableWidth - drawWidth) / 2,
+      y: margin + (availableHeight - drawHeight) / 2,
+      width: drawWidth,
+      height: drawHeight,
+    });
+  }
+
   return output.save();
 }
 
@@ -2064,6 +2107,7 @@ function LabelFormatTool() {
   const { lang } = useLanguage();
   const t = labelCopy[lang] || labelCopy.en;
   const [platform, setPlatform] = useState("meesho");
+  const [meeshoPrintMode, setMeeshoPrintMode] = useState("normal");
   const [meeshoLayout, setMeeshoLayout] = useState(4);
   const [file, setFile] = useState(null);
   const [meta, setMeta] = useState(null);
@@ -2102,13 +2146,15 @@ function LabelFormatTool() {
     try {
       trackEvent("label_process_start", {
         platform,
-        split_mode: platform === "flipkart" ? "standard_shipping_billing" : `${meeshoLayout}_up`,
+        split_mode: platform === "flipkart" ? "standard_shipping_billing" : meeshoPrintMode === "thermal" ? "thermal_4x6" : `${meeshoLayout}_up`,
       });
       if (platform === "meesho") {
-        const bytes = await buildMeeshoLayout(file, meeshoLayout);
+        const bytes = meeshoPrintMode === "thermal"
+          ? await buildMeeshoThermal(file)
+          : await buildMeeshoLayout(file, meeshoLayout);
         setOutputs([{
-          label: `Meesho ${meeshoLayout}-up A4 PDF`,
-          filename: `meesho-labels-${meeshoLayout}-up.pdf`,
+          label: meeshoPrintMode === "thermal" ? "Meesho thermal 4x6 PDF" : `Meesho ${meeshoLayout}-up A4 PDF`,
+          filename: meeshoPrintMode === "thermal" ? "meesho-labels-thermal-4x6.pdf" : `meesho-labels-${meeshoLayout}-up.pdf`,
           bytes,
         }]);
       } else if (platform === "flipkart") {
@@ -2123,7 +2169,7 @@ function LabelFormatTool() {
       setToast("PDF ready. Download buttons are visible here.");
       trackEvent("label_process_complete", {
         platform,
-        split_mode: platform === "flipkart" ? "standard_shipping_billing" : `${meeshoLayout}_up`,
+        split_mode: platform === "flipkart" ? "standard_shipping_billing" : meeshoPrintMode === "thermal" ? "thermal_4x6" : `${meeshoLayout}_up`,
       });
     } catch (err) {
       setError(err.message || "PDF process failed.");
@@ -2173,23 +2219,45 @@ function LabelFormatTool() {
           )}
 
           {platform === "meesho" && (
-            <label className="layout-select">
-              <span>{t.layoutLabel}</span>
-              <select value={meeshoLayout} onChange={(event) => {
-                const nextLayout = Number(event.target.value);
-                setMeeshoLayout(nextLayout);
-                setOutputs(null);
-                trackEvent("label_layout_select", { platform: "meesho", labels_per_page: nextLayout });
-              }}>
-                <option value={4}>4 labels</option>
-                <option value={6}>6 labels</option>
-              </select>
-            </label>
+            <>
+              <label className="layout-select">
+                <span>{t.printerLabel}</span>
+                <select value={meeshoPrintMode} onChange={(event) => {
+                  const nextMode = event.target.value;
+                  setMeeshoPrintMode(nextMode);
+                  setOutputs(null);
+                  trackEvent("label_printer_mode_select", { platform: "meesho", printer_mode: nextMode });
+                }}>
+                  <option value="normal">{t.normalPrinter}</option>
+                  <option value="thermal">{t.thermalPrinter}</option>
+                </select>
+              </label>
+              {meeshoPrintMode === "normal" && (
+                <label className="layout-select">
+                  <span>{t.layoutLabel}</span>
+                  <select value={meeshoLayout} onChange={(event) => {
+                    const nextLayout = Number(event.target.value);
+                    setMeeshoLayout(nextLayout);
+                    setOutputs(null);
+                    trackEvent("label_layout_select", { platform: "meesho", labels_per_page: nextLayout });
+                  }}>
+                    <option value={4}>4 labels</option>
+                    <option value={6}>6 labels</option>
+                  </select>
+                </label>
+              )}
+            </>
+          )}
+
+          {platform === "meesho" && meeshoPrintMode === "thermal" && (
+            <div className="workflow-note">
+              {t.checkThermal}
+            </div>
           )}
 
           {error && <div className="error"><AlertTriangle size={18} />{error}</div>}
           <button className="primary-action label-process" onClick={process} disabled={busy}>
-            {busy ? "Processing..." : platform === "meesho" ? t.createMeesho(meeshoLayout) : t.splitFlipkart}
+            {busy ? "Processing..." : platform === "meesho" ? (meeshoPrintMode === "thermal" ? t.createThermal : t.createMeesho(meeshoLayout)) : t.splitFlipkart}
           </button>
           {outputs && (
             <div className="download-panel inline">
@@ -2220,11 +2288,15 @@ function LabelFormatTool() {
           <h2>{platform === "meesho" ? t.meeshoOutput : t.flipkartOutput}</h2>
           <div className="label-mock">
             {platform === "meesho" ? (
-              <div className={`mock-grid ${meeshoLayout === 6 ? "six-up" : ""}`}>
-                {Array.from({ length: meeshoLayout }, (_, index) => (
-                  <span key={index}>Label {index + 1}</span>
-                ))}
-              </div>
+              meeshoPrintMode === "thermal" ? (
+                <div className="mock-thermal"><span>Thermal 4x6</span></div>
+              ) : (
+                <div className={`mock-grid ${meeshoLayout === 6 ? "six-up" : ""}`}>
+                  {Array.from({ length: meeshoLayout }, (_, index) => (
+                    <span key={index}>Label {index + 1}</span>
+                  ))}
+                </div>
+              )
             ) : (
               <div className="mock-doc-pair">
                 <span>{t.shippingPdf}</span>
@@ -2233,7 +2305,7 @@ function LabelFormatTool() {
             )}
           </div>
           <div className="label-checklist">
-            <CheckLine text={platform === "meesho" ? t.checkMeesho(meeshoLayout) : t.checkFlipkart} />
+            <CheckLine text={platform === "meesho" ? (meeshoPrintMode === "thermal" ? t.checkThermal : t.checkMeesho(meeshoLayout)) : t.checkFlipkart} />
             <CheckLine text={t.privateCheck} />
             <CheckLine text={t.downloadCheck} />
           </div>
