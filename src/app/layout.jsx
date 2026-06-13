@@ -1,8 +1,9 @@
 import "./globals.css";
-import AdSense from "../components/AdSense";
 import GoogleAnalytics from "../components/GoogleAnalytics";
 import { LanguageProvider } from "../components/LanguageProvider";
 import { site, absoluteUrl } from "../lib/site";
+
+const adsenseClientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 
 export const metadata = {
   metadataBase: new URL(site.url),
@@ -68,10 +69,18 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        {adsenseClientId ? (
+          <script
+            async
+            crossOrigin="anonymous"
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`}
+          />
+        ) : null}
+      </head>
       <body>
         <LanguageProvider>{children}</LanguageProvider>
         <GoogleAnalytics measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
-        <AdSense clientId={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID} />
       </body>
     </html>
   );
