@@ -52,6 +52,10 @@ import {
 import { useLanguage } from "./LanguageProvider";
 import { trackEvent } from "../lib/analytics";
 
+if (typeof window !== "undefined") {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+}
+
 const palette = ["#2563eb", "#00a6a6", "#f59e0b", "#ef4444", "#7c3aed", "#16a34a", "#475569"];
 const DEFAULT_HOME_STATE = "RAJASTHAN";
 const GST_STATE_BY_CODE = {
@@ -381,9 +385,9 @@ const labelCopy = {
 const processingCopy = {
   en: {
     kicker: "Label Processing",
-    title: "Sort labels and generate picklists",
-    intro: "Upload one or more marketplace label PDFs, sort pages by courier partner, SKU, or seller account, and download a packing-ready PDF plus picklist.",
-    titleHelp: "Use this when multiple seller accounts or courier partners are packed together. The tool reads PDF text in your browser, sorts pages, and prepares packing counts.",
+    title: "Sort labels, print labels, and generate picklists",
+    intro: "Upload one or more marketplace label PDFs, sort pages by courier partner, SKU, or seller account, then download sorted label PDFs, print-ready formats, and packing picklists.",
+    titleHelp: "Use this when multiple seller accounts or courier partners are packed together. The tool reads PDF text in your browser, sorts pages, creates sorted label PDFs, and prepares packing counts.",
     uploadTitle: "Upload label PDFs",
     uploadHint: "Select multiple Meesho, Flipkart, or marketplace label PDFs",
     uploadHelp: "PDFs stay in your browser. Text extraction works when courier, SKU, and seller details are embedded as selectable text in the PDF.",
@@ -396,7 +400,7 @@ const processingCopy = {
     seller: "Seller account",
     analyze: "Analyze labels",
     analyzing: "Analyzing PDFs...",
-    downloadSorted: "Download sorted labels",
+    downloadSorted: "Download sorted label PDF",
     downloadPicklist: "Download picklist CSV",
     printLabels: "Print / format labels",
     choosePrint: "Choose print output",
@@ -411,14 +415,14 @@ const processingCopy = {
     skuCounts: "Top SKU counts",
     tableTitle: "Sorted label preview",
     unknown: "Unknown",
-    noData: "Upload label PDFs and click Analyze to create sorted labels and picklist.",
+    noData: "Upload label PDFs and click Analyze to create sorted label downloads, print PDFs, and picklist.",
     extractionNote: "If any page appears as Unknown, review the PDF source. Scanned/image-only labels may not expose text for automatic sorting.",
   },
   hi: {
     kicker: "लेबल प्रोसेसिंग",
-    title: "लेबल sort करो और picklist generate करो",
-    intro: "एक या multiple marketplace label PDFs upload करो, courier partner, SKU या seller account से pages sort करो, फिर packing-ready PDF और picklist download करो.",
-    titleHelp: "जब multiple seller accounts या courier partners साथ में pack होते हैं, तब use करो. Tool browser में PDF text read करके pages sort और packing counts prepare करता है.",
+    title: "लेबल sort करो, print करो और picklist generate करो",
+    intro: "एक या multiple marketplace label PDFs upload करो, courier partner, SKU या seller account से pages sort करो, फिर sorted label PDFs, print-ready formats और packing picklists download करो.",
+    titleHelp: "जब multiple seller accounts या courier partners साथ में pack होते हैं, तब use करो. Tool browser में PDF text read करके pages sort, sorted label PDF और packing counts prepare करता है.",
     uploadTitle: "लेबल PDFs upload करो",
     uploadHint: "Multiple मीशो, फ्लिपकार्ट या marketplace label PDFs select करो",
     uploadHelp: "PDFs browser में रहती हैं. Courier, SKU और seller details PDF में selectable text हों तो extraction work करता है.",
@@ -431,7 +435,7 @@ const processingCopy = {
     seller: "Seller account",
     analyze: "Labels analyze करो",
     analyzing: "PDFs analyze हो रही हैं...",
-    downloadSorted: "Sorted labels download",
+    downloadSorted: "Sorted label PDF download",
     downloadPicklist: "Picklist CSV download",
     printLabels: "Print / format labels",
     choosePrint: "Print output choose करो",
@@ -446,7 +450,7 @@ const processingCopy = {
     skuCounts: "Top SKU counts",
     tableTitle: "Sorted label preview",
     unknown: "Unknown",
-    noData: "Label PDFs upload करके Analyze click करो, फिर sorted labels और picklist बन जाएगी.",
+    noData: "Label PDFs upload करके Analyze click करो, फिर sorted label downloads, print PDFs और picklist बन जाएगी.",
     extractionNote: "अगर कोई page Unknown आए, PDF source review करो. Scanned/image-only labels automatic sorting के लिए text expose नहीं कर सकते.",
   },
 };

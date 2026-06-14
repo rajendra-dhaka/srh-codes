@@ -3,9 +3,9 @@ import HomeSeoContent from "../components/HomeSeoContent";
 import { absoluteUrl, site } from "../lib/site";
 
 export const metadata = {
-  title: "Free Flipkart Label Cropper, Meesho Label Sorting, Picklist and GST Tools",
+  title: "Free Flipkart Label Cropper, Meesho Sorted Labels, Picklist and GST Tools",
   description:
-    "Crop Flipkart shipping labels, create Meesho 4-up, 6-up and thermal 4x6 label PDFs, sort labels by courier and SKU, generate picklists, and analyze ecommerce seller GST and performance data.",
+    "Crop Flipkart shipping labels, create Meesho 4-up, 6-up and thermal 4x6 label PDFs, download courier-SKU sorted label PDFs, generate picklists, and analyze ecommerce seller GST and performance data.",
   alternates: {
     canonical: absoluteUrl("/"),
   },
@@ -32,6 +32,8 @@ function JsonLd() {
       "Meesho thermal 4x6 label PDF",
       "Courier-wise label sorting",
       "SKU-wise label sorting",
+      "Sorted label PDF download",
+      "Sorted label print formats",
       "Packing picklist generator",
       "Shipping and billing PDF split",
       "GST report summary",
