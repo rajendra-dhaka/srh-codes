@@ -342,6 +342,10 @@ const processingCopy = {
     analyze: "Process labels",
     analyzing: "Analyzing PDFs...",
     downloadLabels: "Labels PDF",
+    downloadShipping: "Shipping PDF",
+    downloadBilling: "Billing PDF",
+    printShipping: "Print shipping",
+    printBilling: "Print billing",
     printLabels: "Print labels",
     downloadPicklist: "Picklist PDF",
     courierGroups: "Courier-wise label actions",
@@ -357,7 +361,7 @@ const processingCopy = {
     a4Four: "A4 - 4 labels per page",
     a4Six: "A4 - 6 labels per page",
     summary: "Packing summary",
-    marketplacePending: (marketplace) => `${marketplace} label processing workflow is coming next. Use the Meesho tab for courier-wise labels, quantity groups, print PDFs, and picklist generation today.`,
+    marketplacePending: (marketplace) => `${marketplace} label processing workflow is coming next. Meesho and Flipkart tabs support courier-wise labels, quantity groups, print PDFs, and picklist generation today.`,
     courierCounts: "Courier pickup counts",
     sellerCounts: "Seller account counts",
     qtyCounts: "SKU and quantity picklist",
@@ -385,6 +389,10 @@ const processingCopy = {
     analyze: "Labels process करो",
     analyzing: "PDFs analyze हो रही हैं...",
     downloadLabels: "Labels PDF",
+    downloadShipping: "Shipping PDF",
+    downloadBilling: "Billing PDF",
+    printShipping: "Shipping print",
+    printBilling: "Billing print",
     printLabels: "Labels print",
     downloadPicklist: "Picklist PDF",
     courierGroups: "Courier-wise label actions",
@@ -400,7 +408,7 @@ const processingCopy = {
     a4Four: "A4 - 4 labels per page",
     a4Six: "A4 - 6 labels per page",
     summary: "Packing summary",
-    marketplacePending: (marketplace) => `${marketplace} label processing workflow next आएगा. अभी courier-wise labels, quantity groups, print PDFs और picklist generation के लिए Meesho tab use करो.`,
+    marketplacePending: (marketplace) => `${marketplace} label processing workflow next आएगा. अभी Meesho और Flipkart tabs courier-wise labels, quantity groups, print PDFs और picklist generation support करते हैं.`,
     courierCounts: "Courier pickup counts",
     sellerCounts: "Seller account counts",
     qtyCounts: "SKU और quantity picklist",
@@ -1886,6 +1894,7 @@ function detectCourierPartner(text) {
       return detected;
     }
   }
+  if (/\bFlipkart\b|\bFKMP\b|\bFMPP\b|\bE-Kart\b/i.test(compact)) return "Ekart";
 
   return UNKNOWN;
 }
@@ -1932,14 +1941,29 @@ function detectQty(text) {
 function parseProductDetails(text) {
   const compact = text.replace(/\s+/g, " ").trim();
   const match = compact.match(/Product\s*Details\s+SKU\s+Size\s+Qty\s+Color\s+Order\s*No\.?\s+([A-Z0-9][A-Z0-9._/-]{2,60})\s+(.+?)\s+(\d+)\s+([A-Z0-9 -]+?)\s+([0-9]{8,}(?:[_-]\d+)?)\b/i);
-  if (!match) return {};
-  return {
-    sku: cleanDetectedValue(match[1]).toUpperCase(),
-    size: cleanDetectedValue(match[2]),
-    qty: Number(match[3]) || 1,
-    color: cleanDetectedValue(match[4]),
-    orderId: match[5],
-  };
+  if (match) {
+    return {
+      sku: cleanDetectedValue(match[1]).toUpperCase(),
+      size: cleanDetectedValue(match[2]),
+      qty: Number(match[3]) || 1,
+      color: cleanDetectedValue(match[4]),
+      orderId: match[5],
+    };
+  }
+
+  const flipkartSku = compact.match(/SKU\s*ID\s*\|\s*Description\s+QTY\s+\d+\s+([A-Z0-9][A-Z0-9._/-]{2,80})\s*\|/i);
+  const flipkartQty = compact.match(/TOTAL\s+QTY\s*:\s*(\d+)/i)
+    || compact.match(/SKU\s*ID\s*\|\s*Description\s+QTY\s+\d+\s+[A-Z0-9][A-Z0-9._/-]{2,80}\s*\|.*?\s+(\d+)\s+(?:FMPP|OD|Tax\s+Invoice)\b/i);
+  const flipkartOrder = compact.match(/\bOrder\s*Id\s*:\s*([A-Z0-9-]{6,40})\b/i);
+  if (flipkartSku?.[1] || flipkartQty?.[1] || flipkartOrder?.[1]) {
+    return {
+      sku: flipkartSku?.[1] ? cleanDetectedValue(flipkartSku[1]).toUpperCase() : "",
+      qty: Number(flipkartQty?.[1]) || 1,
+      orderId: flipkartOrder?.[1] || "",
+    };
+  }
+
+  return {};
 }
 
 function cleanDetectedValue(value) {
@@ -1974,6 +1998,40 @@ async function buildOriginalSortedPdf(items) {
     const embedded = await output.embedPage(item.page);
     const page = output.addPage([width, height]);
     page.drawPage(embedded, { x: 0, y: 0, width, height });
+  }
+  return output.save();
+}
+
+async function addCroppedPage(output, sourcePage, cropBox, targetSize) {
+  const embedded = await output.embedPage(sourcePage, cropBox);
+  const page = output.addPage([targetSize.width, targetSize.height]);
+  const margin = 8;
+  const cropWidth = cropBox.right - cropBox.left;
+  const cropHeight = cropBox.top - cropBox.bottom;
+  const availableWidth = targetSize.width - margin * 2;
+  const availableHeight = targetSize.height - margin * 2;
+  const scale = Math.min(availableWidth / cropWidth, availableHeight / cropHeight);
+  const drawWidth = cropWidth * scale;
+  const drawHeight = cropHeight * scale;
+  page.drawPage(embedded, {
+    x: margin + (availableWidth - drawWidth) / 2,
+    y: margin + (availableHeight - drawHeight) / 2,
+    width: drawWidth,
+    height: drawHeight,
+  });
+}
+
+async function buildFlipkartCroppedPdf(items, kind) {
+  const output = await PDFDocument.create();
+  for (const item of items) {
+    const { width, height } = item.page.getSize();
+    const cropBox = kind === "billing"
+      ? { left: width * 0.03, bottom: height * 0.02, right: width * 0.97, top: height * 0.56 }
+      : { left: width * 0.28, bottom: height * 0.54, right: width * 0.72, top: height * 0.98 };
+    const targetSize = kind === "billing"
+      ? { width: 288, height: 432 }
+      : A4;
+    await addCroppedPage(output, item.page, cropBox, targetSize);
   }
   return output.save();
 }
@@ -2411,7 +2469,7 @@ function LabelProcessingTool() {
     }
   };
 
-  const runOutputAction = async (rows, action, scopeName, subsetName) => {
+  const runOutputAction = async (rows, action, scopeName, subsetName, outputKind = "labels") => {
     if (!rows.length) return;
     setBusy(true);
     setError("");
@@ -2425,11 +2483,15 @@ function LabelProcessingTool() {
         saveBytes(bytes, filename);
         setToast(`${filename} downloaded.`);
       } else {
-        const bytes = await buildOriginalSortedPdf(sorted);
-        const filename = `${scope}-${subset}-labels.pdf`;
+        const bytes = platform === "flipkart" && outputKind !== "labels"
+          ? await buildFlipkartCroppedPdf(sorted, outputKind)
+          : await buildOriginalSortedPdf(sorted);
+        const filename = platform === "flipkart" && outputKind !== "labels"
+          ? `${scope}-${subset}-${outputKind}.pdf`
+          : `${scope}-${subset}-labels.pdf`;
         if (action === "print") {
           printPdfBytes(bytes);
-          setToast(`${scopeName} ${subsetName} labels opened for printing.`);
+          setToast(`${scopeName} ${subsetName} ${outputKind} opened for printing.`);
         } else {
           saveBytes(bytes, filename);
           setToast(`${filename} downloaded.`);
@@ -2439,6 +2501,7 @@ function LabelProcessingTool() {
         action,
         scope: scopeName,
         subset: subsetName,
+        output_kind: outputKind,
         label_count: rows.length,
       });
     } catch (err) {
@@ -2485,6 +2548,9 @@ function LabelProcessingTool() {
                 marketplace: id,
               });
               setPlatform(id);
+              setFiles([]);
+              setItems([]);
+              setOutputs(null);
               setError("");
               setToast("");
             }}>{marketLabel(id)}</button>
@@ -2492,7 +2558,7 @@ function LabelProcessingTool() {
         </div>
       </div>
 
-      {platform !== "meesho" ? (
+      {platform === "amazon" ? (
         <section className="portal-card">
           <h2>{marketLabel(platform)} Label Processing</h2>
           <div className="placeholder compact">
@@ -2515,7 +2581,7 @@ function LabelProcessingTool() {
             {busy ? t.analyzing : t.analyze}
           </button>
 
-          {outputs && sortedItems.length ? (
+          {platform === "meesho" && outputs && sortedItems.length ? (
             <div className="download-panel inline">
               <h2>{t.formattedDownloads}</h2>
               <div className="download-grid">
@@ -2555,7 +2621,7 @@ function LabelProcessingTool() {
       </section>
       )}
 
-      {platform === "meesho" && sortedItems.length ? (
+      {["meesho", "flipkart"].includes(platform) && sortedItems.length ? (
         <section className="portal-card courier-actions-panel">
           <h2>{t.courierGroups}</h2>
           <CourierActionCard
@@ -2563,6 +2629,7 @@ function LabelProcessingTool() {
             rows={sortedItems}
             t={t}
             busy={busy}
+            platform={platform}
             featured
             onAction={runOutputAction}
           />
@@ -2574,6 +2641,7 @@ function LabelProcessingTool() {
                 rows={group.rows}
                 t={t}
                 busy={busy}
+                platform={platform}
                 onAction={runOutputAction}
               />
             ))}
@@ -2581,7 +2649,7 @@ function LabelProcessingTool() {
         </section>
       ) : null}
 
-      {platform === "meesho" && sortedItems.length ? (
+      {["meesho", "flipkart"].includes(platform) && sortedItems.length ? (
         <section className="portal-card">
           <h2>{t.tableTitle}</h2>
           <CompactTable
@@ -2604,7 +2672,7 @@ function LabelProcessingTool() {
   );
 }
 
-function CourierActionCard({ title, rows, t, busy, onAction, featured = false }) {
+function CourierActionCard({ title, rows, t, busy, onAction, platform, featured = false }) {
   const groups = splitByQuantity(rows);
   const options = [
     { key: "single", label: t.singleQty, rows: groups.single },
@@ -2628,12 +2696,31 @@ function CourierActionCard({ title, rows, t, busy, onAction, featured = false })
             <strong>{option.label}</strong>
             <small>{option.rows.length ? `${option.rows.length} labels` : t.noSubset}</small>
             <div className="mini-action-row">
-              <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "download", title, option.label)}>
-                <Download size={15} /> {t.downloadLabels}
-              </button>
-              <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "print", title, option.label)}>
-                <Printer size={15} /> {t.printLabels}
-              </button>
+              {platform === "flipkart" ? (
+                <>
+                  <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "download", title, option.label, "shipping")}>
+                    <Download size={15} /> {t.downloadShipping}
+                  </button>
+                  <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "download", title, option.label, "billing")}>
+                    <Download size={15} /> {t.downloadBilling}
+                  </button>
+                  <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "print", title, option.label, "shipping")}>
+                    <Printer size={15} /> {t.printShipping}
+                  </button>
+                  <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "print", title, option.label, "billing")}>
+                    <Printer size={15} /> {t.printBilling}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "download", title, option.label)}>
+                    <Download size={15} /> {t.downloadLabels}
+                  </button>
+                  <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "print", title, option.label)}>
+                    <Printer size={15} /> {t.printLabels}
+                  </button>
+                </>
+              )}
               <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "picklist", title, option.label)}>
                 <ClipboardList size={15} /> {t.downloadPicklist}
               </button>
