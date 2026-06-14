@@ -1873,7 +1873,21 @@ async function extractLabelPages(files) {
 
 function detectCourierPartner(text) {
   const match = courierMatchers.find(([, pattern]) => pattern.test(text));
-  return match?.[0] || UNKNOWN;
+  if (match?.[0]) return match[0];
+
+  const compact = text.replace(/\s+/g, " ").trim();
+  const fallbackPatterns = [
+    /(?:Courier|Courier\s*Partner|Logistics\s*Partner|Delivery\s*Partner)\s*[:\-]?\s*([A-Z][A-Z0-9 &.-]{2,35})/i,
+    /(?:COD|Prepaid)\s*[:\-]?\s*(?:Check\s*the\s*payable\s*amount\s*on\s*the\s*app\s*)?([A-Z][A-Z0-9 &.-]{2,35})/i,
+  ];
+  for (const pattern of fallbackPatterns) {
+    const detected = cleanDetectedValue(compact.match(pattern)?.[1]);
+    if (detected && detected !== UNKNOWN && !/^(CHECK|PAYABLE|AMOUNT|CUSTOMER|PRODUCT|ORDER)$/i.test(detected)) {
+      return detected;
+    }
+  }
+
+  return UNKNOWN;
 }
 
 function detectSellerAccount(text, fileName) {
@@ -1940,7 +1954,7 @@ function cleanDetectedValue(value) {
 }
 
 function sortKey(value) {
-  return value && value !== UNKNOWN ? value : "ZZZ_UNKNOWN";
+  return value && value !== UNKNOWN ? String(value) : "ZZZ_UNKNOWN";
 }
 
 function sortForPacking(items) {
