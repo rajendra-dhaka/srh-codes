@@ -401,9 +401,14 @@ const processingCopy = {
     analyze: "Analyze labels",
     analyzing: "Analyzing PDFs...",
     downloadSorted: "Download sorted label PDF",
+    downloadCourierSorted: "Download courier-wise label PDFs",
+    courierZipHint: "ZIP with one PDF per courier",
     downloadPicklist: "Download picklist PDF",
     printLabels: "Print / format labels",
     choosePrint: "Choose print output",
+    printGrouping: "Output grouping",
+    printCombined: "One combined PDF",
+    printCourierWise: "Separate PDFs by courier (ZIP)",
     original: "Original sorted pages",
     a4Four: "A4 - 4 labels per page",
     a4Six: "A4 - 6 labels per page",
@@ -438,9 +443,14 @@ const processingCopy = {
     analyze: "Labels analyze करो",
     analyzing: "PDFs analyze हो रही हैं...",
     downloadSorted: "Sorted label PDF download",
+    downloadCourierSorted: "Courier-wise label PDFs download",
+    courierZipHint: "हर courier की अलग PDF वाली ZIP",
     downloadPicklist: "Picklist PDF download",
     printLabels: "Print / format labels",
     choosePrint: "Print output choose करो",
+    printGrouping: "Output grouping",
+    printCombined: "One combined PDF",
+    printCourierWise: "Courier-wise separate PDFs (ZIP)",
     original: "Original sorted pages",
     a4Four: "A4 - 4 labels per page",
     a4Six: "A4 - 6 labels per page",
@@ -2198,6 +2208,53 @@ async function buildPicklistPdf(items, mode = "none") {
   return output.save();
 }
 
+function safeFilename(value) {
+  return String(value || UNKNOWN)
+    .trim()
+    .replace(/[^a-z0-9]+/gi, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 48)
+    .toLowerCase() || "unknown";
+}
+
+function groupItemsByCourier(items) {
+  const groups = new Map();
+  for (const item of items) {
+    const courier = item.courier || UNKNOWN;
+    if (!groups.has(courier)) groups.set(courier, []);
+    groups.get(courier).push(item);
+  }
+  return Array.from(groups, ([courier, rows]) => ({ courier, rows }))
+    .sort((a, b) => sortKey(a.courier).localeCompare(sortKey(b.courier), "en", { numeric: true }));
+}
+
+async function buildCourierLabelZip(items) {
+  const zip = new JSZip();
+  const groups = groupItemsByCourier(items);
+  for (const group of groups) {
+    const bytes = await buildOriginalSortedPdf(group.rows);
+    zip.file(`${safeFilename(group.courier)}-sorted-labels.pdf`, bytes);
+  }
+  return zip.generateAsync({ type: "uint8array" });
+}
+
+async function buildCourierPrintZip(items, printFormat) {
+  const zip = new JSZip();
+  const groups = groupItemsByCourier(items);
+  for (const group of groups) {
+    const pages = group.rows.map((item) => item.page);
+    const bytes = printFormat === "original"
+      ? await buildOriginalSortedPdf(group.rows)
+      : printFormat === "a4-4"
+        ? await buildMeeshoLayoutFromPages(pages, 4)
+        : printFormat === "a4-6"
+          ? await buildMeeshoLayoutFromPages(pages, 6)
+          : await buildMeeshoThermalFromPages(pages);
+    zip.file(`${safeFilename(group.courier)}-${printFormat}-labels.pdf`, bytes);
+  }
+  return zip.generateAsync({ type: "uint8array" });
+}
+
 async function buildFlipkartSplit(file, splitMode) {
   const source = await PDFDocument.load(await file.arrayBuffer(), { ignoreEncryption: true });
   const shipping = await PDFDocument.create();
@@ -2231,14 +2288,22 @@ async function addCroppedPage(output, sourcePage, box, targetSize) {
   });
 }
 
-function saveBytes(bytes, filename) {
-  const blob = new Blob([bytes], { type: "application/pdf" });
+function saveBlobBytes(bytes, filename, type) {
+  const blob = new Blob([bytes], { type });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
   link.download = filename;
   link.click();
   URL.revokeObjectURL(url);
+}
+
+function saveBytes(bytes, filename) {
+  saveBlobBytes(bytes, filename, "application/pdf");
+}
+
+function saveZip(bytes, filename) {
+  saveBlobBytes(bytes, filename, "application/zip");
 }
 
 function pdfSizeLabel(meta) {
@@ -2655,6 +2720,7 @@ function LabelProcessingTool() {
   const [outputs, setOutputs] = useState(null);
   const [printOpen, setPrintOpen] = useState(false);
   const [printFormat, setPrintFormat] = useState("original");
+  const [printScope, setPrintScope] = useState("combined");
   const [toast, setToast] = useState("");
 
   const sortedItems = useMemo(() => sortLabelPages(items, sortMode), [items, sortMode]);
@@ -2711,6 +2777,25 @@ function LabelProcessingTool() {
     });
   };
 
+  const downloadCourierWiseLabels = async () => {
+    if (!sortedItems.length) {
+      setError("Analyze labels before downloading courier-wise PDFs.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      const bytes = await buildCourierLabelZip(sortedItems);
+      saveZip(bytes, "courier-wise-sorted-labels.zip");
+      setToast("Courier-wise label PDFs downloaded.");
+      trackEvent("label_processing_courier_zip", { courier_count: counts.courier.length });
+    } catch (err) {
+      setError(err.message || "Courier-wise label download failed.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const generatePrintPdf = async () => {
     if (!sortedItems.length) {
       setError("Analyze labels before generating print PDF.");
@@ -2720,6 +2805,19 @@ function LabelProcessingTool() {
     setBusy(true);
     setError("");
     try {
+      if (printScope === "courier") {
+        const bytes = await buildCourierPrintZip(sortedItems, printFormat);
+        const filename = `courier-wise-labels-${printFormat}.zip`;
+        saveZip(bytes, filename);
+        setToast(`${filename} downloaded.`);
+        setPrintOpen(false);
+        trackEvent("label_processing_courier_print_zip", {
+          print_format: printFormat,
+          courier_count: counts.courier.length,
+        });
+        return;
+      }
+
       const pages = sortedItems.map((item) => item.page);
       const bytes = printFormat === "original"
         ? await buildOriginalSortedPdf(sortedItems)
@@ -2806,6 +2904,10 @@ function LabelProcessingTool() {
                   <Download size={18} />
                   <span><strong>{t.downloadSorted}</strong><small>sorted-labels.pdf</small></span>
                 </button>
+                <button onClick={downloadCourierWiseLabels} disabled={busy}>
+                  <Layers size={18} />
+                  <span><strong>{t.downloadCourierSorted}</strong><small>{t.courierZipHint}</small></span>
+                </button>
                 <button onClick={() => saveBytes(outputs.picklistBytes, "packing-picklist.pdf")}>
                   <Download size={18} />
                   <span><strong>{t.downloadPicklist}</strong><small>packing-picklist.pdf</small></span>
@@ -2875,6 +2977,13 @@ function LabelProcessingTool() {
                 <option value="a4-4">{t.a4Four}</option>
                 <option value="a4-6">{t.a4Six}</option>
                 <option value="thermal">{t.thermal}</option>
+              </select>
+            </label>
+            <label className="layout-select">
+              <span>{t.printGrouping}</span>
+              <select value={printScope} onChange={(event) => setPrintScope(event.target.value)}>
+                <option value="combined">{t.printCombined}</option>
+                <option value="courier">{t.printCourierWise}</option>
               </select>
             </label>
             <button className="primary-action" onClick={generatePrintPdf} disabled={busy}>
