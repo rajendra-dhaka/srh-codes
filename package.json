@@ -11,6 +11,7 @@
     "next": "^16.2.9",
     "papaparse": "^5.5.3",
     "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^6.0.227",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "recharts": "^3.1.0",

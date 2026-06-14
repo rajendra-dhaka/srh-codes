@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import Papa from "papaparse";
 import JSZip from "jszip";
 import { degrees, PDFDocument } from "pdf-lib";
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
 import {
   AlertTriangle,
   BarChart3,
@@ -22,6 +23,7 @@ import {
   Menu,
   Moon,
   PackageX,
+  Printer,
   ReceiptText,
   RotateCcw,
   ShieldAlert,
@@ -109,6 +111,8 @@ const shellCopy = {
     gstHint: "GSTR-1 helper",
     labels: "Label Format",
     labelsHint: "Crop and 4-up PDFs",
+    processing: "Label Processing",
+    processingHint: "Sort, picklist, print",
     smartMode: "Smart filing mode",
     smartModeHint: "Upload reports once, reuse portal-ready values.",
     dark: "Dark mode",
@@ -127,6 +131,8 @@ const shellCopy = {
     gstHint: "GSTR-1 helper",
     labels: "लेबल फॉर्मेट",
     labelsHint: "PDF crop aur 4-up",
+    processing: "लेबल प्रोसेसिंग",
+    processingHint: "Sort, picklist, print",
     smartMode: "स्मार्ट फाइलिंग मोड",
     smartModeHint: "रिपोर्ट्स एक बार अपलोड करो, पोर्टल-ready वैल्यूज़ reuse करो.",
     dark: "डार्क मोड",
@@ -369,6 +375,79 @@ const labelCopy = {
     checkFlipkart: "हर original page से एक शिपिंग page और एक 4x6 portrait बिलिंग page crop होता है.",
     privateCheck: "Original PDF ब्राउज़र से बाहर नहीं जाती.",
     downloadCheck: "Generated PDFs direct ब्राउज़र से डाउनलोड होते हैं.",
+  },
+};
+
+const processingCopy = {
+  en: {
+    kicker: "Label Processing",
+    title: "Sort labels and generate picklists",
+    intro: "Upload one or more marketplace label PDFs, sort pages by courier partner, SKU, or seller account, and download a packing-ready PDF plus picklist.",
+    titleHelp: "Use this when multiple seller accounts or courier partners are packed together. The tool reads PDF text in your browser, sorts pages, and prepares packing counts.",
+    uploadTitle: "Upload label PDFs",
+    uploadHint: "Select multiple Meesho, Flipkart, or marketplace label PDFs",
+    uploadHelp: "PDFs stay in your browser. Text extraction works when courier, SKU, and seller details are embedded as selectable text in the PDF.",
+    sortBy: "Sort labels by",
+    none: "None - keep upload order",
+    courier: "Courier partner",
+    sku: "SKU",
+    courierSku: "Courier partner, then SKU",
+    sellerCourierSku: "Seller account, courier partner, then SKU",
+    seller: "Seller account",
+    analyze: "Analyze labels",
+    analyzing: "Analyzing PDFs...",
+    downloadSorted: "Download sorted labels",
+    downloadPicklist: "Download picklist CSV",
+    printLabels: "Print / format labels",
+    choosePrint: "Choose print output",
+    original: "Original sorted pages",
+    a4Four: "A4 - 4 labels per page",
+    a4Six: "A4 - 6 labels per page",
+    thermal: "Thermal 4x6 cropped labels",
+    generatePrint: "Generate print PDF",
+    summary: "Packing summary",
+    courierCounts: "Courier pickup counts",
+    sellerCounts: "Seller account counts",
+    skuCounts: "Top SKU counts",
+    tableTitle: "Sorted label preview",
+    unknown: "Unknown",
+    noData: "Upload label PDFs and click Analyze to create sorted labels and picklist.",
+    extractionNote: "If any page appears as Unknown, review the PDF source. Scanned/image-only labels may not expose text for automatic sorting.",
+  },
+  hi: {
+    kicker: "लेबल प्रोसेसिंग",
+    title: "लेबल sort करो और picklist generate करो",
+    intro: "एक या multiple marketplace label PDFs upload करो, courier partner, SKU या seller account से pages sort करो, फिर packing-ready PDF और picklist download करो.",
+    titleHelp: "जब multiple seller accounts या courier partners साथ में pack होते हैं, तब use करो. Tool browser में PDF text read करके pages sort और packing counts prepare करता है.",
+    uploadTitle: "लेबल PDFs upload करो",
+    uploadHint: "Multiple मीशो, फ्लिपकार्ट या marketplace label PDFs select करो",
+    uploadHelp: "PDFs browser में रहती हैं. Courier, SKU और seller details PDF में selectable text हों तो extraction work करता है.",
+    sortBy: "Labels sort by",
+    none: "None - upload order रखो",
+    courier: "Courier partner",
+    sku: "SKU",
+    courierSku: "Courier partner, फिर SKU",
+    sellerCourierSku: "Seller account, courier partner, फिर SKU",
+    seller: "Seller account",
+    analyze: "Labels analyze करो",
+    analyzing: "PDFs analyze हो रही हैं...",
+    downloadSorted: "Sorted labels download",
+    downloadPicklist: "Picklist CSV download",
+    printLabels: "Print / format labels",
+    choosePrint: "Print output choose करो",
+    original: "Original sorted pages",
+    a4Four: "A4 - 4 labels per page",
+    a4Six: "A4 - 6 labels per page",
+    thermal: "Thermal 4x6 cropped labels",
+    generatePrint: "Print PDF generate करो",
+    summary: "Packing summary",
+    courierCounts: "Courier pickup counts",
+    sellerCounts: "Seller account counts",
+    skuCounts: "Top SKU counts",
+    tableTitle: "Sorted label preview",
+    unknown: "Unknown",
+    noData: "Label PDFs upload करके Analyze click करो, फिर sorted labels और picklist बन जाएगी.",
+    extractionNote: "अगर कोई page Unknown आए, PDF source review करो. Scanned/image-only labels automatic sorting के लिए text expose नहीं कर सकते.",
   },
 };
 
@@ -1682,6 +1761,11 @@ function label(value) {
     date: "Date",
     sku: "SKU",
     source: "Source",
+    sequence: "Seq",
+    seller: "Seller",
+    courier: "Courier",
+    orderId: "Order ID",
+    page: "Page",
     type: "Type",
     saleLost: "Sale Lost",
     chargeToMe: "Charge to Me",
@@ -1774,6 +1858,17 @@ function actionTips(a, lang) {
 
 const A4 = { width: 595, height: 842 };
 const THERMAL_4X6 = { width: 288, height: 432 };
+const UNKNOWN = "Unknown";
+const courierMatchers = [
+  ["Delhivery", /\bDELHIVERY\b|\bDELHIVER\b/i],
+  ["Valmo", /\bVALMO\b/i],
+  ["Shadowfax", /\bSHADOW\s*FAX\b|\bSHADOWFAX\b/i],
+  ["Xpressbees", /\bXPRESS\s*BEES\b|\bXPRESSBEES\b/i],
+  ["Ecom Express", /\bECOM\s*EXPRESS\b/i],
+  ["Ekart", /\bEKART\b|\bE[-\s]?KART\b/i],
+  ["Blue Dart", /\bBLUE\s*DART\b|\bBLUEDART\b/i],
+  ["Amazon Shipping", /\bAMAZON\s*SHIPPING\b/i],
+];
 
 async function readPdf(file) {
   const source = await PDFDocument.load(await file.arrayBuffer(), { ignoreEncryption: true });
@@ -1784,10 +1879,126 @@ async function readPdf(file) {
   };
 }
 
+async function extractLabelPages(files) {
+  const pages = [];
+  for (let fileIndex = 0; fileIndex < files.length; fileIndex += 1) {
+    const file = files[fileIndex];
+    const buffer = await file.arrayBuffer();
+    const source = await PDFDocument.load(buffer.slice(0), { ignoreEncryption: true });
+    const textDoc = await pdfjsLib.getDocument({
+      data: new Uint8Array(buffer.slice(0)),
+      disableWorker: true,
+      useSystemFonts: true,
+      isEvalSupported: false,
+    }).promise;
+    for (let pageIndex = 0; pageIndex < source.getPageCount(); pageIndex += 1) {
+      const pdfPage = await textDoc.getPage(pageIndex + 1);
+      const content = await pdfPage.getTextContent();
+      const text = content.items.map((item) => item.str || "").join(" ");
+      pages.push({
+        id: `${fileIndex}-${pageIndex}`,
+        fileName: file.name,
+        source,
+        page: source.getPage(pageIndex),
+        pageIndex,
+        originalIndex: pages.length,
+        text,
+        seller: detectSellerAccount(text, file.name),
+        courier: detectCourierPartner(text),
+        sku: detectSku(text),
+        orderId: detectOrderId(text),
+      });
+    }
+    if (typeof textDoc.destroy === "function") {
+      await textDoc.destroy();
+    } else if (typeof textDoc.cleanup === "function") {
+      await textDoc.cleanup();
+    }
+  }
+  return pages;
+}
+
+function detectCourierPartner(text) {
+  const match = courierMatchers.find(([, pattern]) => pattern.test(text));
+  return match?.[0] || UNKNOWN;
+}
+
+function detectSellerAccount(text, fileName) {
+  const compact = text.replace(/\s+/g, " ").trim();
+  const patterns = [
+    /(?:Sold\s*By|Seller|Supplier|Pickup\s*Address)\s*[:\-]?\s*([A-Z0-9 &.,'-]{4,70})/i,
+    /(SHREE\s+[A-Z0-9 &.,'-]{4,55})/i,
+  ];
+  for (const pattern of patterns) {
+    const match = compact.match(pattern);
+    if (match?.[1]) return cleanDetectedValue(match[1]);
+  }
+  return fileName.replace(/\.[^.]+$/, "").slice(0, 42) || UNKNOWN;
+}
+
+function detectSku(text) {
+  const compact = text.replace(/\s+/g, " ").trim();
+  const direct = compact.match(/\b(?:SKU|SKU\s*ID|SKU\s*CODE|Product\s*SKU)\s*[:#\-]?\s*([A-Z0-9][A-Z0-9._/-]{2,45})\b/i);
+  if (direct?.[1]) return cleanDetectedValue(direct[1]).toUpperCase();
+  const candidates = compact.toUpperCase().match(/\b[A-Z0-9]{2,}(?:[-_/][A-Z0-9]{2,}){1,5}\b/g) || [];
+  const filtered = candidates.filter((candidate) => !/^(ORDER|SUB|AWB|GST|HSN|TAX|VL|SF|FM|FWJ|COD|PREPAID)/.test(candidate));
+  return filtered[0] || UNKNOWN;
+}
+
+function detectOrderId(text) {
+  const compact = text.replace(/\s+/g, " ");
+  const match = compact.match(/\b(?:Order\s*(?:No|ID|Number)?|Sub\s*Order\s*(?:No|ID)?)\s*[:#\-]?\s*([A-Z0-9-]{6,40})\b/i);
+  return match?.[1] || "";
+}
+
+function cleanDetectedValue(value) {
+  return String(value || "")
+    .replace(/\s{2,}/g, " ")
+    .replace(/\b(?:GSTIN|Invoice|Tax|Order|Product|Details)\b.*$/i, "")
+    .trim()
+    .slice(0, 64) || UNKNOWN;
+}
+
+function sortLabelPages(pages, mode) {
+  const keys = {
+    none: [],
+    courier: ["courier"],
+    sku: ["sku"],
+    courierSku: ["courier", "sku"],
+    sellerCourierSku: ["seller", "courier", "sku"],
+    seller: ["seller"],
+  }[mode] || [];
+  return [...pages].sort((a, b) => {
+    for (const key of keys) {
+      const compared = sortKey(a[key]).localeCompare(sortKey(b[key]), "en", { numeric: true });
+      if (compared) return compared;
+    }
+    return a.originalIndex - b.originalIndex;
+  });
+}
+
+function sortKey(value) {
+  return value && value !== UNKNOWN ? value : "ZZZ_UNKNOWN";
+}
+
+async function buildOriginalSortedPdf(items) {
+  const output = await PDFDocument.create();
+  for (const item of items) {
+    const { width, height } = item.page.getSize();
+    const embedded = await output.embedPage(item.page);
+    const page = output.addPage([width, height]);
+    page.drawPage(embedded, { x: 0, y: 0, width, height });
+  }
+  return output.save();
+}
+
 async function buildMeeshoLayout(file, labelsPerPage = 4) {
   const source = await PDFDocument.load(await file.arrayBuffer(), { ignoreEncryption: true });
+  return buildMeeshoLayoutFromPages(source.getPages(), labelsPerPage);
+}
+
+async function buildMeeshoLayoutFromPages(pages, labelsPerPage = 4) {
   const output = await PDFDocument.create();
-  const pages = source.getPages();
   const layout = labelsPerPage === 6
     ? { columns: 2, rows: 3, margin: 10, gapX: 8, gapY: 8, rotate: true, cropBottomWhitespace: true }
     : { columns: 2, rows: 2, margin: 18, gapX: 12, gapY: 12 };
@@ -1855,9 +2066,13 @@ function meeshoFilledCropBox(width, height) {
 
 async function buildMeeshoThermal(file) {
   const source = await PDFDocument.load(await file.arrayBuffer(), { ignoreEncryption: true });
+  return buildMeeshoThermalFromPages(source.getPages());
+}
+
+async function buildMeeshoThermalFromPages(pages) {
   const output = await PDFDocument.create();
 
-  for (const sourcePage of source.getPages()) {
+  for (const sourcePage of pages) {
     const { width, height } = sourcePage.getSize();
     const cropBox = meeshoFilledCropBox(width, height);
     const embedded = await output.embedPage(sourcePage, cropBox);
@@ -1879,6 +2094,37 @@ async function buildMeeshoThermal(file) {
   }
 
   return output.save();
+}
+
+function makePicklistCsv(items) {
+  const rows = [
+    ["Sequence", "Seller Account", "Courier Partner", "SKU", "Order ID", "Source PDF", "Page Number"],
+    ...items.map((item, index) => [
+      index + 1,
+      item.seller,
+      item.courier,
+      item.sku,
+      item.orderId,
+      item.fileName,
+      item.pageIndex + 1,
+    ]),
+  ];
+  return rows.map((row) => row.map(csvCell).join(",")).join("\n");
+}
+
+function csvCell(value) {
+  const text = String(value ?? "");
+  return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+function saveText(text, filename, type = "text/csv;charset=utf-8") {
+  const blob = new Blob([text], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 async function buildFlipkartSplit(file, splitMode) {
@@ -1940,6 +2186,7 @@ export default function SellerToolClient() {
     { id: "performance", label: s.performance, icon: BarChart3, hint: s.performanceHint },
     { id: "gst", label: s.gst, icon: ReceiptText, hint: s.gstHint },
     { id: "labels", label: s.labels, icon: LayoutGrid, hint: s.labelsHint },
+    { id: "processing", label: s.processing, icon: ClipboardList, hint: s.processingHint },
   ];
   const activeNav = nav.find((item) => item.id === section);
   const selectSection = (id) => {
@@ -2046,6 +2293,7 @@ export default function SellerToolClient() {
         {section === "performance" && <PerformanceSection lang={lang} />}
         {section === "gst" && <GstAnalysis lang={lang} />}
         {section === "labels" && <LabelFormatTool />}
+        {section === "processing" && <LabelProcessingTool />}
       </main>
     </div>
   );
@@ -2321,6 +2569,248 @@ function LabelFormatTool() {
       </section>
       {toast && <div className="snackbar">{toast}</div>}
     </section>
+  );
+}
+
+function LabelProcessingTool() {
+  const { lang } = useLanguage();
+  const t = processingCopy[lang] || processingCopy.en;
+  const [files, setFiles] = useState([]);
+  const [sortMode, setSortMode] = useState("none");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [items, setItems] = useState([]);
+  const [outputs, setOutputs] = useState(null);
+  const [printOpen, setPrintOpen] = useState(false);
+  const [printFormat, setPrintFormat] = useState("original");
+  const [toast, setToast] = useState("");
+
+  const sortedItems = useMemo(() => sortLabelPages(items, sortMode), [items, sortMode]);
+  const counts = useMemo(() => ({
+    courier: countBy(sortedItems, "courier"),
+    seller: countBy(sortedItems, "seller"),
+    sku: countBy(sortedItems, "sku").slice(0, 8),
+  }), [sortedItems]);
+
+  const onFiles = (selectedFiles) => {
+    const pdfFiles = Array.from(selectedFiles || []).filter((file) => /\.pdf$/i.test(file.name) || file.type === "application/pdf");
+    setFiles(pdfFiles);
+    setItems([]);
+    setOutputs(null);
+    setToast("");
+    setError("");
+    trackEvent("label_processing_upload", { file_count: pdfFiles.length });
+  };
+
+  const analyze = async () => {
+    if (!files.length) {
+      setError("Upload at least one label PDF.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    setToast("");
+    try {
+      trackEvent("label_processing_start", { file_count: files.length, sort_mode: sortMode });
+      const extracted = await extractLabelPages(files);
+      const sorted = sortLabelPages(extracted, sortMode);
+      const sortedBytes = await buildOriginalSortedPdf(sorted);
+      const picklist = makePicklistCsv(sorted);
+      setItems(extracted);
+      setOutputs({ sortedBytes, picklist });
+      setToast("Sorted labels and picklist are ready.");
+      trackEvent("label_processing_complete", { label_count: extracted.length, sort_mode: sortMode });
+    } catch (err) {
+      setError(err.message || "Label processing failed.");
+      trackEvent("label_processing_error", { sort_mode: sortMode });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const refreshOutputsForSort = async (nextMode) => {
+    setSortMode(nextMode);
+    if (!items.length) return;
+    const sorted = sortLabelPages(items, nextMode);
+    setOutputs({
+      sortedBytes: await buildOriginalSortedPdf(sorted),
+      picklist: makePicklistCsv(sorted),
+    });
+  };
+
+  const generatePrintPdf = async () => {
+    if (!sortedItems.length) {
+      setError("Analyze labels before generating print PDF.");
+      setPrintOpen(false);
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      const pages = sortedItems.map((item) => item.page);
+      const bytes = printFormat === "original"
+        ? await buildOriginalSortedPdf(sortedItems)
+        : printFormat === "a4-4"
+          ? await buildMeeshoLayoutFromPages(pages, 4)
+          : printFormat === "a4-6"
+            ? await buildMeeshoLayoutFromPages(pages, 6)
+            : await buildMeeshoThermalFromPages(pages);
+      const filename = `sorted-labels-${printFormat}.pdf`;
+      saveBytes(bytes, filename);
+      setToast(`${filename} downloaded.`);
+      setPrintOpen(false);
+      trackEvent("label_processing_print_pdf", { print_format: printFormat });
+    } catch (err) {
+      setError(err.message || "Print PDF generation failed.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="labels-page processing-page">
+      <div className="module-header">
+        <div>
+          <span>{t.kicker}</span>
+          <h1>{t.title} <HelpTip text={t.titleHelp} /></h1>
+          <p>{t.intro}</p>
+        </div>
+      </div>
+
+      <section className="processing-layout">
+        <div className="label-workbench">
+          <label className="label-dropzone compact">
+            <input type="file" accept="application/pdf,.pdf" multiple onChange={(e) => onFiles(e.target.files)} />
+            <span className="label-drop-icon"><Upload size={26} /></span>
+            <strong>{files.length ? `${files.length} PDF file${files.length > 1 ? "s" : ""} selected` : t.uploadTitle}</strong>
+            <em>{files.length ? files.map((file) => file.name).join(", ") : t.uploadHint} <HelpTip text={t.uploadHelp} /></em>
+          </label>
+
+          <label className="layout-select">
+            <span>{t.sortBy}</span>
+            <select value={sortMode} onChange={(event) => refreshOutputsForSort(event.target.value)}>
+              <option value="none">{t.none}</option>
+              <option value="courier">{t.courier}</option>
+              <option value="sku">{t.sku}</option>
+              <option value="courierSku">{t.courierSku}</option>
+              <option value="sellerCourierSku">{t.sellerCourierSku}</option>
+              <option value="seller">{t.seller}</option>
+            </select>
+          </label>
+
+          {error && <div className="error"><AlertTriangle size={18} />{error}</div>}
+          <button className="primary-action label-process" onClick={analyze} disabled={busy}>
+            {busy ? t.analyzing : t.analyze}
+          </button>
+
+          {outputs && (
+            <div className="download-panel inline">
+              <h2>Download ready</h2>
+              <div className="download-grid">
+                <button onClick={() => saveBytes(outputs.sortedBytes, "sorted-labels.pdf")}>
+                  <Download size={18} />
+                  <span><strong>{t.downloadSorted}</strong><small>sorted-labels.pdf</small></span>
+                </button>
+                <button onClick={() => saveText(outputs.picklist, "packing-picklist.csv")}>
+                  <Download size={18} />
+                  <span><strong>{t.downloadPicklist}</strong><small>packing-picklist.csv</small></span>
+                </button>
+                <button onClick={() => setPrintOpen(true)}>
+                  <Printer size={18} />
+                  <span><strong>{t.printLabels}</strong><small>{t.choosePrint}</small></span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="processing-summary">
+          <h2>{t.summary}</h2>
+          {sortedItems.length ? (
+            <>
+              <div className="processing-kpis">
+                <MiniMetric label="PDF files" value={files.length} tone="blue" />
+                <MiniMetric label="Labels" value={sortedItems.length} tone="green" />
+                <MiniMetric label="Couriers" value={counts.courier.length} tone="orange" />
+                <MiniMetric label="SKUs" value={counts.sku.length} tone="purple" />
+              </div>
+              <CountList title={t.courierCounts} rows={counts.courier} />
+              <CountList title={t.sellerCounts} rows={counts.seller} />
+              <CountList title={t.skuCounts} rows={counts.sku} />
+            </>
+          ) : (
+            <div className="placeholder compact"><ClipboardList size={28} /><p>{t.noData}</p></div>
+          )}
+          <div className="workflow-note">{t.extractionNote}</div>
+        </div>
+      </section>
+
+      {sortedItems.length ? (
+        <section className="portal-card">
+          <h2>{t.tableTitle}</h2>
+          <CompactTable
+            rows={sortedItems.slice(0, 80).map((item, index) => ({
+              sequence: index + 1,
+              seller: item.seller,
+              courier: item.courier,
+              sku: item.sku,
+              orderId: item.orderId || "-",
+              source: item.fileName,
+              page: item.pageIndex + 1,
+            }))}
+            columns={["sequence", "seller", "courier", "sku", "orderId", "source", "page"]}
+          />
+        </section>
+      ) : null}
+
+      {printOpen && (
+        <div className="modal-backdrop" role="presentation" onClick={() => setPrintOpen(false)}>
+          <div className="print-modal" role="dialog" aria-modal="true" aria-labelledby="print-modal-title" onClick={(event) => event.stopPropagation()}>
+            <button className="drawer-close modal-close" onClick={() => setPrintOpen(false)} aria-label="Close print options">
+              <X size={18} />
+            </button>
+            <h2 id="print-modal-title">{t.choosePrint}</h2>
+            <label className="layout-select">
+              <span>{t.printLabels}</span>
+              <select value={printFormat} onChange={(event) => setPrintFormat(event.target.value)}>
+                <option value="original">{t.original}</option>
+                <option value="a4-4">{t.a4Four}</option>
+                <option value="a4-6">{t.a4Six}</option>
+                <option value="thermal">{t.thermal}</option>
+              </select>
+            </label>
+            <button className="primary-action" onClick={generatePrintPdf} disabled={busy}>
+              {busy ? t.analyzing : t.generatePrint}
+            </button>
+          </div>
+        </div>
+      )}
+      {toast && <div className="snackbar">{toast}</div>}
+    </section>
+  );
+}
+
+function countBy(items, key) {
+  const map = new Map();
+  for (const item of items) {
+    const value = item[key] || UNKNOWN;
+    map.set(value, (map.get(value) || 0) + 1);
+  }
+  return Array.from(map, ([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count || sortKey(a.name).localeCompare(sortKey(b.name)));
+}
+
+function CountList({ title, rows }) {
+  return (
+    <div className="count-list">
+      <h3>{title}</h3>
+      {rows.length ? rows.map((row) => (
+        <div key={row.name} className="count-row">
+          <span>{row.name}</span>
+          <strong>{row.count}</strong>
+        </div>
+      )) : <p>No rows yet.</p>}
+    </div>
   );
 }
 

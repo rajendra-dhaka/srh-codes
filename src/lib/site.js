@@ -7,7 +7,7 @@ export const site = {
   contactEmail: "shree.anjaneya.1304@gmail.com",
   jurisdiction: "Rajasthan, India",
   description:
-    "Free browser-based ecommerce seller tools for Flipkart label crop, Meesho 4-up, 6-up and thermal label PDFs, GST helper values, performance insights, and marketplace data analysis.",
+    "Free browser-based ecommerce seller tools for Flipkart label crop, Meesho 4-up, 6-up and thermal label PDFs, courier and SKU label sorting, picklist generation, GST helper values, performance insights, and marketplace data analysis.",
   url: siteUrl,
   keywords: [
     "flipkart label crop",
@@ -24,6 +24,12 @@ export const site = {
     "ecommerce label cropper",
     "seller shipping label tool",
     "marketplace label pdf tool",
+    "courier wise label sorting",
+    "sku wise label sorting",
+    "ecommerce picklist generator",
+    "packing picklist generator",
+    "sort labels by courier partner",
+    "sort shipping labels by sku",
     "label printer 4x6 pdf",
     "gst helper for sellers",
     "gstr 1 helper",
@@ -42,6 +48,10 @@ export const landingFeatures = [
   {
     title: "Meesho 4-in-1 label maker",
     text: "Convert Meesho labels into 4-up or 6-up A4 PDFs, or generate cropped 4x6 thermal printer PDFs.",
+  },
+  {
+    title: "Courier and SKU label sorting",
+    text: "Upload multiple label PDFs, sort courier-wise or SKU-wise, and generate a packing picklist with seller account and courier pickup counts.",
   },
   {
     title: "Private browser processing",
