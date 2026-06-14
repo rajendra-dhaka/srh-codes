@@ -7,7 +7,7 @@ export const site = {
   contactEmail: "shree.anjaneya.1304@gmail.com",
   jurisdiction: "Rajasthan, India",
   description:
-    "Free browser-based ecommerce seller tools for Flipkart label crop, Meesho 4-up, 6-up and thermal label PDFs, courier and SKU label sorting, combined and courier-wise sorted label PDF downloads, picklist generation, GST helper values, performance insights, and marketplace data analysis.",
+    "Free browser-based ecommerce seller tools for Flipkart label crop, Meesho 4-up and 6-up label PDFs, courier and SKU label sorting, combined and courier-wise sorted label PDF downloads, picklist generation, GST helper values, performance insights, and marketplace data analysis.",
   url: siteUrl,
   keywords: [
     "flipkart label crop",
@@ -17,8 +17,6 @@ export const site = {
     "meesho label 4 per page",
     "meesho label 6 per page",
     "meesho 6 up labels",
-    "meesho thermal label pdf",
-    "meesho 4x6 label",
     "meesho shipping label pdf",
     "meesho label crop",
     "ecommerce label cropper",
@@ -50,7 +48,7 @@ export const landingFeatures = [
   },
   {
     title: "Meesho 4-in-1 label maker",
-    text: "Convert Meesho labels into 4-up or 6-up A4 PDFs, or generate cropped 4x6 thermal printer PDFs.",
+    text: "Convert Meesho labels into compact 4-up or 6-up A4 PDFs for normal page printers.",
   },
   {
     title: "Courier and SKU label sorting",
@@ -87,7 +85,7 @@ export const keywordPages = [
       },
       {
         title: "Built for seller packing desks",
-        text: "Use it before printing labels for dispatch. The output is designed for faster handling on thermal and label-printer workflows.",
+        text: "Use it before printing labels for dispatch. The output is designed for faster handling on shipping label and packing desk workflows.",
       },
       {
         title: "No server upload required",
@@ -97,16 +95,14 @@ export const keywordPages = [
   },
   {
     slug: "meesho-label-4-in-1",
-    title: "Meesho Label Maker - 4-in-1, 6-up and Thermal 4x6 PDF Tool",
-    h1: "Meesho Label Maker for 4-up, 6-up and Thermal 4x6 PDFs",
+    title: "Meesho Label Maker - 4-in-1 and 6-up PDF Tool",
+    h1: "Meesho Label Maker for 4-up and 6-up PDFs",
     description:
-      "Convert Meesho shipping label PDFs into 4-in-1 A4 pages, 6 labels per page, or cropped 4x6 thermal label PDFs.",
+      "Convert Meesho shipping label PDFs into 4-in-1 A4 pages or 6 labels per page for normal page printers.",
     primaryKeyword: "meesho label 4 in 1",
     related: [
       "meesho label 4 per page",
       "meesho label 6 per page",
-      "meesho thermal label pdf",
-      "meesho 4x6 label",
       "meesho shipping label pdf",
       "meesho label print 4 in 1",
       "meesho label maker",
@@ -117,8 +113,8 @@ export const keywordPages = [
         text: "Upload the label PDF and generate a clean A4 output with either four labels or six compact labels per page.",
       },
       {
-        title: "Create cropped thermal 4x6 labels",
-        text: "Thermal mode removes extra blank space from each Meesho label and fits one label per 4x6 printer page without stretching the ratio.",
+        title: "Download courier-wise sorted labels",
+        text: "Use the Labels tool to group Meesho labels by courier partner and quantity, then download matching labels and picklists.",
       },
       {
         title: "Useful for marketplace sellers",
