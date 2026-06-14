@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Papa from "papaparse";
 import JSZip from "jszip";
-import { degrees, PDFDocument } from "pdf-lib";
+import { degrees, PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
 import {
   AlertTriangle,
@@ -401,7 +401,7 @@ const processingCopy = {
     analyze: "Analyze labels",
     analyzing: "Analyzing PDFs...",
     downloadSorted: "Download sorted label PDF",
-    downloadPicklist: "Download picklist CSV",
+    downloadPicklist: "Download picklist PDF",
     printLabels: "Print / format labels",
     choosePrint: "Choose print output",
     original: "Original sorted pages",
@@ -410,8 +410,10 @@ const processingCopy = {
     thermal: "Thermal 4x6 cropped labels",
     generatePrint: "Generate print PDF",
     summary: "Packing summary",
+    marketplacePending: (marketplace) => `${marketplace} label sorting workflow is coming next. Use the Meesho tab for courier, SKU, sorted label PDF, print PDF, and picklist generation today.`,
     courierCounts: "Courier pickup counts",
     sellerCounts: "Seller account counts",
+    qtyCounts: "SKU and quantity picklist",
     skuCounts: "Top SKU counts",
     tableTitle: "Sorted label preview",
     unknown: "Unknown",
@@ -436,7 +438,7 @@ const processingCopy = {
     analyze: "Labels analyze करो",
     analyzing: "PDFs analyze हो रही हैं...",
     downloadSorted: "Sorted label PDF download",
-    downloadPicklist: "Picklist CSV download",
+    downloadPicklist: "Picklist PDF download",
     printLabels: "Print / format labels",
     choosePrint: "Print output choose करो",
     original: "Original sorted pages",
@@ -445,8 +447,10 @@ const processingCopy = {
     thermal: "Thermal 4x6 cropped labels",
     generatePrint: "Print PDF generate करो",
     summary: "Packing summary",
+    marketplacePending: (marketplace) => `${marketplace} label sorting workflow next आएगा. अभी courier, SKU, sorted label PDF, print PDF और picklist generation के लिए Meesho tab use करो.`,
     courierCounts: "Courier pickup counts",
     sellerCounts: "Seller account counts",
+    qtyCounts: "SKU और quantity picklist",
     skuCounts: "Top SKU counts",
     tableTitle: "Sorted label preview",
     unknown: "Unknown",
@@ -1769,6 +1773,7 @@ function label(value) {
     seller: "Seller",
     courier: "Courier",
     orderId: "Order ID",
+    qty: "Qty",
     page: "Page",
     type: "Type",
     saleLost: "Sale Lost",
@@ -1911,6 +1916,7 @@ async function extractLabelPages(files) {
         courier: detectCourierPartner(text),
         sku: detectSku(text),
         orderId: detectOrderId(text),
+        qty: detectQty(text),
       });
     }
     if (typeof textDoc.destroy === "function") {
@@ -1930,37 +1936,64 @@ function detectCourierPartner(text) {
 function detectSellerAccount(text, fileName) {
   const compact = text.replace(/\s+/g, " ").trim();
   const patterns = [
-    /(?:Sold\s*By|Seller|Supplier|Pickup\s*Address)\s*[:\-]?\s*([A-Z0-9 &.,'-]{4,70})/i,
-    /(SHREE\s+[A-Z0-9 &.,'-]{4,55})/i,
+    /Sold\s*by\s*:\s*(.+?)(?:GSTIN|Purchase\s*Order|Invoice\s*No|Order\s*Date|Description|$)/i,
+    /If\s*undelivered,\s*return\s*to\s*:\s*(.+?)(?:COD:|Prepaid|Check\s*the\s*payable|Exchange|Delhivery|Valmo|Shadowfax|Xpressbees|Product\s*Details|$)/i,
+    /(?:Seller|Supplier|Pickup\s*Address)\s*[:\-]?\s*([A-Z0-9 &.,'-]{4,70})/i,
+    /(SHREE[.\s]+[A-Z0-9 &.,'-]{4,55})/i,
   ];
   for (const pattern of patterns) {
     const match = compact.match(pattern);
     if (match?.[1]) return cleanDetectedValue(match[1]);
   }
-  return fileName.replace(/\.[^.]+$/, "").slice(0, 42) || UNKNOWN;
+  return UNKNOWN;
 }
 
 function detectSku(text) {
+  const product = parseProductDetails(text);
+  if (product.sku) return product.sku;
   const compact = text.replace(/\s+/g, " ").trim();
   const direct = compact.match(/\b(?:SKU|SKU\s*ID|SKU\s*CODE|Product\s*SKU)\s*[:#\-]?\s*([A-Z0-9][A-Z0-9._/-]{2,45})\b/i);
-  if (direct?.[1]) return cleanDetectedValue(direct[1]).toUpperCase();
+  if (direct?.[1] && !/^SIZE$/i.test(direct[1])) return cleanDetectedValue(direct[1]).toUpperCase();
   const candidates = compact.toUpperCase().match(/\b[A-Z0-9]{2,}(?:[-_/][A-Z0-9]{2,}){1,5}\b/g) || [];
   const filtered = candidates.filter((candidate) => !/^(ORDER|SUB|AWB|GST|HSN|TAX|VL|SF|FM|FWJ|COD|PREPAID)/.test(candidate));
   return filtered[0] || UNKNOWN;
 }
 
 function detectOrderId(text) {
+  const product = parseProductDetails(text);
+  if (product.orderId) return product.orderId;
   const compact = text.replace(/\s+/g, " ");
   const match = compact.match(/\b(?:Order\s*(?:No|ID|Number)?|Sub\s*Order\s*(?:No|ID)?)\s*[:#\-]?\s*([A-Z0-9-]{6,40})\b/i);
   return match?.[1] || "";
 }
 
+function detectQty(text) {
+  const product = parseProductDetails(text);
+  return product.qty || 1;
+}
+
+function parseProductDetails(text) {
+  const compact = text.replace(/\s+/g, " ").trim();
+  const match = compact.match(/Product\s*Details\s+SKU\s+Size\s+Qty\s+Color\s+Order\s*No\.?\s+([A-Z0-9][A-Z0-9._/-]{2,60})\s+(.+?)\s+(\d+)\s+([A-Z0-9 -]+?)\s+([0-9]{8,}(?:[_-]\d+)?)\b/i);
+  if (!match) return {};
+  return {
+    sku: cleanDetectedValue(match[1]).toUpperCase(),
+    size: cleanDetectedValue(match[2]),
+    qty: Number(match[3]) || 1,
+    color: cleanDetectedValue(match[4]),
+    orderId: match[5],
+  };
+}
+
 function cleanDetectedValue(value) {
-  return String(value || "")
+  const text = String(value || "")
     .replace(/\s{2,}/g, " ")
-    .replace(/\b(?:GSTIN|Invoice|Tax|Order|Product|Details)\b.*$/i, "")
-    .trim()
-    .slice(0, 64) || UNKNOWN;
+    .replace(/\b(?:GSTIN|Invoice|Tax|Order|Product|Details|Pickup|Destination|Return Code)\b.*$/i, "")
+    .replace(/\s*,?\s*00\s+Dungarwas.*$/i, "")
+    .replace(/\s+1st\s+Floor.*$/i, "")
+    .trim();
+  if (/SHREE[.\s]*ANJANEYA/i.test(text)) return "SHREE.ANJANEYA";
+  return text.slice(0, 64) || UNKNOWN;
 }
 
 function sortLabelPages(pages, mode) {
@@ -2100,35 +2133,69 @@ async function buildMeeshoThermalFromPages(pages) {
   return output.save();
 }
 
-function makePicklistCsv(items) {
-  const rows = [
-    ["Sequence", "Seller Account", "Courier Partner", "SKU", "Order ID", "Source PDF", "Page Number"],
-    ...items.map((item, index) => [
-      index + 1,
-      item.seller,
-      item.courier,
-      item.sku,
-      item.orderId,
-      item.fileName,
-      item.pageIndex + 1,
-    ]),
-  ];
-  return rows.map((row) => row.map(csvCell).join(",")).join("\n");
-}
+async function buildPicklistPdf(items, mode = "none") {
+  const output = await PDFDocument.create();
+  const regular = await output.embedFont(StandardFonts.Helvetica);
+  const bold = await output.embedFont(StandardFonts.HelveticaBold);
+  const margin = 32;
+  const line = 14;
+  let page = output.addPage([A4.width, A4.height]);
+  let y = A4.height - margin;
 
-function csvCell(value) {
-  const text = String(value ?? "");
-  return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
-}
+  const draw = (text, x, size = 9, font = regular, color = rgb(0.12, 0.2, 0.31)) => {
+    page.drawText(String(text ?? ""), { x, y, size, font, color });
+  };
+  const next = (amount = line) => {
+    y -= amount;
+    if (y < margin + 30) {
+      page = output.addPage([A4.width, A4.height]);
+      y = A4.height - margin;
+    }
+  };
+  const section = (title) => {
+    next(18);
+    draw(title, margin, 12, bold);
+    next(16);
+  };
+  const drawTwoCol = (rows) => {
+    rows.forEach((row) => {
+      draw(truncate(row.name, 52), margin, 8, regular);
+      draw(String(row.count), A4.width - margin - 35, 8, bold);
+      next(12);
+    });
+  };
 
-function saveText(text, filename, type = "text/csv;charset=utf-8") {
-  const blob = new Blob([text], { type });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
+  draw("SRH Codes Packing Picklist", margin, 16, bold);
+  next(18);
+  draw(`Generated: ${new Date().toLocaleString("en-IN")} | Sort: ${mode}`, margin, 8);
+  next(12);
+  draw(`Total labels: ${items.length} | Total pieces: ${items.reduce((sum, item) => sum + (Number(item.qty) || 1), 0)}`, margin, 8);
+
+  section("Courier pickup counts");
+  drawTwoCol(countBy(items, "courier"));
+
+  section("Seller account counts");
+  drawTwoCol(countBy(items, "seller"));
+
+  section("SKU and quantity grouping");
+  drawTwoCol(countBySkuQty(items));
+
+  section("Sorted label sequence");
+  const headers = ["#", "Courier", "SKU", "Qty", "Order ID", "Seller"];
+  const xs = [margin, 60, 145, 270, 300, 410];
+  headers.forEach((header, index) => draw(header, xs[index], 8, bold));
+  next(12);
+  items.forEach((item, index) => {
+    draw(index + 1, xs[0], 7);
+    draw(truncate(item.courier, 15), xs[1], 7);
+    draw(truncate(item.sku, 24), xs[2], 7);
+    draw(item.qty || 1, xs[3], 7, bold);
+    draw(truncate(item.orderId || "-", 20), xs[4], 7);
+    draw(truncate(item.seller, 26), xs[5], 7);
+    next(10);
+  });
+
+  return output.save();
 }
 
 async function buildFlipkartSplit(file, splitMode) {
@@ -2579,6 +2646,7 @@ function LabelFormatTool() {
 function LabelProcessingTool() {
   const { lang } = useLanguage();
   const t = processingCopy[lang] || processingCopy.en;
+  const [platform, setPlatform] = useState("meesho");
   const [files, setFiles] = useState([]);
   const [sortMode, setSortMode] = useState("none");
   const [busy, setBusy] = useState(false);
@@ -2593,6 +2661,7 @@ function LabelProcessingTool() {
   const counts = useMemo(() => ({
     courier: countBy(sortedItems, "courier"),
     seller: countBy(sortedItems, "seller"),
+    skuQty: countBySkuQty(sortedItems),
     sku: countBy(sortedItems, "sku").slice(0, 8),
   }), [sortedItems]);
 
@@ -2619,9 +2688,9 @@ function LabelProcessingTool() {
       const extracted = await extractLabelPages(files);
       const sorted = sortLabelPages(extracted, sortMode);
       const sortedBytes = await buildOriginalSortedPdf(sorted);
-      const picklist = makePicklistCsv(sorted);
+      const picklistBytes = await buildPicklistPdf(sorted, sortMode);
       setItems(extracted);
-      setOutputs({ sortedBytes, picklist });
+      setOutputs({ sortedBytes, picklistBytes });
       setToast("Sorted labels and picklist are ready.");
       trackEvent("label_processing_complete", { label_count: extracted.length, sort_mode: sortMode });
     } catch (err) {
@@ -2638,7 +2707,7 @@ function LabelProcessingTool() {
     const sorted = sortLabelPages(items, nextMode);
     setOutputs({
       sortedBytes: await buildOriginalSortedPdf(sorted),
-      picklist: makePicklistCsv(sorted),
+      picklistBytes: await buildPicklistPdf(sorted, nextMode),
     });
   };
 
@@ -2679,8 +2748,30 @@ function LabelProcessingTool() {
           <h1>{t.title} <HelpTip text={t.titleHelp} /></h1>
           <p>{t.intro}</p>
         </div>
+        <div className="platform-switch">
+          {["meesho", "flipkart", "amazon"].map((id) => (
+            <button key={id} className={platform === id ? "active" : ""} onClick={() => {
+              trackEvent("marketplace_tab_select", {
+                module: "label_processing",
+                marketplace: id,
+              });
+              setPlatform(id);
+              setError("");
+              setToast("");
+            }}>{marketLabel(id)}</button>
+          ))}
+        </div>
       </div>
 
+      {platform !== "meesho" ? (
+        <section className="portal-card">
+          <h2>{marketLabel(platform)} Label Processing</h2>
+          <div className="placeholder compact">
+            <ClipboardList size={28} />
+            <p>{t.marketplacePending(marketLabel(platform))}</p>
+          </div>
+        </section>
+      ) : (
       <section className="processing-layout">
         <div className="label-workbench">
           <label className="label-dropzone compact">
@@ -2715,9 +2806,9 @@ function LabelProcessingTool() {
                   <Download size={18} />
                   <span><strong>{t.downloadSorted}</strong><small>sorted-labels.pdf</small></span>
                 </button>
-                <button onClick={() => saveText(outputs.picklist, "packing-picklist.csv")}>
+                <button onClick={() => saveBytes(outputs.picklistBytes, "packing-picklist.pdf")}>
                   <Download size={18} />
-                  <span><strong>{t.downloadPicklist}</strong><small>packing-picklist.csv</small></span>
+                  <span><strong>{t.downloadPicklist}</strong><small>packing-picklist.pdf</small></span>
                 </button>
                 <button onClick={() => setPrintOpen(true)}>
                   <Printer size={18} />
@@ -2740,6 +2831,7 @@ function LabelProcessingTool() {
               </div>
               <CountList title={t.courierCounts} rows={counts.courier} />
               <CountList title={t.sellerCounts} rows={counts.seller} />
+              <CountList title={t.qtyCounts} rows={counts.skuQty} />
               <CountList title={t.skuCounts} rows={counts.sku} />
             </>
           ) : (
@@ -2748,8 +2840,9 @@ function LabelProcessingTool() {
           <div className="workflow-note">{t.extractionNote}</div>
         </div>
       </section>
+      )}
 
-      {sortedItems.length ? (
+      {platform === "meesho" && sortedItems.length ? (
         <section className="portal-card">
           <h2>{t.tableTitle}</h2>
           <CompactTable
@@ -2758,11 +2851,12 @@ function LabelProcessingTool() {
               seller: item.seller,
               courier: item.courier,
               sku: item.sku,
+              qty: item.qty || 1,
               orderId: item.orderId || "-",
               source: item.fileName,
               page: item.pageIndex + 1,
             }))}
-            columns={["sequence", "seller", "courier", "sku", "orderId", "source", "page"]}
+            columns={["sequence", "seller", "courier", "sku", "qty", "orderId", "source", "page"]}
           />
         </section>
       ) : null}
@@ -2802,6 +2896,30 @@ function countBy(items, key) {
   }
   return Array.from(map, ([name, count]) => ({ name, count }))
     .sort((a, b) => b.count - a.count || sortKey(a.name).localeCompare(sortKey(b.name)));
+}
+
+function countBySkuQty(items) {
+  const map = new Map();
+  for (const item of items) {
+    const sku = item.sku || UNKNOWN;
+    const qty = Number(item.qty) || 1;
+    const key = `${sku} | Qty ${qty}`;
+    const current = map.get(key) || { name: key, count: 0, pieces: 0 };
+    current.count += 1;
+    current.pieces += qty;
+    map.set(key, current);
+  }
+  return Array.from(map.values())
+    .map((row) => ({
+      ...row,
+      name: `${row.name} - ${row.count} orders / ${row.pieces} pcs`,
+    }))
+    .sort((a, b) => b.pieces - a.pieces || sortKey(a.name).localeCompare(sortKey(b.name)));
+}
+
+function truncate(value, max = 40) {
+  const text = String(value ?? "");
+  return text.length > max ? `${text.slice(0, Math.max(0, max - 3))}...` : text;
 }
 
 function CountList({ title, rows }) {
