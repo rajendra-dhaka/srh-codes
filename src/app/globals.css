@@ -1235,6 +1235,153 @@ main {
   border: 1px solid #fed7aa;
 }
 
+.shipping-calculator-grid {
+  display: grid;
+  grid-template-columns: minmax(360px, 0.95fr) minmax(440px, 1.05fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.shipping-input-card h2,
+.fee-result-card h2,
+.fee-policy-card h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.calculator-field {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.calculator-field.full {
+  margin-bottom: 14px;
+}
+
+.calculator-field span {
+  color: #17324d;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.calculator-field input {
+  width: 100%;
+  border: 1px solid #d9e4f2;
+  border-radius: 8px;
+  background: #fbfdff;
+  color: #17324d;
+  font: inherit;
+  font-weight: 800;
+  padding: 11px 12px;
+}
+
+.calculator-field input:focus,
+.layout-select select:focus {
+  outline: 2px solid rgba(0, 166, 166, 0.18);
+  border-color: #00a6a6;
+}
+
+.calculator-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.pill-selector {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.pill-selector button {
+  border: 1px solid #d9e4f2;
+  border-radius: 8px;
+  background: #fbfdff;
+  color: #475569;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 10px 8px;
+}
+
+.pill-selector button.active {
+  background: #17324d;
+  border-color: #17324d;
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(23, 50, 77, 0.14);
+}
+
+.shipping-kpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.fee-highlight {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding: 14px;
+  border: 1px solid #9bd9d9;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #f2fbfb 0%, #ffffff 100%);
+}
+
+.fee-highlight strong {
+  color: #17324d;
+  font-size: 18px;
+}
+
+.fee-highlight span {
+  color: #64748b;
+  font-weight: 800;
+}
+
+.comparison-card {
+  border: 1px solid #e5edf6;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fbfdff;
+}
+
+.comparison-card h3 {
+  margin: 0;
+  padding: 10px 12px;
+  background: #f2fbfb;
+  color: #17324d;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.comparison-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1.4fr;
+  gap: 10px;
+  align-items: center;
+  padding: 11px 12px;
+  border-top: 1px solid #e5edf6;
+  color: #475569;
+  font-weight: 800;
+}
+
+.comparison-row strong {
+  color: #17324d;
+}
+
+.comparison-row em {
+  color: #64748b;
+  font-style: normal;
+  text-align: right;
+}
+
+.comparison-row.selected {
+  background: #fff7ed;
+}
+
 .label-layout {
   display: grid;
   grid-template-columns: minmax(360px, 0.9fr) minmax(420px, 1.1fr);
@@ -2803,13 +2950,25 @@ tr:nth-child(even) td {
   .overall-strip,
   .label-layout,
   .processing-layout,
+  .shipping-calculator-grid,
   .download-grid,
   .workspace-strip {
     grid-template-columns: 1fr;
   }
 
-  .processing-kpis {
+  .processing-kpis,
+  .shipping-kpis {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .calculator-field-grid,
+  .pill-selector,
+  .comparison-row {
+    grid-template-columns: 1fr;
+  }
+
+  .comparison-row em {
+    text-align: left;
   }
 
   .courier-card-grid,
@@ -2936,6 +3095,7 @@ tr:nth-child(even) td {
 .theme-dark .mock-grid,
 .theme-dark .mock-split,
 .theme-dark .count-list,
+.theme-dark .comparison-card,
 .theme-dark .mini-metric,
 .theme-dark .mini-row,
 .theme-dark .summary-main,
@@ -2944,6 +3104,36 @@ tr:nth-child(even) td {
 .theme-dark .state-field {
   background: #111c2e;
   border-color: #2f4058;
+}
+
+.theme-dark .calculator-field span,
+.theme-dark .calculator-field input,
+.theme-dark .comparison-card h3,
+.theme-dark .comparison-row strong,
+.theme-dark .fee-highlight strong {
+  color: #eef6ff;
+}
+
+.theme-dark .calculator-field input,
+.theme-dark .pill-selector button {
+  background: #111c2e;
+  border-color: #2f4058;
+  color: #b8c7dc;
+}
+
+.theme-dark .comparison-card h3,
+.theme-dark .fee-highlight {
+  background: #10243a;
+  border-color: #2f4058;
+}
+
+.theme-dark .comparison-row {
+  border-color: #2f4058;
+  color: #b8c7dc;
+}
+
+.theme-dark .comparison-row.selected {
+  background: rgba(251, 146, 60, 0.12);
 }
 
 .theme-dark .state-field select {
