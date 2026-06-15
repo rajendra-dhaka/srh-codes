@@ -1266,7 +1266,8 @@ main {
   font-weight: 900;
 }
 
-.calculator-field input {
+.calculator-field input,
+.calculator-field select {
   width: 100%;
   border: 1px solid #d9e4f2;
   border-radius: 8px;
@@ -1278,9 +1279,45 @@ main {
 }
 
 .calculator-field input:focus,
+.calculator-field select:focus,
 .layout-select select:focus {
   outline: 2px solid rgba(0, 166, 166, 0.18);
   border-color: #00a6a6;
+}
+
+.amazon-mode-tabs {
+  margin-bottom: 14px;
+}
+
+.amazon-toggle-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 0 0 14px;
+  padding: 11px 12px;
+  border: 1px solid #d9e4f2;
+  border-radius: 8px;
+  background: #fbfdff;
+  color: #17324d;
+  font-weight: 900;
+}
+
+.amazon-toggle-row input {
+  width: 18px;
+  height: 18px;
+  accent-color: #00a6a6;
+}
+
+.soft-note {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #33506b;
+  font-weight: 800;
+  line-height: 1.55;
 }
 
 .calculator-field-grid {
@@ -3115,10 +3152,18 @@ tr:nth-child(even) td {
 }
 
 .theme-dark .calculator-field input,
+.theme-dark .calculator-field select,
 .theme-dark .pill-selector button {
   background: #111c2e;
   border-color: #2f4058;
   color: #b8c7dc;
+}
+
+.theme-dark .amazon-toggle-row,
+.theme-dark .soft-note {
+  background: #10243a;
+  border-color: #2f4058;
+  color: #d8e5f6;
 }
 
 .theme-dark .comparison-card h3,

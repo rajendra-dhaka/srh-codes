@@ -115,8 +115,8 @@ const shellCopy = {
     gstHint: "GSTR-1 helper",
     processing: "Labels",
     processingHint: "Sort, picklist, print",
-    shipping: "Amazon Fees",
-    shippingHint: "Easy Ship calculator",
+    shipping: "Amazon Calculator",
+    shippingHint: "Fees and pricing",
     smartMode: "Smart filing mode",
     smartModeHint: "Upload reports once, reuse portal-ready values.",
     dark: "Dark mode",
@@ -135,8 +135,8 @@ const shellCopy = {
     gstHint: "GSTR-1 helper",
     processing: "लेबल्स",
     processingHint: "Sort, picklist, print",
-    shipping: "Amazon Fees",
-    shippingHint: "Easy Ship calculator",
+    shipping: "Amazon Calculator",
+    shippingHint: "Fees and pricing",
     smartMode: "स्मार्ट फाइलिंग मोड",
     smartModeHint: "रिपोर्ट्स एक बार अपलोड करो, पोर्टल-ready वैल्यूज़ reuse करो.",
     dark: "डार्क मोड",
@@ -505,12 +505,24 @@ const gstCopy = {
 
 const amazonFeeCopy = {
   en: {
-    kicker: "Amazon Easy Ship",
-    title: "Shipping fee calculator",
-    intro: "Enter packed weight and box dimensions to estimate Amazon Easy Ship weight handling fee, GST, and the chargeable weight used for pricing.",
+    kicker: "Amazon Calculator",
+    title: "Fees and listing price calculator",
+    intro: "Estimate Easy Ship shipping fees, referral fees, closing fees, GST on Amazon fees, profit, margin, and break-even listing price in one workspace.",
+    shippingTab: "Shipping fee",
+    listingTab: "Listing price",
     step: "STEP level",
     shipment: "Shipment type",
     zone: "Heavy & bulky zone",
+    fulfilment: "Fulfilment channel",
+    category: "Referral fee category",
+    customReferral: "Custom referral %",
+    itemPrice: "Listing price",
+    productCost: "Product cost",
+    packagingCost: "Packaging cost",
+    adCost: "Ad / promotion cost",
+    includeShipping: "Include Easy Ship fee",
+    targetProfit: "Target profit",
+    targetMargin: "Target margin",
     actualWeight: "Actual packed weight",
     length: "Length",
     breadth: "Breadth",
@@ -542,14 +554,37 @@ const amazonFeeCopy = {
     dimensionWarning: "Large package dimensions may move the shipment into heavy & bulky rules. Review Amazon criteria if max side exceeds 183 cm, girth exceeds 300 cm, or packed weight exceeds 22.5 kg.",
     volumetricHigh: "Volumetric weight is higher. Compact packaging can reduce the fee.",
     actualHigh: "Actual packed weight is higher or equal. Dimensions are not increasing the fee.",
+    listingSummary: "Profit estimate",
+    referralFee: "Referral fee",
+    closingFee: "Closing fee",
+    amazonFees: "Amazon fees before GST",
+    feeGst: "GST on Amazon fees",
+    totalCost: "Total cost",
+    netProfit: "Net profit",
+    margin: "Net margin",
+    breakEven: "Break-even price",
+    suggestedPrice: "Suggested price",
+    listingNote: "Referral and closing fees are calculated on item price including seller shipping/gift-wrap charges. This tool uses attached Amazon fee schedule data effective June 10, 2026 and should be rechecked with Seller Central before final pricing.",
   },
   hi: {
-    kicker: "Amazon Easy Ship",
-    title: "Shipping fee calculator",
-    intro: "Packed weight और box dimensions डालकर Amazon Easy Ship weight handling fee, GST और chargeable weight estimate करो.",
+    kicker: "Amazon Calculator",
+    title: "Fees और listing price calculator",
+    intro: "Easy Ship shipping fees, referral fees, closing fees, Amazon fees पर GST, profit, margin और break-even listing price एक जगह estimate करो.",
+    shippingTab: "Shipping fee",
+    listingTab: "Listing price",
     step: "STEP level",
     shipment: "Shipment type",
     zone: "Heavy & bulky zone",
+    fulfilment: "Fulfilment channel",
+    category: "Referral fee category",
+    customReferral: "Custom referral %",
+    itemPrice: "Listing price",
+    productCost: "Product cost",
+    packagingCost: "Packaging cost",
+    adCost: "Ad / promotion cost",
+    includeShipping: "Easy Ship fee include करो",
+    targetProfit: "Target profit",
+    targetMargin: "Target margin",
     actualWeight: "Actual packed weight",
     length: "Length",
     breadth: "Breadth",
@@ -581,8 +616,55 @@ const amazonFeeCopy = {
     dimensionWarning: "Package dimensions बड़े हैं तो shipment heavy & bulky rules में जा सकता है. Max side 183 cm से ज्यादा, girth 300 cm से ज्यादा, या packed weight 22.5 kg से ज्यादा हो तो Amazon criteria review करो.",
     volumetricHigh: "Volumetric weight ज्यादा है. Compact packaging fee reduce कर सकती है.",
     actualHigh: "Actual packed weight ज्यादा या equal है. Dimensions fee नहीं बढ़ा रही हैं.",
+    listingSummary: "Profit estimate",
+    referralFee: "Referral fee",
+    closingFee: "Closing fee",
+    amazonFees: "Amazon fees before GST",
+    feeGst: "Amazon fees पर GST",
+    totalCost: "Total cost",
+    netProfit: "Net profit",
+    margin: "Net margin",
+    breakEven: "Break-even price",
+    suggestedPrice: "Suggested price",
+    listingNote: "Referral और closing fees item price पर calculate होती हैं, जिसमें seller shipping/gift-wrap charges भी include हो सकते हैं. यह tool attached Amazon fee schedule data effective June 10, 2026 use करता है; final pricing से पहले Seller Central recheck करो.",
   },
 };
+
+const AMAZON_REFERRAL_CATEGORIES = [
+  { id: "custom", label: "Custom referral %", slabs: [{ rate: 10 }] },
+  { id: "school_textbook", label: "School Textbook Bundles", slabs: [{ max: 250, rate: 2 }, { max: 1000, rate: 3 }, { max: 1500, rate: 4 }, { rate: 4.5 }], closingProfile: "textbook" },
+  { id: "books", label: "Books", slabs: [{ max: 250, rate: 0 }, { max: 500, rate: 2 }, { max: 1000, rate: 4 }, { rate: 13.5 }] },
+  { id: "laptops", label: "Laptops", slabs: [{ rate: 6 }] },
+  { id: "mobile_phones", label: "Mobile Phones", slabs: [{ rate: 5 }] },
+  { id: "tablets", label: "Tablets", slabs: [{ max: 300, rate: 0 }, { max: 12000, rate: 6 }, { rate: 10 }] },
+  { id: "electronics_accessories", label: "Accessories - Electronics, PC and Wireless", slabs: [{ max: 300, rate: 0 }, { max: 1000, rate: 5 }, { rate: 17 }] },
+  { id: "headphones", label: "Headsets, Headphones and Earphones", slabs: [{ max: 1000, rate: 0 }, { rate: 18 }] },
+  { id: "power_banks", label: "Power Banks and Chargers", slabs: [{ max: 1000, rate: 0 }, { rate: 20.5 }] },
+  { id: "cases_covers", label: "Cases, Covers and Screen Guards", slabs: [{ max: 1000, rate: 0 }, { rate: 25 }] },
+  { id: "beauty_other", label: "Beauty - Other products", slabs: [{ max: 500, rate: 0 }, { rate: 9 }] },
+  { id: "beauty_makeup", label: "Beauty - Make-up", slabs: [{ max: 1000, rate: 0 }, { rate: 7 }] },
+  { id: "deodorants", label: "Deodorants", slabs: [{ max: 500, rate: 0 }, { max: 1000, rate: 6.5 }, { rate: 7 }] },
+  { id: "face_wash", label: "Face Wash / Moisturiser / Sunscreen", slabs: [{ max: 500, rate: 0 }, { max: 1000, rate: 9 }, { rate: 9.5 }] },
+  { id: "pet_foods", label: "Pet Foods", slabs: [{ max: 300, rate: 0 }, { max: 1000, rate: 6.5 }, { rate: 9.5 }] },
+  { id: "toys_other", label: "Toys - Other products", slabs: [{ max: 1000, rate: 0 }, { rate: 11.5 }] },
+  { id: "toys_drones", label: "Toys - Drones", slabs: [{ max: 1000, rate: 0 }, { rate: 30 }] },
+  { id: "packing_materials", label: "Packing Materials", slabs: [{ max: 1000, rate: 0 }, { rate: 5 }] },
+  { id: "office_supplies", label: "Office Products - Office Supplies", slabs: [{ max: 1000, rate: 0 }, { rate: 13 }] },
+  { id: "sports_other", label: "Sports - Other products", slabs: [{ max: 1000, rate: 0 }, { rate: 13 }] },
+  { id: "sports_equipment", label: "Sports - Cricket/Badminton/Tennis equipment", slabs: [{ max: 1000, rate: 0 }, { rate: 8.5 }] },
+  { id: "fashion_jewellery", label: "Fashion Jewellery", slabs: [{ max: 300, rate: 0 }, { max: 1000, rate: 5 }, { rate: 22.5 }] },
+  { id: "apparel_other", label: "Apparel - Other products", slabs: [{ max: 300, rate: 0 }, { max: 1000, rate: 5 }, { rate: 19 }] },
+  { id: "kitchen", label: "Kitchen tools / Home - Other products", slabs: [{ max: 1000, rate: 0 }, { rate: 11.5 }] },
+  { id: "furniture_other", label: "Furniture - Other products", slabs: [{ max: 1000, rate: 0 }, { max: 15000, rate: 15.5 }, { rate: 11 }] },
+  { id: "major_appliances", label: "Major Appliances - Other products", slabs: [{ rate: 5.5 }] },
+];
+
+const AMAZON_FULFILMENT_CHANNELS = [
+  { id: "easy_ship", label: "Easy Ship" },
+  { id: "self_ship", label: "Self-Ship" },
+  { id: "seller_flex", label: "Seller Flex" },
+  { id: "fulfilment_centre", label: "Fulfilment Centre" },
+];
 
 const EASY_SHIP_STANDARD_FEES = {
   premium: { label: "Premium", first500: 53, upTo1kg: 73, upTo2kg: 110, after2: 34, after5: 18 },
@@ -656,6 +738,141 @@ function calculateHeavyFee(step, zone, chargeableKg) {
   const base = baseByZone[zone] || baseByZone.regional;
   const additional = EASY_SHIP_HEAVY_ADDITIONAL[zone] || EASY_SHIP_HEAVY_ADDITIONAL.regional;
   return base + Math.max(0, Math.ceil(chargeableKg) - 12) * additional;
+}
+
+function calculateEasyShipEstimate({ step, shipmentType, zone, weightGm, lengthCm, breadthCm, heightCm, returnRisk }) {
+  const actualKg = positiveNumber(weightGm) / 1000;
+  const l = positiveNumber(lengthCm);
+  const b = positiveNumber(breadthCm);
+  const h = positiveNumber(heightCm);
+  const volumetricKg = l && b && h ? (l * b * h) / 5000 : 0;
+  const rounder = shipmentType === "heavy" ? roundHeavyWeightKg : roundStandardWeightKg;
+  const actualSlabKg = rounder(actualKg);
+  const volumetricSlabKg = rounder(volumetricKg);
+  const chargeableKg = Math.max(actualSlabKg, volumetricSlabKg);
+  const calculateFee = (kg) => {
+    if (shipmentType === "heavy") return calculateHeavyFee(step, zone, kg);
+    if (shipmentType === "textbook") return calculateTextbookFee(kg);
+    return calculateStandardFee(step, kg);
+  };
+  const baseFee = calculateFee(chargeableKg);
+  const actualFee = calculateFee(actualSlabKg);
+  const volumetricFee = calculateFee(volumetricSlabKg);
+  const gst = baseFee * GST_RATE;
+  const total = baseFee + gst;
+  const returnRiskAmount = total * (positiveNumber(returnRisk) / 100);
+  const girth = l + 2 * (b + h);
+  return {
+    actualKg,
+    volumetricKg,
+    actualSlabKg,
+    volumetricSlabKg,
+    chargeableKg,
+    baseFee,
+    actualFee,
+    volumetricFee,
+    gst,
+    total,
+    suggestedBuffer: total + returnRiskAmount,
+    returnRiskAmount,
+    girth,
+    heavyWarning: actualKg > 22.5 || Math.max(l, b, h) > 183 || girth > 300,
+    volumetricHigher: volumetricSlabKg > actualSlabKg,
+  };
+}
+
+function getReferralRate(categoryId, itemPrice, customReferralRate) {
+  if (categoryId === "custom") return positiveNumber(customReferralRate);
+  const category = AMAZON_REFERRAL_CATEGORIES.find((item) => item.id === categoryId) || AMAZON_REFERRAL_CATEGORIES[0];
+  const slab = category.slabs.find((item) => item.max === undefined || itemPrice <= item.max) || category.slabs.at(-1);
+  return slab?.rate || 0;
+}
+
+function getClosingFee(channel, itemPrice, categoryId) {
+  const category = AMAZON_REFERRAL_CATEGORIES.find((item) => item.id === categoryId);
+  if (category?.closingProfile === "textbook") {
+    if (channel === "fulfilment_centre") {
+      if (itemPrice <= 500) return 2.4;
+      if (itemPrice <= 1000) return 3;
+      if (itemPrice <= 1500) return 6;
+      return 30;
+    }
+    if (channel === "seller_flex") {
+      if (itemPrice <= 250) return 1.6;
+      if (itemPrice <= 500) return 2.2;
+      if (itemPrice <= 1000) return 6;
+      return 9;
+    }
+    if (itemPrice <= 250) return 0.75;
+    if (itemPrice <= 500) return 1.2;
+    if (itemPrice <= 1000) return 4.2;
+    return 7.5;
+  }
+
+  if (channel === "self_ship") {
+    if (itemPrice <= 300) return 20;
+    if (itemPrice <= 500) return 26;
+    if (itemPrice <= 1000) return 51;
+    return 101;
+  }
+  if (channel === "seller_flex") {
+    if (itemPrice <= 300) return 6;
+    if (itemPrice <= 500) return 12;
+    if (itemPrice <= 1000) return 35;
+    return 66;
+  }
+  if (channel === "fulfilment_centre") {
+    if (itemPrice <= 300) return 26;
+    if (itemPrice <= 500) return 22;
+    if (itemPrice <= 1000) return 27;
+    return 52;
+  }
+  if (itemPrice <= 300) return 1;
+  if (itemPrice <= 500) return 22;
+  if (itemPrice <= 1000) return 45;
+  return 76;
+}
+
+function calculateListingEstimate({
+  itemPrice,
+  categoryId,
+  customReferralRate,
+  fulfilmentChannel,
+  productCost,
+  packagingCost,
+  adCost,
+  shippingFee,
+  includeShipping,
+  targetProfit,
+}) {
+  const price = positiveNumber(itemPrice);
+  const referralRate = getReferralRate(categoryId, price, customReferralRate);
+  const referralFee = price * (referralRate / 100);
+  const closingFee = getClosingFee(fulfilmentChannel, price, categoryId);
+  const amazonFeesBeforeGst = referralFee + closingFee;
+  const feeGst = amazonFeesBeforeGst * GST_RATE;
+  const shipping = includeShipping ? positiveNumber(shippingFee) : 0;
+  const baseCosts = positiveNumber(productCost) + positiveNumber(packagingCost) + positiveNumber(adCost) + shipping;
+  const totalCost = baseCosts + amazonFeesBeforeGst + feeGst;
+  const profit = price - totalCost;
+  const margin = price ? profit / price : 0;
+  const variableFeeRate = (referralRate / 100) * (1 + GST_RATE);
+  const fixedCosts = baseCosts + closingFee * (1 + GST_RATE);
+  const breakEven = variableFeeRate < 1 ? fixedCosts / (1 - variableFeeRate) : 0;
+  const suggestedPrice = variableFeeRate < 1 ? (fixedCosts + positiveNumber(targetProfit)) / (1 - variableFeeRate) : 0;
+  return {
+    referralRate,
+    referralFee,
+    closingFee,
+    amazonFeesBeforeGst,
+    feeGst,
+    shipping,
+    totalCost,
+    profit,
+    margin,
+    breakEven,
+    suggestedPrice,
+  };
 }
 
 function formatWeight(kg) {
@@ -2575,6 +2792,7 @@ function CommandBar({ activeNav, lang, setLang }) {
 function AmazonShippingCalculator() {
   const { lang } = useLanguage();
   const t = amazonFeeCopy[lang] || amazonFeeCopy.en;
+  const [mode, setMode] = useState("listing");
   const [step, setStep] = useState("standard");
   const [shipmentType, setShipmentType] = useState("standard");
   const [zone, setZone] = useState("regional");
@@ -2582,52 +2800,33 @@ function AmazonShippingCalculator() {
   const [lengthCm, setLengthCm] = useState("20");
   const [breadthCm, setBreadthCm] = useState("15");
   const [heightCm, setHeightCm] = useState("5");
-  const [sellingPrice, setSellingPrice] = useState("");
   const [returnRisk, setReturnRisk] = useState("15");
+  const [itemPrice, setItemPrice] = useState("499");
+  const [productCost, setProductCost] = useState("180");
+  const [packagingCost, setPackagingCost] = useState("10");
+  const [adCost, setAdCost] = useState("20");
+  const [targetProfit, setTargetProfit] = useState("50");
+  const [categoryId, setCategoryId] = useState("packing_materials");
+  const [customReferralRate, setCustomReferralRate] = useState("10");
+  const [fulfilmentChannel, setFulfilmentChannel] = useState("easy_ship");
+  const [includeShipping, setIncludeShipping] = useState(true);
 
   const result = useMemo(() => {
-    const actualKg = positiveNumber(weightGm) / 1000;
-    const l = positiveNumber(lengthCm);
-    const b = positiveNumber(breadthCm);
-    const h = positiveNumber(heightCm);
-    const volumetricKg = l && b && h ? (l * b * h) / 5000 : 0;
-    const rounder = shipmentType === "heavy" ? roundHeavyWeightKg : roundStandardWeightKg;
-    const actualSlabKg = rounder(actualKg);
-    const volumetricSlabKg = rounder(volumetricKg);
-    const chargeableKg = Math.max(actualSlabKg, volumetricSlabKg);
-    const calculateFee = (kg) => {
-      if (shipmentType === "heavy") return calculateHeavyFee(step, zone, kg);
-      if (shipmentType === "textbook") return calculateTextbookFee(kg);
-      return calculateStandardFee(step, kg);
-    };
-    const baseFee = calculateFee(chargeableKg);
-    const actualFee = calculateFee(actualSlabKg);
-    const volumetricFee = calculateFee(volumetricSlabKg);
-    const gst = baseFee * GST_RATE;
-    const total = baseFee + gst;
-    const returnRiskAmount = total * (positiveNumber(returnRisk) / 100);
-    const suggestedBuffer = total + returnRiskAmount;
-    const girth = l + 2 * (b + h);
-    const heavyWarning = actualKg > 22.5 || Math.max(l, b, h) > 183 || girth > 300;
-    return {
-      actualKg,
-      volumetricKg,
-      actualSlabKg,
-      volumetricSlabKg,
-      chargeableKg,
-      baseFee,
-      actualFee,
-      volumetricFee,
-      gst,
-      total,
-      suggestedBuffer,
-      returnRiskAmount,
-      girth,
-      heavyWarning,
-      price: positiveNumber(sellingPrice),
-      volumetricHigher: volumetricSlabKg > actualSlabKg,
-    };
-  }, [breadthCm, heightCm, lengthCm, returnRisk, sellingPrice, shipmentType, step, weightGm, zone]);
+    return calculateEasyShipEstimate({ step, shipmentType, zone, weightGm, lengthCm, breadthCm, heightCm, returnRisk });
+  }, [breadthCm, heightCm, lengthCm, returnRisk, shipmentType, step, weightGm, zone]);
+
+  const listingResult = useMemo(() => calculateListingEstimate({
+    itemPrice,
+    categoryId,
+    customReferralRate,
+    fulfilmentChannel,
+    productCost,
+    packagingCost,
+    adCost,
+    shippingFee: result.total,
+    includeShipping: includeShipping && fulfilmentChannel === "easy_ship",
+    targetProfit,
+  }), [adCost, categoryId, customReferralRate, fulfilmentChannel, includeShipping, itemPrice, packagingCost, productCost, result.total, targetProfit]);
 
   const stepOptions = Object.entries(EASY_SHIP_STANDARD_FEES);
   const shipmentOptions = [
@@ -2645,13 +2844,70 @@ function AmazonShippingCalculator() {
     <>
       <section className="module-header">
         <span>{t.kicker}</span>
-        <h1>{t.title}<HelpTip text="Fees are estimated from Amazon Easy Ship policy tables. Use Seller Central for final billing confirmation." /></h1>
+        <h1>{t.title}<HelpTip text="Fees are estimated from the attached Amazon fee schedule and Easy Ship policy tables. Use Seller Central for final billing confirmation." /></h1>
         <p>{t.intro}</p>
       </section>
 
+      <nav className="market-tabs amazon-mode-tabs">
+        <button type="button" className={mode === "shipping" ? "active" : ""} onClick={() => setMode("shipping")}>
+          {t.shippingTab}
+        </button>
+        <button type="button" className={mode === "listing" ? "active" : ""} onClick={() => setMode("listing")}>
+          {t.listingTab}
+        </button>
+      </nav>
+
       <section className="shipping-calculator-grid">
         <div className="portal-card shipping-input-card">
-          <h2><Calculator size={18} /> {lang === "hi" ? "Inputs" : "Inputs"}</h2>
+          <h2><Calculator size={18} /> {mode === "listing" ? t.listingTab : t.shippingTab}</h2>
+
+          {mode === "listing" && (
+            <>
+              <div className="calculator-field-grid">
+                <NumberField label={`${t.itemPrice} (Rs)`} value={itemPrice} onChange={setItemPrice} />
+                <NumberField label={`${t.productCost} (Rs)`} value={productCost} onChange={setProductCost} />
+                <NumberField label={`${t.packagingCost} (Rs)`} value={packagingCost} onChange={setPackagingCost} />
+                <NumberField label={`${t.adCost} (Rs)`} value={adCost} onChange={setAdCost} />
+                <NumberField label={`${t.targetProfit} (Rs)`} value={targetProfit} onChange={setTargetProfit} />
+              </div>
+
+              <label className="calculator-field full">
+                <span>{t.category}</span>
+                <select value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
+                  {AMAZON_REFERRAL_CATEGORIES.map((category) => (
+                    <option key={category.id} value={category.id}>{category.label}</option>
+                  ))}
+                </select>
+              </label>
+
+              {categoryId === "custom" && (
+                <NumberField label={t.customReferral} value={customReferralRate} onChange={setCustomReferralRate} />
+              )}
+
+              <label className="calculator-field full">
+                <span>{t.fulfilment}</span>
+                <div className="pill-selector">
+                  {AMAZON_FULFILMENT_CHANNELS.map((channel) => (
+                    <button
+                      key={channel.id}
+                      className={fulfilmentChannel === channel.id ? "active" : ""}
+                      type="button"
+                      onClick={() => setFulfilmentChannel(channel.id)}
+                    >
+                      {channel.label}
+                    </button>
+                  ))}
+                </div>
+              </label>
+
+              {fulfilmentChannel === "easy_ship" && (
+                <label className="amazon-toggle-row">
+                  <input checked={includeShipping} type="checkbox" onChange={(event) => setIncludeShipping(event.target.checked)} />
+                  <span>{t.includeShipping}</span>
+                </label>
+              )}
+            </>
+          )}
 
           <label className="calculator-field full">
             <span>{t.step}</span>
@@ -2706,12 +2962,12 @@ function AmazonShippingCalculator() {
             <NumberField label={`${t.length} (cm)`} value={lengthCm} onChange={setLengthCm} />
             <NumberField label={`${t.breadth} (cm)`} value={breadthCm} onChange={setBreadthCm} />
             <NumberField label={`${t.height} (cm)`} value={heightCm} onChange={setHeightCm} />
-            <NumberField label={`${t.sellingPrice} (${t.optional})`} value={sellingPrice} onChange={setSellingPrice} />
             <NumberField label={`${t.returnRisk} %`} value={returnRisk} onChange={setReturnRisk} />
           </div>
         </div>
 
-        <div className="portal-card fee-result-card">
+        {mode === "shipping" ? (
+          <div className="portal-card fee-result-card">
           <h2><IndianRupee size={18} /> {t.summary}</h2>
           <div className="shipping-kpis">
             <MiniMetric label={t.chargeable} value={formatWeight(result.chargeableKg)} tone="blue" />
@@ -2724,7 +2980,7 @@ function AmazonShippingCalculator() {
             <strong>{t.buffer}: {moneyPrecise(result.suggestedBuffer)}</strong>
             <span>
               {moneyPrecise(result.total)} Easy Ship + {moneyPrecise(result.returnRiskAmount)} return-risk buffer
-              {result.price ? ` (${((result.suggestedBuffer / result.price) * 100).toFixed(1)}% of selling price)` : ""}
+              {positiveNumber(itemPrice) ? ` (${((result.suggestedBuffer / positiveNumber(itemPrice)) * 100).toFixed(1)}% of selling price)` : ""}
             </span>
           </div>
 
@@ -2749,12 +3005,55 @@ function AmazonShippingCalculator() {
 
           {result.heavyWarning && <p className="soft-warning">{t.dimensionWarning}</p>}
         </div>
+        ) : (
+          <div className="portal-card fee-result-card">
+            <h2><IndianRupee size={18} /> {t.listingSummary}</h2>
+            <div className="shipping-kpis">
+              <MiniMetric label={t.netProfit} value={moneyPrecise(listingResult.profit)} tone={listingResult.profit >= 0 ? "green" : "red"} />
+              <MiniMetric label={t.margin} value={`${(listingResult.margin * 100).toFixed(1)}%`} tone="blue" />
+              <MiniMetric label={t.breakEven} value={moneyPrecise(listingResult.breakEven)} tone="orange" />
+              <MiniMetric label={t.suggestedPrice} value={moneyPrecise(listingResult.suggestedPrice)} tone="purple" />
+            </div>
+
+            <div className="fee-highlight">
+              <strong>{t.totalCost}: {moneyPrecise(listingResult.totalCost)}</strong>
+              <span>
+                {t.referralFee} {moneyPrecise(listingResult.referralFee)} ({listingResult.referralRate.toFixed(2)}%) + {t.closingFee} {moneyPrecise(listingResult.closingFee)} + {t.feeGst} {moneyPrecise(listingResult.feeGst)}
+              </span>
+            </div>
+
+            <div className="comparison-card">
+              <h3>{lang === "hi" ? "Cost breakup" : "Cost breakup"}</h3>
+              <div className="comparison-row">
+                <span>{t.amazonFees}</span>
+                <strong>{moneyPrecise(listingResult.amazonFeesBeforeGst)}</strong>
+                <em>{t.referralFee} + {t.closingFee}</em>
+              </div>
+              <div className="comparison-row">
+                <span>{t.feeGst}</span>
+                <strong>{moneyPrecise(listingResult.feeGst)}</strong>
+                <em>18% GST</em>
+              </div>
+              <div className="comparison-row">
+                <span>Easy Ship</span>
+                <strong>{moneyPrecise(listingResult.shipping)}</strong>
+                <em>{formatWeight(result.chargeableKg)} chargeable</em>
+              </div>
+              <div className="comparison-row selected">
+                <span>{t.netProfit}</span>
+                <strong>{moneyPrecise(listingResult.profit)}</strong>
+                <em>{listingResult.profit >= 0 ? "Profitable at this price" : "Increase price or reduce cost"}</em>
+              </div>
+            </div>
+          </div>
+        )}
       </section>
 
       <section className="portal-card fee-policy-card">
         <h2><ShieldAlert size={18} /> {t.policy}</h2>
+        {mode === "listing" && <p className="soft-note">{t.listingNote}</p>}
         <div>
-          {t.policyLines.map((line) => <CheckLine key={line}>{line}</CheckLine>)}
+          {t.policyLines.map((line) => <CheckLine key={line} text={line} />)}
         </div>
       </section>
     </>

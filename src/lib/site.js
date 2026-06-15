@@ -7,7 +7,7 @@ export const site = {
   contactEmail: "shree.anjaneya.1304@gmail.com",
   jurisdiction: "Rajasthan, India",
   description:
-    "Free browser-based ecommerce seller tools for Flipkart label crop, Meesho 4-up and 6-up label PDFs, Amazon Easy Ship fee calculator, volumetric weight checks, courier and SKU label sorting, picklist generation, GST helper values, performance insights, and marketplace data analysis.",
+    "Free browser-based ecommerce seller tools for Flipkart label crop, Meesho 4-up and 6-up label PDFs, Amazon Easy Ship fee calculator, Amazon listing price and profit calculator, volumetric weight checks, courier and SKU label sorting, picklist generation, GST helper values, performance insights, and marketplace data analysis.",
   url: siteUrl,
   keywords: [
     "flipkart label crop",
@@ -33,6 +33,10 @@ export const site = {
     "sort shipping labels by sku",
     "label printer 4x6 pdf",
     "amazon easy ship fee calculator",
+    "amazon listing price calculator",
+    "amazon profit calculator india",
+    "amazon referral fee calculator",
+    "amazon closing fee calculator",
     "amazon shipping fee calculator india",
     "amazon volumetric weight calculator",
     "easy ship weight handling fee",
@@ -60,8 +64,8 @@ export const landingFeatures = [
     text: "Upload multiple label PDFs, sort courier-wise or SKU-wise, download combined or courier-wise sorted label PDFs, print courier-wise label PDFs, and generate a packing picklist with seller account and courier pickup counts.",
   },
   {
-    title: "Amazon Easy Ship fee calculator",
-    text: "Estimate actual and volumetric chargeable weight, GST-inclusive Easy Ship fee, and pricing buffers for Amazon India seller orders.",
+    title: "Amazon fee and listing price calculator",
+    text: "Estimate actual and volumetric chargeable weight, GST-inclusive Easy Ship fee, referral fee, closing fee, break-even selling price, profit, and pricing buffers for Amazon India seller orders.",
   },
   {
     title: "Private browser processing",
