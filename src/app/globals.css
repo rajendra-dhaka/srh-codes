@@ -1093,6 +1093,214 @@ main {
   margin-bottom: 16px;
 }
 
+.gst-return-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(128px, 1fr));
+  gap: 6px;
+  padding: 5px;
+  border: 1px solid #d9e4f2;
+  border-radius: 8px;
+  background: #f8fbff;
+}
+
+.gst-return-switch button {
+  min-height: 54px;
+  display: grid;
+  align-content: center;
+  gap: 3px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #475569;
+  cursor: pointer;
+}
+
+.gst-return-switch button strong,
+.gst-return-switch button small {
+  display: block;
+}
+
+.gst-return-switch button strong {
+  font-size: 14px;
+}
+
+.gst-return-switch button small {
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.gst-return-switch button.active {
+  background: #17324d;
+  color: #ffffff;
+}
+
+.gst-market-switch {
+  width: fit-content;
+  margin: 0 0 14px auto;
+}
+
+.gst-layout.guided {
+  grid-template-columns: minmax(360px, 0.92fr) minmax(430px, 1.08fr);
+  align-items: start;
+}
+
+.filing-guide {
+  position: sticky;
+  top: 16px;
+}
+
+.filing-steps {
+  display: grid;
+  gap: 8px;
+}
+
+.filing-steps .accordion-card {
+  box-shadow: none;
+  border-color: #e2eaf4;
+}
+
+.filing-steps .accordion-head {
+  min-height: 48px;
+  padding: 11px 12px;
+  text-align: left;
+  gap: 12px;
+}
+
+.filing-steps .accordion-head strong {
+  flex: 0 0 auto;
+}
+
+.filing-steps .accordion-body {
+  padding: 0 12px 11px;
+}
+
+.filing-steps .accordion-body p {
+  padding: 10px 0 0;
+  font-size: 13px;
+}
+
+.gst-source-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.gst-source-status.ready {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.gst-source-status svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.gst-source-status strong,
+.gst-source-status span {
+  display: block;
+}
+
+.gst-source-status span {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.gst-assistance-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.gst-assistance-note svg {
+  flex: 0 0 auto;
+  color: #b45309;
+}
+
+.gst-back-to-one {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 11px 14px;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.gst-back-to-one svg {
+  transform: rotate(180deg);
+}
+
+.portal-value-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 9px 11px;
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  background: #ecfdf5;
+  color: #166534;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.portal-value-note svg {
+  flex: 0 0 auto;
+}
+
+.gst-kpis.four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.gstr3b-final-grid {
+  align-items: stretch;
+}
+
+.gstr3b-final-grid .portal-card {
+  margin-bottom: 0;
+}
+
+.remaining-credit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #ecfdf5;
+  color: #166534;
+}
+
+.remaining-credit span {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.remaining-credit strong {
+  white-space: nowrap;
+  font-size: 17px;
+}
+
 .gst-upload-panel,
 .gst-guidance,
 .portal-card,
@@ -1260,10 +1468,23 @@ main {
   margin-bottom: 14px;
 }
 
-.calculator-field span {
+.calculator-field > span,
+.calculator-field .field-label {
   color: #17324d;
   font-size: 13px;
   font-weight: 900;
+}
+
+.field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  line-height: 1.2;
+}
+
+.field-label .help-tip-wrap {
+  transform: translateY(0);
 }
 
 .calculator-field input,
@@ -2993,6 +3214,18 @@ tr:nth-child(even) td {
     grid-template-columns: 1fr;
   }
 
+  .gst-layout.guided {
+    grid-template-columns: 1fr;
+  }
+
+  .filing-guide {
+    position: static;
+  }
+
+  .gst-kpis.four {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .processing-kpis,
   .shipping-kpis {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3315,6 +3548,49 @@ tr:nth-child(even) td {
   color: #06202a;
 }
 
+.theme-dark .gst-return-switch {
+  border-color: #2f4058;
+  background: #0b1320;
+}
+
+.theme-dark .gst-return-switch button {
+  color: #b8c7dc;
+}
+
+.theme-dark .gst-return-switch button.active {
+  background: #00a6a6;
+  color: #06202a;
+}
+
+.theme-dark .gst-source-status {
+  border-color: #7c4a17;
+  background: #2b1d0d;
+  color: #fdba74;
+}
+
+.theme-dark .gst-source-status.ready {
+  border-color: #166534;
+  background: #0d2518;
+  color: #86efac;
+}
+
+.theme-dark .gst-assistance-note,
+.theme-dark .portal-value-note,
+.theme-dark .remaining-credit {
+  color: #b8c7dc;
+}
+
+.theme-dark .portal-value-note,
+.theme-dark .remaining-credit {
+  border-color: #2f4058;
+  background: #111c2e;
+}
+
+.theme-dark .gst-back-to-one {
+  background: #00a6a6;
+  color: #06202a;
+}
+
 .theme-dark th {
   background: #0b1320;
 }
@@ -3405,6 +3681,16 @@ tr:nth-child(even) td {
     flex-direction: column;
   }
 
+  .gst-return-switch,
+  .gst-market-switch {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .gst-return-switch {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .platform-switch {
     width: 100%;
     overflow-x: auto;
@@ -3421,6 +3707,10 @@ tr:nth-child(even) td {
   .business-layout,
   .lifecycle-grid,
   .gst-kpis {
+    grid-template-columns: 1fr;
+  }
+
+  .gst-kpis.four {
     grid-template-columns: 1fr;
   }
 

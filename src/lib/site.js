@@ -7,7 +7,7 @@ export const site = {
   contactEmail: "shree.anjaneya.1304@gmail.com",
   jurisdiction: "Rajasthan, India",
   description:
-    "Free browser-based ecommerce seller tools for Flipkart label crop, Meesho 4-up and 6-up label PDFs, Amazon Easy Ship fee calculator, Amazon listing price and profit calculator, volumetric weight checks, courier and SKU label sorting, picklist generation, GST helper values, performance insights, and marketplace data analysis.",
+    "Free ecommerce seller tools for Flipkart and Meesho labels, Amazon fees and pricing, GSTR-1 tables, GSTR-2B ITC reconciliation, guided GSTR-3B filing checks, performance insights, and marketplace data analysis.",
   url: siteUrl,
   keywords: [
     "flipkart label crop",
@@ -34,7 +34,12 @@ export const site = {
     "label printer 4x6 pdf",
     "amazon easy ship fee calculator",
     "amazon listing price calculator",
+    "amazon listing price calculator with gst",
+    "amazon seller price calculator with gst",
     "amazon profit calculator india",
+    "amazon gst profit calculator",
+    "amazon margin calculator india",
+    "amazon break even price calculator",
     "amazon referral fee calculator",
     "amazon closing fee calculator",
     "amazon shipping fee calculator india",
@@ -43,6 +48,12 @@ export const site = {
     "amazon seller shipping cost calculator",
     "gst helper for sellers",
     "gstr 1 helper",
+    "gstr 3b helper",
+    "gstr 3b filing guide",
+    "gstr 2b reconciliation",
+    "gstr 2b itc reconciliation",
+    "ecommerce seller gst return",
+    "meesho gst filing helper",
     "ecommerce seller insights tools",
     "seller performance analytics",
     "marketplace data analysis",
@@ -65,7 +76,7 @@ export const landingFeatures = [
   },
   {
     title: "Amazon fee and listing price calculator",
-    text: "Estimate actual and volumetric chargeable weight, GST-inclusive Easy Ship fee, referral fee, closing fee, break-even selling price, profit, and pricing buffers for Amazon India seller orders.",
+    text: "Estimate actual and volumetric chargeable weight, GST-inclusive Easy Ship fee, referral fee, closing fee, GST paid on cost price, balance GST, break-even selling price, profit, and pricing buffers for Amazon India seller orders.",
   },
   {
     title: "Private browser processing",
@@ -73,7 +84,7 @@ export const landingFeatures = [
   },
   {
     title: "Seller analytics workspace",
-    text: "Analyze marketplace orders, payments, ads, returns, GST helper tables, performance insights, and seller data in one app.",
+    text: "Analyze marketplace data, prepare GSTR-1 tables, reconcile GSTR-2B ITC, estimate GSTR-3B set-off, and follow guided filing steps in one app.",
   },
 ];
 

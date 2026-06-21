@@ -112,7 +112,7 @@ const shellCopy = {
     performance: "Performance",
     performanceHint: "Sales, ads, returns",
     gst: "GST Analysis",
-    gstHint: "GSTR-1 helper",
+    gstHint: "GSTR-1 and 3B helper",
     processing: "Labels",
     processingHint: "Sort, picklist, print",
     shipping: "Amazon Calculator",
@@ -132,7 +132,7 @@ const shellCopy = {
     performance: "परफॉर्मेंस",
     performanceHint: "सेल्स, ऐड्स, रिटर्न",
     gst: "जीएसटी एनालिसिस",
-    gstHint: "GSTR-1 helper",
+    gstHint: "GSTR-1 और 3B helper",
     processing: "लेबल्स",
     processingHint: "Sort, picklist, print",
     shipping: "Amazon Calculator",
@@ -503,11 +503,112 @@ const gstCopy = {
   },
 };
 
+const gstReturnCopy = {
+  en: {
+    gstr1: "GSTR-1",
+    gstr3b: "GSTR-3B",
+    gstr1Hint: "Report outward supplies",
+    gstr3bHint: "Claim ITC and pay tax",
+    guideTitle: "Step-by-step filing guide",
+    guideHelp: "Follow the portal steps in order. Each step tells you which value from this workspace belongs in which GST table.",
+    evaluatedValue: "Use this evaluated data",
+    gstr1Steps: [
+      ["1. Open the return", "GST Portal > Services > Returns > Returns Dashboard. Select financial year and month, then open GSTR-1 > Prepare Online."],
+      ["2. Upload marketplace reports here", "Choose the seller home GST state, upload the Meesho GST Report ZIP and Tax Invoice ZIP, then generate the summary."],
+      ["3. Fill Table 7 - B2C Others", "Add every state/rate row shown in Table 7. Keep differential percentage unchecked unless a notified special rate genuinely applies."],
+      ["4. Fill Table 12 - HSN Summary", "Open the B2C Supplies tab and copy each HSN row: HSN, UQC, quantity, taxable value and tax amounts."],
+      ["5. Fill Table 13 - Documents Issued", "Copy the invoice/document series shown here. Enter From, To, total issued, cancelled and net issued exactly from the source records."],
+      ["6. Review Table 14 - ECO", "Use the operator GSTIN and net supplies shown by the marketplace report. This TCS disclosure is different from section 9(5) supplies."],
+      ["7. Generate summary and file", "Generate the portal summary, download the preview PDF, reconcile totals, then file GSTR-1 with EVC/DSC."],
+    ],
+    gstr3bSteps: [
+      ["1. File GSTR-1 first", "Complete GSTR-1 for the same month. GSTR-3B outward liability is auto-drafted from GSTR-1 and must be reconciled with the summary below."],
+      ["2. Download GSTR-2B", "GST Portal > Returns Dashboard > GSTR-2B > Download Summary Excel. Keep the matching purchase and expense invoices as supporting records."],
+      ["3. Generate the GSTR-3B check here", "Upload the GSTR-2B Excel. This workspace compares outward liability with eligible ITC, unavailable ITC, reversals and rejected credits."],
+      ["4. Verify Tables 3.1 and 3.2", "Copy/reconcile outward taxable value and tax in Table 3.1(a). Table 3.2 contains only interstate supplies to unregistered/composition/UIN recipients."],
+      ["5. Verify Table 4 - Eligible ITC", "Use the GSTR-2B values shown here. Claim only genuine business invoices that satisfy ITC conditions; review unavailable, rejected and reversal amounts before confirming."],
+      ["6. Review Table 5 and save", "Enter composition, exempt, nil-rated and non-GST inward supplies only if applicable. Save GSTR-3B and download the draft preview."],
+      ["7. Offset and file", "Proceed to Payment, review the portal's ITC utilisation, create a challan only for actual cash required, post credit to ledger, then file with EVC/DSC."],
+    ],
+    threeBTitle: "GSTR-3B filing check",
+    threeBIntro: "Combine the generated GSTR-1 liability with your GSTR-2B to prepare Tables 3.1, 3.2 and 4 before filing.",
+    twoBTitle: "GSTR-2B Summary Excel",
+    twoBHint: "Download from GST Portal for the selected return month",
+    twoBHelp: "Use the official GSTR-2B summary Excel. The tool reads available, unavailable, reversal and rejected ITC sections in your browser.",
+    systemThreeBTitle: "System-generated GSTR-3B PDF",
+    systemThreeBHint: "Optional reference downloaded from the GSTR-3B page",
+    systemThreeBHelp: "Optional record for your own reconciliation. The calculator uses GSTR-1 results and the GSTR-2B Excel for evaluated values.",
+    generateThreeB: "Generate GSTR-3B Check",
+    needGstr1: "Generate the GSTR-1 summary in this workspace first so outward liability can be carried into GSTR-3B.",
+    liabilityReady: "GSTR-1 liability ready",
+    liabilityRequired: "GSTR-1 liability required",
+    liabilitySummary: (taxable, gst) => `Net taxable Rs ${taxable} / GST Rs ${gst}`,
+    readinessTitle: "Before you claim ITC",
+    readiness: [
+      "Invoice is addressed to your GSTIN and appears as available in GSTR-2B.",
+      "Goods or services were received and are used for business.",
+      "Personal, blocked or otherwise ineligible credits are excluded or reversed.",
+      "Keep purchase, marketplace fee, advertising and equipment invoices safely in your records.",
+    ],
+    assistanceNote: "Helper only: GST returns are self-assessed. Verify source invoices, portal auto-drafted values and current legal requirements before filing.",
+    analyzeThreeB: "Reading GSTR-2B...",
+  },
+  hi: {
+    gstr1: "GSTR-1",
+    gstr3b: "GSTR-3B",
+    gstr1Hint: "Outward supplies report करो",
+    gstr3bHint: "ITC claim और tax pay करो",
+    guideTitle: "Step-by-step filing guide",
+    guideHelp: "Portal steps को order में follow करो. हर step बताता है कि workspace की evaluated value GST portal की किस table में जाएगी.",
+    evaluatedValue: "ये evaluated data use करो",
+    gstr1Steps: [
+      ["1. Return खोलो", "GST Portal > Services > Returns > Returns Dashboard. Financial year और month select करके GSTR-1 > Prepare Online खोलो."],
+      ["2. Marketplace reports upload करो", "Seller home GST state चुनो, मीशो GST Report ZIP और Tax Invoice ZIP upload करके summary generate करो."],
+      ["3. Table 7 - B2C Others भरो", "Table 7 में दिख रही हर state/rate row add करो. कोई notified special rate न हो तो differential percentage checkbox unticked रखो."],
+      ["4. Table 12 - HSN Summary भरो", "B2C Supplies tab में हर HSN row का HSN, UQC, quantity, taxable value और tax amount copy करो."],
+      ["5. Table 13 - Documents Issued भरो", "यहां दिखाई invoice/document series से From, To, total issued, cancelled और net issued भरो."],
+      ["6. Table 14 - ECO review करो", "Marketplace report वाला operator GSTIN और net supplies use करो. ये TCS disclosure section 9(5) supplies से अलग है."],
+      ["7. Summary generate करके file करो", "Portal summary generate करो, preview PDF download करके totals reconcile करो, फिर EVC/DSC से GSTR-1 file करो."],
+    ],
+    gstr3bSteps: [
+      ["1. पहले GSTR-1 file करो", "उसी month का GSTR-1 complete करो. GSTR-3B outward liability GSTR-1 से auto-draft होती है और नीचे की summary से match करनी है."],
+      ["2. GSTR-2B download करो", "GST Portal > Returns Dashboard > GSTR-2B > Download Summary Excel. Matching purchase और expense invoices records में रखो."],
+      ["3. यहां GSTR-3B check generate करो", "GSTR-2B Excel upload करो. Workspace outward liability, eligible ITC, unavailable ITC, reversals और rejected credits compare करेगा."],
+      ["4. Tables 3.1 और 3.2 verify करो", "Table 3.1(a) में outward taxable value और tax reconcile करो. Table 3.2 में केवल interstate unregistered/composition/UIN supplies आती हैं."],
+      ["5. Table 4 - Eligible ITC verify करो", "यहां दिखाई GSTR-2B values use करो. केवल genuine business invoices claim करो और unavailable, rejected, reversal amounts review करो."],
+      ["6. Table 5 review करके save करो", "Applicable होने पर composition, exempt, nil-rated और non-GST inward supplies भरो. GSTR-3B save करके draft preview download करो."],
+      ["7. Liability offset करके file करो", "Proceed to Payment में ITC utilisation check करो, actual cash required हो तभी challan बनाओ, credit ledger post करके EVC/DSC से file करो."],
+    ],
+    threeBTitle: "GSTR-3B filing check",
+    threeBIntro: "Generated GSTR-1 liability को GSTR-2B से combine करके filing से पहले Tables 3.1, 3.2 और 4 prepare करो.",
+    twoBTitle: "GSTR-2B Summary Excel",
+    twoBHint: "Selected return month के लिए GST Portal से download करो",
+    twoBHelp: "Official GSTR-2B summary Excel use करो. Tool available, unavailable, reversal और rejected ITC browser में read करता है.",
+    systemThreeBTitle: "System-generated GSTR-3B PDF",
+    systemThreeBHint: "GSTR-3B page से downloaded optional reference",
+    systemThreeBHelp: "Optional reconciliation record. Evaluated values के लिए calculator GSTR-1 result और GSTR-2B Excel use करता है.",
+    generateThreeB: "GSTR-3B Check generate करो",
+    needGstr1: "Outward liability carry करने के लिए पहले इसी workspace में GSTR-1 summary generate करो.",
+    liabilityReady: "GSTR-1 liability तैयार है",
+    liabilityRequired: "GSTR-1 liability जरूरी है",
+    liabilitySummary: (taxable, gst) => `Net taxable Rs ${taxable} / GST Rs ${gst}`,
+    readinessTitle: "ITC claim करने से पहले",
+    readiness: [
+      "Invoice आपके GSTIN पर है और GSTR-2B में available दिख रहा है.",
+      "Goods/service receive हुई है और business में use होती है.",
+      "Personal, blocked या ineligible credit exclude/reverse किया है.",
+      "Purchase, marketplace fee, advertising और equipment invoices records में सुरक्षित रखे हैं.",
+    ],
+    assistanceNote: "Helper only: GST returns self-assessed हैं. Filing से पहले source invoices, portal auto-drafted values और current legal requirements verify करो.",
+    analyzeThreeB: "GSTR-2B read हो रहा है...",
+  },
+};
+
 const amazonFeeCopy = {
   en: {
     kicker: "Amazon Calculator",
     title: "Fees and listing price calculator",
-    intro: "Estimate Easy Ship shipping fees, referral fees, closing fees, GST on Amazon fees, profit, margin, and break-even listing price in one workspace.",
+    intro: "Estimate Easy Ship fees, referral fees, closing fees, GST-inclusive selling price, GST already paid on costs, balance GST, profit, margin, and break-even listing price in one workspace.",
     shippingTab: "Shipping fee",
     listingTab: "Listing price",
     step: "STEP level",
@@ -516,10 +617,14 @@ const amazonFeeCopy = {
     fulfilment: "Fulfilment channel",
     category: "Referral fee category",
     customReferral: "Custom referral %",
-    itemPrice: "Listing price",
-    productCost: "Product cost",
-    packagingCost: "Packaging cost",
-    adCost: "Ad / promotion cost",
+    itemPrice: "Selling price including GST",
+    saleGstRate: "Product GST rate",
+    productCost: "Cost price including GST",
+    productGstRate: "Cost GST rate",
+    packagingCost: "Packing cost including GST",
+    packagingGstRate: "Packing GST rate",
+    adCost: "Ad cost including GST",
+    adGstRate: "Ad GST rate",
     includeShipping: "Include Easy Ship fee",
     targetProfit: "Target profit",
     targetMargin: "Target margin",
@@ -559,17 +664,45 @@ const amazonFeeCopy = {
     closingFee: "Closing fee",
     amazonFees: "Amazon fees before GST",
     feeGst: "GST on Amazon fees",
-    totalCost: "Total cost",
-    netProfit: "Net profit",
+    taxableSale: "Price before GST",
+    outputGst: "GST in selling price",
+    inputGst: "GST already paid on costs",
+    netGstPayable: "Balance GST to pay",
+    gstCredit: "Extra GST credit",
+    totalCost: "Tax-adjusted cost",
+    netProfit: "Profit after GST adjustment",
     margin: "Net margin",
     breakEven: "Break-even price",
     suggestedPrice: "Suggested price",
-    listingNote: "Referral and closing fees are calculated on item price including seller shipping/gift-wrap charges. This tool uses attached Amazon fee schedule data effective June 10, 2026 and should be rechecked with Seller Central before final pricing.",
+    listingNote: "Enter selling price and costs including GST. The calculator separates GST inside the selling price, subtracts GST already paid on costs, and shows the balance GST impact before estimating profit. Referral and closing fees are estimated from attached Amazon fee schedule data effective June 10, 2026; recheck Seller Central before final pricing.",
+    tooltips: {
+      itemPrice: "Final customer price on Amazon including GST. Example: customer pays Rs 499, enter 499.",
+      saleGstRate: "GST rate applicable on the product you sell. Set 18 for most taxable goods, 12/5/0 if your product category uses another rate.",
+      productCost: "Your product purchase cost including GST. Example: you bought item for Rs 118 including 18% GST, enter 118.",
+      productGstRate: "GST rate included in your product purchase cost. Use 0 if GST is not available in purchase.",
+      packagingCost: "Packing material cost including GST, such as box, tape, pouch, label and filler.",
+      packagingGstRate: "GST rate included in packing material cost. Use 0 if GST is not available.",
+      adCost: "Expected ad or promotion cost per order including GST, if charged by the platform.",
+      adGstRate: "GST rate included in ad/promotion cost. Use 0 if GST is not available.",
+      targetProfit: "Profit amount you want after tax-adjusted costs. Suggested price is calculated to reach this profit.",
+      category: "Amazon referral fee category. Choose the closest category or use Custom referral %.",
+      customReferral: "Use this only when your exact category referral percentage is known.",
+      fulfilment: "Amazon fulfilment method. Closing fee differs by Easy Ship, Self Ship, Seller Flex and FC.",
+      includeShipping: "When enabled, Easy Ship shipping fee estimate is included in listing profit.",
+      step: "Amazon STEP level. It changes Easy Ship shipping fee slabs.",
+      shipment: "Standard-size, Heavy & bulky, or School textbook shipping fee table.",
+      zone: "Heavy & bulky zone used for local, regional or national shipping fee.",
+      actualWeight: "Packed shipment weight in grams. Amazon compares this with volumetric weight.",
+      length: "Outer package length in centimetres after packing.",
+      breadth: "Outer package breadth in centimetres after packing.",
+      height: "Outer package height in centimetres after packing.",
+      returnRisk: "Extra buffer percentage on shipping fee for return/RTO risk planning.",
+    },
   },
   hi: {
     kicker: "Amazon Calculator",
     title: "Fees और listing price calculator",
-    intro: "Easy Ship shipping fees, referral fees, closing fees, Amazon fees पर GST, profit, margin और break-even listing price एक जगह estimate करो.",
+    intro: "Easy Ship fees, referral fees, closing fees, GST-inclusive selling price, costs पर पहले से paid GST, balance GST, profit, margin और break-even listing price एक जगह estimate करो.",
     shippingTab: "Shipping fee",
     listingTab: "Listing price",
     step: "STEP level",
@@ -578,10 +711,14 @@ const amazonFeeCopy = {
     fulfilment: "Fulfilment channel",
     category: "Referral fee category",
     customReferral: "Custom referral %",
-    itemPrice: "Listing price",
-    productCost: "Product cost",
-    packagingCost: "Packaging cost",
-    adCost: "Ad / promotion cost",
+    itemPrice: "Selling price including GST",
+    saleGstRate: "Product GST rate",
+    productCost: "Cost price including GST",
+    productGstRate: "Cost GST rate",
+    packagingCost: "Packing cost including GST",
+    packagingGstRate: "Packing GST rate",
+    adCost: "Ad cost including GST",
+    adGstRate: "Ad GST rate",
     includeShipping: "Easy Ship fee include करो",
     targetProfit: "Target profit",
     targetMargin: "Target margin",
@@ -621,12 +758,40 @@ const amazonFeeCopy = {
     closingFee: "Closing fee",
     amazonFees: "Amazon fees before GST",
     feeGst: "Amazon fees पर GST",
-    totalCost: "Total cost",
-    netProfit: "Net profit",
+    taxableSale: "GST से पहले price",
+    outputGst: "Selling price में GST",
+    inputGst: "Costs पर पहले से paid GST",
+    netGstPayable: "Balance GST pay करना है",
+    gstCredit: "Extra GST credit",
+    totalCost: "Tax-adjusted cost",
+    netProfit: "GST adjustment के बाद profit",
     margin: "Net margin",
     breakEven: "Break-even price",
     suggestedPrice: "Suggested price",
-    listingNote: "Referral और closing fees item price पर calculate होती हैं, जिसमें seller shipping/gift-wrap charges भी include हो सकते हैं. यह tool attached Amazon fee schedule data effective June 10, 2026 use करता है; final pricing से पहले Seller Central recheck करो.",
+    listingNote: "Selling price और costs GST सहित डालो. Calculator selling price में शामिल GST अलग करता है, costs पर पहले से paid GST घटाता है, और balance GST impact के बाद profit estimate करता है. Referral और closing fees attached Amazon fee schedule data effective June 10, 2026 से estimate होती हैं; final pricing से पहले Seller Central recheck करो.",
+    tooltips: {
+      itemPrice: "Amazon पर customer जो final price GST सहित pay करता है. Example: customer Rs 499 pay करता है, तो 499 डालो.",
+      saleGstRate: "आपके product पर applicable GST rate. Most taxable goods में 18 होता है; category के हिसाब से 12/5/0 भी हो सकता है.",
+      productCost: "Product purchase cost GST सहित. Example: item Rs 118 में खरीदा और उसमें 18% GST included है, तो 118 डालो.",
+      productGstRate: "Product purchase cost में included GST rate. Purchase पर GST available नहीं है तो 0 रखो.",
+      packagingCost: "Box, tape, pouch, label, filler जैसी packing material cost including GST.",
+      packagingGstRate: "Packing material cost में included GST rate. GST available नहीं है तो 0 रखो.",
+      adCost: "Per order expected ad/promotion cost GST सहित, अगर platform GST charge करता है.",
+      adGstRate: "Ad/promotion cost में included GST rate. GST available नहीं है तो 0 रखो.",
+      targetProfit: "Tax-adjusted costs के बाद जितना profit चाहिए. Suggested price इसी target से निकलेगा.",
+      category: "Amazon referral fee category. Closest category select करो या Custom referral % use करो.",
+      customReferral: "Exact category referral percentage पता हो तभी use करो.",
+      fulfilment: "Amazon fulfilment method. Easy Ship, Self Ship, Seller Flex और FC में closing fee अलग होती है.",
+      includeShipping: "On रखने पर Easy Ship shipping fee estimate listing profit में include होगा.",
+      step: "Amazon STEP level. Easy Ship shipping fee slabs इसी से change होते हैं.",
+      shipment: "Standard-size, Heavy & bulky, या School textbook shipping fee table.",
+      zone: "Heavy & bulky shipment के लिए local, regional या national fee zone.",
+      actualWeight: "Packing के बाद shipment weight grams में. Amazon इसे volumetric weight से compare करता है.",
+      length: "Packing के बाद outer package length centimetres में.",
+      breadth: "Packing के बाद outer package breadth centimetres में.",
+      height: "Packing के बाद outer package height centimetres में.",
+      returnRisk: "Return/RTO risk planning के लिए shipping fee पर extra buffer percentage.",
+    },
   },
 };
 
@@ -835,44 +1000,82 @@ function getClosingFee(channel, itemPrice, categoryId) {
 
 function calculateListingEstimate({
   itemPrice,
+  saleGstRate,
   categoryId,
   customReferralRate,
   fulfilmentChannel,
   productCost,
+  productGstRate,
   packagingCost,
+  packagingGstRate,
   adCost,
+  adGstRate,
   shippingFee,
+  shippingGst,
   includeShipping,
   targetProfit,
 }) {
   const price = positiveNumber(itemPrice);
+  const outputRate = positiveNumber(saleGstRate) / 100;
+  const taxableSaleValue = outputRate ? price / (1 + outputRate) : price;
+  const outputGst = Math.max(price - taxableSaleValue, 0);
   const referralRate = getReferralRate(categoryId, price, customReferralRate);
   const referralFee = price * (referralRate / 100);
   const closingFee = getClosingFee(fulfilmentChannel, price, categoryId);
   const amazonFeesBeforeGst = referralFee + closingFee;
   const feeGst = amazonFeesBeforeGst * GST_RATE;
   const shipping = includeShipping ? positiveNumber(shippingFee) : 0;
-  const baseCosts = positiveNumber(productCost) + positiveNumber(packagingCost) + positiveNumber(adCost) + shipping;
-  const totalCost = baseCosts + amazonFeesBeforeGst + feeGst;
-  const profit = price - totalCost;
+  const shippingInputGst = includeShipping ? positiveNumber(shippingGst) : 0;
+  const shippingBeforeGst = Math.max(shipping - shippingInputGst, 0);
+  const product = splitInclusiveTax(productCost, productGstRate);
+  const packaging = splitInclusiveTax(packagingCost, packagingGstRate);
+  const ads = splitInclusiveTax(adCost, adGstRate);
+  const inputGstCredit = product.gst + packaging.gst + ads.gst + feeGst + shippingInputGst;
+  const netGstPayableRaw = outputGst - inputGstCredit;
+  const netGstPayable = Math.max(netGstPayableRaw, 0);
+  const gstCredit = Math.max(inputGstCredit - outputGst, 0);
+  const taxAdjustedCost = product.taxable + packaging.taxable + ads.taxable + shippingBeforeGst + amazonFeesBeforeGst;
+  const cashCostBeforeGstSettlement = positiveNumber(productCost) + positiveNumber(packagingCost) + positiveNumber(adCost) + shipping + amazonFeesBeforeGst + feeGst;
+  const profit = taxableSaleValue - taxAdjustedCost;
   const margin = price ? profit / price : 0;
-  const variableFeeRate = (referralRate / 100) * (1 + GST_RATE);
-  const fixedCosts = baseCosts + closingFee * (1 + GST_RATE);
-  const breakEven = variableFeeRate < 1 ? fixedCosts / (1 - variableFeeRate) : 0;
-  const suggestedPrice = variableFeeRate < 1 ? (fixedCosts + positiveNumber(targetProfit)) / (1 - variableFeeRate) : 0;
+  const taxableRevenueRate = outputRate ? 1 / (1 + outputRate) : 1;
+  const variableFeeRate = taxableRevenueRate - (referralRate / 100);
+  const fixedCosts = product.taxable + packaging.taxable + ads.taxable + shippingBeforeGst + closingFee;
+  const breakEven = variableFeeRate > 0 ? fixedCosts / variableFeeRate : 0;
+  const suggestedPrice = variableFeeRate > 0 ? (fixedCosts + positiveNumber(targetProfit)) / variableFeeRate : 0;
   return {
+    taxableSaleValue,
+    outputGst,
     referralRate,
     referralFee,
     closingFee,
     amazonFeesBeforeGst,
     feeGst,
     shipping,
-    totalCost,
+    shippingBeforeGst,
+    shippingInputGst,
+    productInputGst: product.gst,
+    packagingInputGst: packaging.gst,
+    adInputGst: ads.gst,
+    inputGstCredit,
+    netGstPayable,
+    gstCredit,
+    netGstPayableRaw,
+    cashCostBeforeGstSettlement,
+    totalCost: taxAdjustedCost,
     profit,
     margin,
     breakEven,
     suggestedPrice,
   };
+}
+
+function splitInclusiveTax(amount, ratePercent) {
+  const gross = positiveNumber(amount);
+  const rate = positiveNumber(ratePercent) / 100;
+  if (!gross || !rate) return { taxable: gross, gst: 0 };
+  const taxable = gross / (1 + rate);
+  return { taxable, gst: gross - taxable };
 }
 
 function formatWeight(kg) {
@@ -1414,6 +1617,136 @@ async function parseMeeshoTaxInvoice(file) {
   if (!detailsBuffer) throw new Error("Tax_invoice_details.xlsx was not found in the Tax Invoice ZIP.");
   const workbook = await parseXlsxWorkbook(detailsBuffer);
   return rowsToObjects(workbook.Invoice_Info || Object.values(workbook)[0] || []);
+}
+
+const emptyTaxVector = () => ({ igst: 0, cgst: 0, sgst: 0, cess: 0 });
+
+function addTaxVectors(...vectors) {
+  return vectors.reduce((sum, item) => ({
+    igst: sum.igst + parseNumberish(item?.igst),
+    cgst: sum.cgst + parseNumberish(item?.cgst),
+    sgst: sum.sgst + parseNumberish(item?.sgst),
+    cess: sum.cess + parseNumberish(item?.cess),
+  }), emptyTaxVector());
+}
+
+function findGstr2bTaxColumns(rows) {
+  for (const row of rows || []) {
+    const labels = row.map((cell) => String(cell || "").trim().toLowerCase());
+    const igst = labels.findIndex((cell) => cell.includes("integrated tax"));
+    const cgst = labels.findIndex((cell) => cell.includes("central tax"));
+    const sgst = labels.findIndex((cell) => cell.includes("state/ut tax"));
+    const cess = labels.findIndex((cell) => cell.includes("cess"));
+    if ([igst, cgst, sgst, cess].every((index) => index >= 0)) return { igst, cgst, sgst, cess };
+  }
+  return null;
+}
+
+function taxVectorFromRow(row, columns) {
+  if (!row || !columns) return emptyTaxVector();
+  return {
+    igst: parseNumberish(row[columns.igst]),
+    cgst: parseNumberish(row[columns.cgst]),
+    sgst: parseNumberish(row[columns.sgst]),
+    cess: parseNumberish(row[columns.cess]),
+  };
+}
+
+function findGstr2bSummaryRow(rows, includes) {
+  const terms = includes.map((term) => term.toLowerCase());
+  return (rows || []).find((row) => {
+    const text = row.map((cell) => String(cell || "")).join(" | ").toLowerCase();
+    return terms.every((term) => text.includes(term));
+  });
+}
+
+function sumGstr2bRowsByCode(rows, code) {
+  const columns = findGstr2bTaxColumns(rows);
+  return (rows || []).reduce((sum, row) => {
+    const text = row.map((cell) => String(cell || "")).join(" | ").toLowerCase();
+    return text.includes(code.toLowerCase()) ? addTaxVectors(sum, taxVectorFromRow(row, columns)) : sum;
+  }, emptyTaxVector());
+}
+
+async function parseGstr2bSummary(file) {
+  const workbook = await parseXlsxWorkbook(await file.arrayBuffer());
+  const availableRows = workbook["ITC Available"];
+  if (!availableRows?.length) throw new Error("ITC Available sheet was not found. Upload the official GSTR-2B Summary Excel.");
+
+  const availableColumns = findGstr2bTaxColumns(availableRows);
+  const category = (terms) => taxVectorFromRow(findGstr2bSummaryRow(availableRows, terms), availableColumns);
+  const available = {
+    importGoods: category(["Import of Goods", "4(A)(1)"]),
+    reverseCharge: category(["Inward Supplies liable for reverse charge", "4(A)(3)"]),
+    isd: category(["Inward Supplies from ISD", "4(A)(4)"]),
+    allOther: category(["All other ITC", "4(A)(5)"]),
+  };
+  available.total = addTaxVectors(available.importGoods, available.reverseCharge, available.isd, available.allOther);
+
+  const notAvailableRows = workbook["ITC not available"] || [];
+  const reversalRows = workbook["ITC Reversal"] || [];
+  const rejectedRows = workbook["ITC Rejected"] || [];
+  const rejectedColumns = findGstr2bTaxColumns(rejectedRows);
+  const rejectedSummary = findGstr2bSummaryRow(rejectedRows, ["All other ITC - Supplies from registered persons"]);
+
+  return {
+    available,
+    notAvailable: sumGstr2bRowsByCode(notAvailableRows, "4(D)(2)"),
+    reversal: sumGstr2bRowsByCode(reversalRows, "4(B)(2)"),
+    rejected: taxVectorFromRow(rejectedSummary, rejectedColumns),
+  };
+}
+
+function totalTaxVector(vector) {
+  return parseNumberish(vector?.igst) + parseNumberish(vector?.cgst) + parseNumberish(vector?.sgst) + parseNumberish(vector?.cess);
+}
+
+function estimateGstr3bSetoff(liability, credit) {
+  const due = { ...emptyTaxVector(), ...liability };
+  const available = { ...emptyTaxVector(), ...credit };
+  const used = { igst: emptyTaxVector(), cgst: emptyTaxVector(), sgst: emptyTaxVector(), cess: emptyTaxVector() };
+  const consume = (creditHead, liabilityHead) => {
+    const amount = Math.min(available[creditHead], due[liabilityHead]);
+    available[creditHead] -= amount;
+    due[liabilityHead] -= amount;
+    used[liabilityHead][creditHead] += amount;
+  };
+
+  consume("igst", "igst");
+  consume("igst", "cgst");
+  consume("igst", "sgst");
+  consume("cgst", "cgst");
+  consume("sgst", "sgst");
+  consume("cgst", "igst");
+  consume("sgst", "igst");
+  consume("cess", "cess");
+
+  return {
+    used,
+    cash: due,
+    remaining: available,
+    totalCash: totalTaxVector(due),
+    totalUsed: totalTaxVector(credit) - totalTaxVector(available),
+  };
+}
+
+function buildGstr3bSummary(gstr1Result, gstr2b) {
+  const liability = {
+    igst: gstr1Result.totals.igst,
+    cgst: gstr1Result.totals.cgst,
+    sgst: gstr1Result.totals.sgst,
+    cess: 0,
+  };
+  const interstateStates = gstr1Result.states.filter((row) => row.state !== gstr1Result.homeState);
+  const interstate = interstateStates.reduce((sum, row) => ({ taxable: sum.taxable + row.net, igst: sum.igst + row.tax }), { taxable: 0, igst: 0 });
+  return {
+    taxable: gstr1Result.totals.taxable,
+    liability,
+    interstate,
+    interstateStates,
+    gstr2b,
+    setoff: estimateGstr3bSetoff(liability, gstr2b.available.total),
+  };
 }
 
 function summarizeMeeshoGst(gstReport, docsRows = [], selectedHomeState = "") {
@@ -2802,9 +3135,13 @@ function AmazonShippingCalculator() {
   const [heightCm, setHeightCm] = useState("5");
   const [returnRisk, setReturnRisk] = useState("15");
   const [itemPrice, setItemPrice] = useState("499");
+  const [saleGstRate, setSaleGstRate] = useState("18");
   const [productCost, setProductCost] = useState("180");
+  const [productGstRate, setProductGstRate] = useState("18");
   const [packagingCost, setPackagingCost] = useState("10");
+  const [packagingGstRate, setPackagingGstRate] = useState("18");
   const [adCost, setAdCost] = useState("20");
+  const [adGstRate, setAdGstRate] = useState("18");
   const [targetProfit, setTargetProfit] = useState("50");
   const [categoryId, setCategoryId] = useState("packing_materials");
   const [customReferralRate, setCustomReferralRate] = useState("10");
@@ -2817,16 +3154,21 @@ function AmazonShippingCalculator() {
 
   const listingResult = useMemo(() => calculateListingEstimate({
     itemPrice,
+    saleGstRate,
     categoryId,
     customReferralRate,
     fulfilmentChannel,
     productCost,
+    productGstRate,
     packagingCost,
+    packagingGstRate,
     adCost,
+    adGstRate,
     shippingFee: result.total,
+    shippingGst: result.gst,
     includeShipping: includeShipping && fulfilmentChannel === "easy_ship",
     targetProfit,
-  }), [adCost, categoryId, customReferralRate, fulfilmentChannel, includeShipping, itemPrice, packagingCost, productCost, result.total, targetProfit]);
+  }), [adCost, adGstRate, categoryId, customReferralRate, fulfilmentChannel, includeShipping, itemPrice, packagingCost, packagingGstRate, productCost, productGstRate, result.gst, result.total, saleGstRate, targetProfit]);
 
   const stepOptions = Object.entries(EASY_SHIP_STANDARD_FEES);
   const shipmentOptions = [
@@ -2864,15 +3206,19 @@ function AmazonShippingCalculator() {
           {mode === "listing" && (
             <>
               <div className="calculator-field-grid">
-                <NumberField label={`${t.itemPrice} (Rs)`} value={itemPrice} onChange={setItemPrice} />
-                <NumberField label={`${t.productCost} (Rs)`} value={productCost} onChange={setProductCost} />
-                <NumberField label={`${t.packagingCost} (Rs)`} value={packagingCost} onChange={setPackagingCost} />
-                <NumberField label={`${t.adCost} (Rs)`} value={adCost} onChange={setAdCost} />
-                <NumberField label={`${t.targetProfit} (Rs)`} value={targetProfit} onChange={setTargetProfit} />
+                <NumberField label={`${t.itemPrice} (Rs)`} value={itemPrice} onChange={setItemPrice} help={t.tooltips.itemPrice} />
+                <RateField label={`${t.saleGstRate} %`} value={saleGstRate} onChange={setSaleGstRate} help={t.tooltips.saleGstRate} />
+                <NumberField label={`${t.productCost} (Rs)`} value={productCost} onChange={setProductCost} help={t.tooltips.productCost} />
+                <RateField label={`${t.productGstRate} %`} value={productGstRate} onChange={setProductGstRate} help={t.tooltips.productGstRate} />
+                <NumberField label={`${t.packagingCost} (Rs)`} value={packagingCost} onChange={setPackagingCost} help={t.tooltips.packagingCost} />
+                <RateField label={`${t.packagingGstRate} %`} value={packagingGstRate} onChange={setPackagingGstRate} help={t.tooltips.packagingGstRate} />
+                <NumberField label={`${t.adCost} (Rs)`} value={adCost} onChange={setAdCost} help={t.tooltips.adCost} />
+                <RateField label={`${t.adGstRate} %`} value={adGstRate} onChange={setAdGstRate} help={t.tooltips.adGstRate} />
+                <NumberField label={`${t.targetProfit} (Rs)`} value={targetProfit} onChange={setTargetProfit} help={t.tooltips.targetProfit} />
               </div>
 
               <label className="calculator-field full">
-                <span>{t.category}</span>
+                <FieldLabel label={t.category} help={t.tooltips.category} />
                 <select value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
                   {AMAZON_REFERRAL_CATEGORIES.map((category) => (
                     <option key={category.id} value={category.id}>{category.label}</option>
@@ -2881,11 +3227,11 @@ function AmazonShippingCalculator() {
               </label>
 
               {categoryId === "custom" && (
-                <NumberField label={t.customReferral} value={customReferralRate} onChange={setCustomReferralRate} />
+                <NumberField label={t.customReferral} value={customReferralRate} onChange={setCustomReferralRate} help={t.tooltips.customReferral} />
               )}
 
               <label className="calculator-field full">
-                <span>{t.fulfilment}</span>
+                <FieldLabel label={t.fulfilment} help={t.tooltips.fulfilment} />
                 <div className="pill-selector">
                   {AMAZON_FULFILMENT_CHANNELS.map((channel) => (
                     <button
@@ -2903,14 +3249,14 @@ function AmazonShippingCalculator() {
               {fulfilmentChannel === "easy_ship" && (
                 <label className="amazon-toggle-row">
                   <input checked={includeShipping} type="checkbox" onChange={(event) => setIncludeShipping(event.target.checked)} />
-                  <span>{t.includeShipping}</span>
+                  <FieldLabel label={t.includeShipping} help={t.tooltips.includeShipping} />
                 </label>
               )}
             </>
           )}
 
           <label className="calculator-field full">
-            <span>{t.step}</span>
+            <FieldLabel label={t.step} help={t.tooltips.step} />
             <div className="pill-selector">
               {stepOptions.map(([id, option]) => (
                 <button
@@ -2929,7 +3275,7 @@ function AmazonShippingCalculator() {
           </label>
 
           <label className="calculator-field full">
-            <span>{t.shipment}</span>
+            <FieldLabel label={t.shipment} help={t.tooltips.shipment} />
             <div className="pill-selector">
               {shipmentOptions.map(([id, labelText]) => (
                 <button
@@ -2946,7 +3292,7 @@ function AmazonShippingCalculator() {
 
           {shipmentType === "heavy" && (
             <label className="calculator-field full">
-              <span>{t.zone}</span>
+              <FieldLabel label={t.zone} help={t.tooltips.zone} />
               <div className="pill-selector">
                 {zoneOptions.map(([id, labelText]) => (
                   <button key={id} className={zone === id ? "active" : ""} type="button" onClick={() => setZone(id)}>
@@ -2958,11 +3304,11 @@ function AmazonShippingCalculator() {
           )}
 
           <div className="calculator-field-grid">
-            <NumberField label={`${t.actualWeight} (gm)`} value={weightGm} onChange={setWeightGm} />
-            <NumberField label={`${t.length} (cm)`} value={lengthCm} onChange={setLengthCm} />
-            <NumberField label={`${t.breadth} (cm)`} value={breadthCm} onChange={setBreadthCm} />
-            <NumberField label={`${t.height} (cm)`} value={heightCm} onChange={setHeightCm} />
-            <NumberField label={`${t.returnRisk} %`} value={returnRisk} onChange={setReturnRisk} />
+            <NumberField label={`${t.actualWeight} (gm)`} value={weightGm} onChange={setWeightGm} help={t.tooltips.actualWeight} />
+            <NumberField label={`${t.length} (cm)`} value={lengthCm} onChange={setLengthCm} help={t.tooltips.length} />
+            <NumberField label={`${t.breadth} (cm)`} value={breadthCm} onChange={setBreadthCm} help={t.tooltips.breadth} />
+            <NumberField label={`${t.height} (cm)`} value={heightCm} onChange={setHeightCm} help={t.tooltips.height} />
+            <NumberField label={`${t.returnRisk} %`} value={returnRisk} onChange={setReturnRisk} help={t.tooltips.returnRisk} />
           </div>
         </div>
 
@@ -3011,6 +3357,7 @@ function AmazonShippingCalculator() {
             <div className="shipping-kpis">
               <MiniMetric label={t.netProfit} value={moneyPrecise(listingResult.profit)} tone={listingResult.profit >= 0 ? "green" : "red"} />
               <MiniMetric label={t.margin} value={`${(listingResult.margin * 100).toFixed(1)}%`} tone="blue" />
+              <MiniMetric label={listingResult.gstCredit ? t.gstCredit : t.netGstPayable} value={moneyPrecise(listingResult.gstCredit || listingResult.netGstPayable)} tone={listingResult.gstCredit ? "green" : "orange"} />
               <MiniMetric label={t.breakEven} value={moneyPrecise(listingResult.breakEven)} tone="orange" />
               <MiniMetric label={t.suggestedPrice} value={moneyPrecise(listingResult.suggestedPrice)} tone="purple" />
             </div>
@@ -3018,12 +3365,22 @@ function AmazonShippingCalculator() {
             <div className="fee-highlight">
               <strong>{t.totalCost}: {moneyPrecise(listingResult.totalCost)}</strong>
               <span>
-                {t.referralFee} {moneyPrecise(listingResult.referralFee)} ({listingResult.referralRate.toFixed(2)}%) + {t.closingFee} {moneyPrecise(listingResult.closingFee)} + {t.feeGst} {moneyPrecise(listingResult.feeGst)}
+                {t.taxableSale} {moneyPrecise(listingResult.taxableSaleValue)} + {t.outputGst} {moneyPrecise(listingResult.outputGst)}. {t.inputGst}: {moneyPrecise(listingResult.inputGstCredit)}
               </span>
             </div>
 
             <div className="comparison-card">
               <h3>{lang === "hi" ? "Cost breakup" : "Cost breakup"}</h3>
+              <div className="comparison-row">
+                <span>{t.taxableSale}</span>
+                <strong>{moneyPrecise(listingResult.taxableSaleValue)}</strong>
+                <em>{t.itemPrice} minus {t.outputGst}</em>
+              </div>
+              <div className="comparison-row">
+                <span>{t.outputGst}</span>
+                <strong>{moneyPrecise(listingResult.outputGst)}</strong>
+                <em>{t.saleGstRate}</em>
+              </div>
               <div className="comparison-row">
                 <span>{t.amazonFees}</span>
                 <strong>{moneyPrecise(listingResult.amazonFeesBeforeGst)}</strong>
@@ -3035,9 +3392,19 @@ function AmazonShippingCalculator() {
                 <em>18% GST</em>
               </div>
               <div className="comparison-row">
+                <span>{t.inputGst}</span>
+                <strong>{moneyPrecise(listingResult.inputGstCredit)}</strong>
+                <em>Cost GST + Amazon fee GST + shipping GST</em>
+              </div>
+              <div className="comparison-row">
+                <span>{listingResult.gstCredit ? t.gstCredit : t.netGstPayable}</span>
+                <strong>{moneyPrecise(listingResult.gstCredit || listingResult.netGstPayable)}</strong>
+                <em>{listingResult.gstCredit ? "Paid GST is higher than selling GST" : "Selling GST minus paid GST"}</em>
+              </div>
+              <div className="comparison-row">
                 <span>Easy Ship</span>
                 <strong>{moneyPrecise(listingResult.shipping)}</strong>
-                <em>{formatWeight(result.chargeableKg)} chargeable</em>
+                <em>{moneyPrecise(listingResult.shippingBeforeGst)} + GST {moneyPrecise(listingResult.shippingInputGst)}</em>
               </div>
               <div className="comparison-row selected">
                 <span>{t.netProfit}</span>
@@ -3060,10 +3427,19 @@ function AmazonShippingCalculator() {
   );
 }
 
-function NumberField({ label, value, onChange }) {
+function FieldLabel({ label, help }) {
+  return (
+    <span className="field-label">
+      {label}
+      {help ? <HelpTip text={help} /> : null}
+    </span>
+  );
+}
+
+function NumberField({ label, value, onChange, help }) {
   return (
     <label className="calculator-field">
-      <span>{label}</span>
+      <FieldLabel label={label} help={help} />
       <input
         inputMode="decimal"
         min="0"
@@ -3071,6 +3447,19 @@ function NumberField({ label, value, onChange }) {
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />
+    </label>
+  );
+}
+
+function RateField({ label, value, onChange, help }) {
+  return (
+    <label className="calculator-field">
+      <FieldLabel label={label} help={help} />
+      <select value={value} onChange={(event) => onChange(event.target.value)}>
+        {["0", "5", "12", "18", "28"].map((rate) => (
+          <option key={rate} value={rate}>{rate}%</option>
+        ))}
+      </select>
     </label>
   );
 }
@@ -3441,11 +3830,15 @@ function CountList({ title, rows }) {
 
 function GstAnalysis({ lang }) {
   const t = gstCopy[lang] || gstCopy.en;
+  const r = gstReturnCopy[lang] || gstReturnCopy.en;
+  const [returnType, setReturnType] = useState("gstr1");
   const [platform, setPlatform] = useState("meesho");
   const [files, setFiles] = useState({});
+  const [threeBFiles, setThreeBFiles] = useState({});
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState(null);
+  const [threeBResult, setThreeBResult] = useState(null);
   const [homeState, setHomeState] = useState("");
 
   const onFile = async (key, file) => {
@@ -3471,6 +3864,7 @@ function GstAnalysis({ lang }) {
       const gstReport = await parseMeeshoGstReport(files.gstReport);
       const docsRows = files.taxInvoice ? await parseMeeshoTaxInvoice(files.taxInvoice) : [];
       setResult(summarizeMeeshoGst(gstReport, docsRows, homeState));
+      setThreeBResult(null);
       trackEvent("gst_analysis_complete", {
         marketplace: platform,
         has_tax_invoice: Boolean(files.taxInvoice),
@@ -3484,62 +3878,142 @@ function GstAnalysis({ lang }) {
     }
   };
 
+  const onThreeBFile = (key, file) => {
+    setThreeBFiles((state) => ({ ...state, [key]: file }));
+    setThreeBResult(null);
+    setError("");
+    trackEvent("gst_document_upload", {
+      marketplace: "overall",
+      document_type: key,
+      return_type: "gstr3b",
+      file_extension: file.name.split(".").pop()?.toLowerCase() || "unknown",
+    });
+  };
+
+  const analyzeThreeB = async () => {
+    setBusy(true);
+    setError("");
+    try {
+      if (!result) throw new Error(r.needGstr1);
+      if (!threeBFiles.gstr2b) throw new Error("GSTR-2B Summary Excel is required.");
+      const gstr2b = await parseGstr2bSummary(threeBFiles.gstr2b);
+      setThreeBResult(buildGstr3bSummary(result, gstr2b));
+      trackEvent("gst_analysis_complete", {
+        marketplace: "overall",
+        return_type: "gstr3b",
+        has_system_generated_pdf: Boolean(threeBFiles.systemThreeB),
+      });
+    } catch (err) {
+      setError(err.message || "GSTR-3B analysis failed.");
+      trackEvent("gst_analysis_error", { marketplace: "overall", return_type: "gstr3b" });
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <section className="gst-page">
       <div className="module-header">
         <div>
           <span>{t.kicker}</span>
-          <h1>{t.title}</h1>
-          <p>{t.intro}</p>
+          <h1>{returnType === "gstr1" ? t.title : r.threeBTitle}</h1>
+          <p>{returnType === "gstr1" ? t.intro : r.threeBIntro}</p>
         </div>
-        <div className="platform-switch">
-          {["overall", "meesho", "flipkart", "amazon"].map((id) => (
-            <button key={id} className={platform === id ? "active" : ""} onClick={() => {
-              setPlatform(id);
-              setResult(null);
+        <div className="gst-return-switch" aria-label="GST return type">
+          {["gstr1", "gstr3b"].map((id) => (
+            <button key={id} className={returnType === id ? "active" : ""} onClick={() => {
+              setReturnType(id);
               setError("");
-              trackEvent("marketplace_tab_select", {
-                module: "gst",
-                marketplace: id,
-              });
-            }}>{marketLabel(id)}</button>
+              trackEvent("gst_return_tab_select", { return_type: id });
+            }}>
+              <strong>{r[id]}</strong>
+              <small>{r[`${id}Hint`]}</small>
+            </button>
           ))}
         </div>
       </div>
 
-      {platform === "meesho" ? (
+      {returnType === "gstr1" ? (
         <>
-          <section className="gst-layout">
-            <div className="gst-upload-panel">
-              <h2>{t.docsTitle} <HelpTip text={t.docsHelp} /></h2>
-              <label className="state-field">
-                <span className="field-title"><span>{t.homeStateLabel}</span> <HelpTip text={t.homeStateHelp} /></span>
-                <select value={homeState} onChange={(event) => setHomeState(event.target.value)}>
-                  <option value="">{t.homeStateAuto}</option>
-                  {GST_STATE_OPTIONS.map((state) => <option key={state} value={state}>{state}</option>)}
-                </select>
-              </label>
-              <DocUpload title={t.gstReport} hint={t.gstReportHint} help={t.gstReportHelp} requiredLabel={t.required} file={files.gstReport} onFile={(file) => onFile("gstReport", file)} required />
-              <DocUpload title={t.taxInvoice} hint={t.taxInvoiceHint} help={t.taxInvoiceHelp} requiredLabel={t.required} file={files.taxInvoice} onFile={(file) => onFile("taxInvoice", file)} required />
-              <DocUpload title={t.supplierInvoice} hint={t.supplierInvoiceHint} help={t.supplierInvoiceHelp} requiredLabel={t.required} file={files.supplierInvoice} onFile={(file) => onFile("supplierInvoice", file)} />
-              <DocUpload title={t.commission} hint={t.commissionHint} help={t.commissionHelp} requiredLabel={t.required} file={files.commissionBackup} onFile={(file) => onFile("commissionBackup", file)} />
-              {error && <div className="error"><AlertTriangle size={18} />{error}</div>}
-              <button className="primary-action" onClick={analyze} disabled={busy}>{busy ? t.analyzing : t.generate}</button>
-            </div>
-            <div className="gst-guidance">
-              <h2>{t.moduleTitle} <HelpTip text={t.moduleHelp} /></h2>
-              {t.checks.map((text) => <CheckLine key={text} text={text} />)}
-            </div>
-          </section>
-          {result && <GstResult result={result} />}
+          <div className="platform-switch gst-market-switch">
+            {["overall", "meesho", "flipkart", "amazon"].map((id) => (
+              <button key={id} className={platform === id ? "active" : ""} onClick={() => {
+                setPlatform(id);
+                setError("");
+                trackEvent("marketplace_tab_select", { module: "gst", marketplace: id });
+              }}>{marketLabel(id)}</button>
+            ))}
+          </div>
+          {platform === "meesho" ? (
+            <>
+              <section className="gst-layout guided">
+                <div className="gst-upload-panel">
+                  <h2>{t.docsTitle} <HelpTip text={t.docsHelp} /></h2>
+                  <label className="state-field">
+                    <span className="field-title"><span>{t.homeStateLabel}</span> <HelpTip text={t.homeStateHelp} /></span>
+                    <select value={homeState} onChange={(event) => setHomeState(event.target.value)}>
+                      <option value="">{t.homeStateAuto}</option>
+                      {GST_STATE_OPTIONS.map((state) => <option key={state} value={state}>{state}</option>)}
+                    </select>
+                  </label>
+                  <DocUpload title={t.gstReport} hint={t.gstReportHint} help={t.gstReportHelp} requiredLabel={t.required} file={files.gstReport} onFile={(file) => onFile("gstReport", file)} required />
+                  <DocUpload title={t.taxInvoice} hint={t.taxInvoiceHint} help={t.taxInvoiceHelp} requiredLabel={t.required} file={files.taxInvoice} onFile={(file) => onFile("taxInvoice", file)} required />
+                  <DocUpload title={t.supplierInvoice} hint={t.supplierInvoiceHint} help={t.supplierInvoiceHelp} requiredLabel={t.required} file={files.supplierInvoice} onFile={(file) => onFile("supplierInvoice", file)} />
+                  <DocUpload title={t.commission} hint={t.commissionHint} help={t.commissionHelp} requiredLabel={t.required} file={files.commissionBackup} onFile={(file) => onFile("commissionBackup", file)} />
+                  {error && <div className="error"><AlertTriangle size={18} />{error}</div>}
+                  <button className="primary-action" onClick={analyze} disabled={busy}>{busy ? t.analyzing : t.generate}</button>
+                </div>
+                <FilingGuide title={r.guideTitle} help={r.guideHelp} steps={r.gstr1Steps} />
+              </section>
+              {result && <GstResult result={result} lang={lang} />}
+            </>
+          ) : (
+            <section className="portal-card gst-coming-soon">
+              <h2>{t.comingTitle(platform)}</h2>
+              <p>{t.comingBody(platform)}</p>
+            </section>
+          )}
         </>
       ) : (
-        <section className="portal-card gst-coming-soon">
-          <h2>{t.comingTitle(platform)}</h2>
-          <p>{t.comingBody(platform)}</p>
-        </section>
+        <>
+          <section className="gst-layout guided">
+            <div className="gst-upload-panel">
+              <h2>{r.threeBTitle}</h2>
+              <div className={`gst-source-status ${result ? "ready" : "pending"}`}>
+                {result ? <CheckCircle2 size={18} /> : <AlertTriangle size={18} />}
+                <div>
+                  <strong>{result ? r.liabilityReady : r.liabilityRequired}</strong>
+                  <span>{result ? r.liabilitySummary(asMoney(result.totals.taxable), asMoney(result.totals.tax)) : r.needGstr1}</span>
+                </div>
+              </div>
+              <DocUpload title={r.twoBTitle} hint={r.twoBHint} help={r.twoBHelp} requiredLabel={t.required} file={threeBFiles.gstr2b} onFile={(file) => onThreeBFile("gstr2b", file)} required />
+              <DocUpload title={r.systemThreeBTitle} hint={r.systemThreeBHint} help={r.systemThreeBHelp} requiredLabel={t.required} file={threeBFiles.systemThreeB} onFile={(file) => onThreeBFile("systemThreeB", file)} />
+              {error && <div className="error"><AlertTriangle size={18} />{error}</div>}
+              <button className="primary-action" onClick={analyzeThreeB} disabled={busy}>{busy ? r.analyzeThreeB : r.generateThreeB}</button>
+              <p className="gst-assistance-note"><ShieldAlert size={16} />{r.assistanceNote}</p>
+            </div>
+            <FilingGuide title={r.guideTitle} help={r.guideHelp} steps={r.gstr3bSteps} />
+          </section>
+          {!result && <button className="gst-back-to-one" onClick={() => setReturnType("gstr1")}><ChevronRight size={17} />{r.needGstr1}</button>}
+          {threeBResult && <Gstr3bResult result={threeBResult} lang={lang} />}
+        </>
       )}
     </section>
+  );
+}
+
+function FilingGuide({ title, help, steps }) {
+  return (
+    <aside className="gst-guidance filing-guide">
+      <h2>{title} <HelpTip text={help} /></h2>
+      <div className="filing-steps">
+        {steps.map(([step, detail], index) => (
+          <Accordion key={step} title={step} defaultOpen={index === 0}>
+            <p>{detail}</p>
+          </Accordion>
+        ))}
+      </div>
+    </aside>
   );
 }
 
@@ -3569,7 +4043,8 @@ function HelpTip({ text }) {
   );
 }
 
-function GstResult({ result }) {
+function GstResult({ result, lang }) {
+  const r = gstReturnCopy[lang] || gstReturnCopy.en;
   const table7Rows = result.states.map((row) => ({
     state: row.state,
     rate: 18,
@@ -3600,11 +4075,13 @@ function GstResult({ result }) {
       <section className="portal-card">
         <h2>Table 7 - B2C Others</h2>
         <p>Add these rows state-wise in the portal. Local supplies for seller home state ({result.homeState}) are reported as CGST/SGST; other states are reported as IGST. Home state source: {result.homeStateSource}.</p>
+        <PortalValueNote>{r.evaluatedValue}: taxable value and tax columns shown in every state row.</PortalValueNote>
         <CompactTable rows={table7Rows} columns={["state", "rate", "taxable", "igst", "cgst", "sgst", "cess"]} />
       </section>
 
       <section className="portal-card">
         <h2>Table 12 - HSN Summary, B2C Supplies tab</h2>
+        <PortalValueNote>{r.evaluatedValue}: copy each HSN row into the B2C Supplies tab.</PortalValueNote>
         <CompactTable rows={result.hsn.map((row) => ({ ...row, rate: 18, uqc: "NOS" }))} columns={["hsn", "uqc", "qty", "totalValue", "taxable", "rate", "igst", "cgst", "sgst", "cess"]} />
       </section>
 
@@ -3617,6 +4094,73 @@ function GstResult({ result }) {
         <div className="portal-card">
           <h2>Table 14 - Supplies through ECO, u/s 52</h2>
           <CompactTable rows={[table14]} columns={["gstin", "name", "net", "igst", "cgst", "sgst"]} />
+        </div>
+      </section>
+    </section>
+  );
+}
+
+function PortalValueNote({ children }) {
+  return <div className="portal-value-note"><CheckCircle2 size={16} /><span>{children}</span></div>;
+}
+
+function Gstr3bResult({ result, lang }) {
+  const r = gstReturnCopy[lang] || gstReturnCopy.en;
+  const itc = result.gstr2b;
+  const table4Rows = [
+    { table: "4(A)(1)", description: "Import of goods", ...itc.available.importGoods },
+    { table: "4(A)(3)", description: "Inward supplies liable to reverse charge", ...itc.available.reverseCharge },
+    { table: "4(A)(4)", description: "Inward supplies from ISD", ...itc.available.isd },
+    { table: "4(A)(5)", description: "All other ITC", ...itc.available.allOther },
+    { table: "4(B)(2)", description: "ITC reversal shown in GSTR-2B", ...itc.reversal },
+    { table: "4(D)(2)", description: "ITC not available", ...itc.notAvailable },
+    { table: "IMS", description: "Rejected ITC - do not claim", ...itc.rejected },
+  ];
+  const paymentRows = ["igst", "cgst", "sgst", "cess"].map((head) => ({
+    taxHead: head.toUpperCase(),
+    liability: result.liability[head],
+    paidByItc: totalTaxVector(result.setoff.used[head]),
+    cash: result.setoff.cash[head],
+  }));
+  const remainingItc = totalTaxVector(result.setoff.remaining);
+
+  return (
+    <section className="gst-results gstr3b-results">
+      <div className="gst-kpis four">
+        <Kpi label="Outward taxable value" value={`Rs ${asMoney(result.taxable)}`} tone="blue" icon={<IndianRupee />} />
+        <Kpi label="Output GST liability" value={`Rs ${asMoney(totalTaxVector(result.liability))}`} tone="orange" icon={<ReceiptText />} />
+        <Kpi label="Eligible ITC in GSTR-2B" value={`Rs ${asMoney(totalTaxVector(itc.available.total))}`} tone="green" icon={<CheckCircle2 />} />
+        <Kpi label="Estimated cash required" value={`Rs ${asMoney(result.setoff.totalCash)}`} tone={result.setoff.totalCash ? "red" : "green"} icon={<Calculator />} />
+      </div>
+
+      <section className="portal-card">
+        <h2>Table 3.1(a) - Outward taxable supplies</h2>
+        <PortalValueNote>{r.evaluatedValue}: reconcile these totals with the auto-drafted GSTR-3B values.</PortalValueNote>
+        <CompactTable rows={[{ taxable: result.taxable, ...result.liability }]} columns={["taxable", "igst", "cgst", "sgst", "cess"]} />
+      </section>
+
+      <section className="portal-card">
+        <h2>Table 3.2 - Interstate B2C supplies</h2>
+        <p>Total interstate taxable value Rs {asMoney(result.interstate.taxable)} and IGST Rs {asMoney(result.interstate.igst)}.</p>
+        <CompactTable rows={result.interstateStates.map((row) => ({ state: row.state, taxable: row.net, igst: row.tax }))} columns={["state", "taxable", "igst"]} />
+      </section>
+
+      <section className="portal-card">
+        <h2>Table 4 - Eligible ITC from GSTR-2B</h2>
+        <PortalValueNote>{r.evaluatedValue}: claim available ITC only after checking the source invoices and eligibility conditions.</PortalValueNote>
+        <CompactTable rows={table4Rows} columns={["table", "description", "igst", "cgst", "sgst", "cess"]} />
+      </section>
+
+      <section className="portal-grid gstr3b-final-grid">
+        <div className="portal-card">
+          <h2>Estimated ITC set-off</h2>
+          <CompactTable rows={paymentRows} columns={["taxHead", "liability", "paidByItc", "cash"]} />
+          <p className="soft-warning">The GST Portal applies available ledger balances and statutory rounding. Always verify the final Payment of Tax screen before posting credit.</p>
+        </div>
+        <div className="portal-card readiness-card">
+          <h2>{r.readinessTitle}</h2>
+          {r.readiness.map((text) => <CheckLine key={text} text={text} />)}
+          <div className="remaining-credit"><span>Estimated ITC remaining after set-off</span><strong>Rs {asMoney(remainingItc)}</strong></div>
         </div>
       </section>
     </section>
