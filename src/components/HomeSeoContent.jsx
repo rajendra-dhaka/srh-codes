@@ -3,7 +3,13 @@
 import { useLanguage } from "./LanguageProvider";
 import { absoluteUrl } from "../lib/site";
 
-const seoLinks = ["/flipkart-label-crop", "/meesho-label-4-in-1", "/#tool", "/#tool"];
+const seoLinks = [
+  "/flipkart-label-crop",
+  "/meesho-label-4-in-1",
+  "/guides/courier-sku-label-sorting",
+  "/guides/amazon-fees-and-listing-price",
+  "/guides/gstr1-gstr2b-gstr3b-ecommerce",
+];
 
 const homeCopy = {
   en: {
@@ -24,10 +30,10 @@ const homeCopy = {
       ["Private browser processing", "PDFs and reports are processed in your browser. Files do not need to be uploaded to a server."],
       ["GSTR-1 and GSTR-3B filing helper", "Prepare Meesho GSTR-1 tables, reconcile GSTR-2B eligible ITC, estimate GSTR-3B set-off, and follow a beginner-friendly portal filing guide."],
     ],
-    search: "Search-focused tools",
-    searchTitle: "Popular marketplace seller workflows",
+    search: "Seller learning center",
+    searchTitle: "Practical marketplace workflows",
     searchText:
-      "These pages support high-intent seller searches such as Flipkart label crop, Meesho label 4 in 1, Amazon fee calculator, sorted label PDF download, courier wise label sorting, ecommerce picklist generator, GSTR-1 helper, GSTR-3B filing guide, GSTR-2B ITC reconciliation, ecommerce seller GST return helper, performance analytics, and marketplace data analysis.",
+      "Read the method behind each tool before using it on a packing desk or GST return. The guides explain source documents, calculations, output choices, verification checks, limitations, and common mistakes in plain language.",
     links: [
       ["Flipkart Label Crop Tool", "Crop Flipkart label PDFs into a clean shipping label and a separate 4x6 portrait billing PDF for label printers."],
       ["Meesho Label Maker", "Convert Meesho shipping label PDFs into 4-up or 6-up A4 PDFs for normal printer workflows."],
@@ -43,6 +49,7 @@ const homeCopy = {
     contact: "Contact",
     privacy: "Privacy Policy",
     terms: "Terms of Use",
+    guides: "Guides",
   },
   hi: {
     kicker: "फ्री ecommerce seller tools",
@@ -62,10 +69,10 @@ const homeCopy = {
       ["Private browser processing", "PDFs और reports browser में process होते हैं. Files server पर upload करने की जरूरत नहीं होती."],
       ["GSTR-1 और GSTR-3B filing helper", "मीशो GSTR-1 tables prepare करो, GSTR-2B eligible ITC reconcile करो, GSTR-3B set-off estimate करो और beginner-friendly portal guide follow करो."],
     ],
-    search: "Search-focused tools",
-    searchTitle: "Popular marketplace seller workflows",
+    search: "Seller learning center",
+    searchTitle: "Practical marketplace workflows",
     searchText:
-      "ये pages high-intent seller searches के लिए हैं जैसे फ्लिपकार्ट label crop, मीशो label 4 in 1, Amazon fee calculator, sorted label PDF download, courier wise label sorting, ecommerce picklist generator, GSTR-1 helper, GSTR-3B filing guide, GSTR-2B ITC reconciliation, ecommerce seller GST return helper, performance analytics और marketplace data analysis.",
+      "Packing desk या GST return में tool use करने से पहले उसका method पढ़ो. Guides source documents, calculations, output choices, verification checks, limitations और common mistakes आसान भाषा में समझाती हैं.",
     links: [
       ["फ्लिपकार्ट Label Crop Tool", "फ्लिपकार्ट label PDFs को clean shipping label और separate 4x6 portrait billing PDF में crop करो."],
       ["मीशो Label Maker", "मीशो shipping label PDFs को 4-up या 6-up A4 PDFs में convert करो."],
@@ -81,6 +88,7 @@ const homeCopy = {
     contact: "Contact",
     privacy: "Privacy Policy",
     terms: "Terms of Use",
+    guides: "गाइड्स",
   },
 };
 
@@ -141,6 +149,7 @@ export default function HomeSeoContent() {
           <p>{t.infoText}</p>
         </div>
         <nav className="seo-actions" aria-label="Legal and support pages">
+          <a href={absoluteUrl("/guides")}>{t.guides}</a>
           <a href={absoluteUrl("/about")}>{t.about}</a>
           <a href={absoluteUrl("/contact")}>{t.contact}</a>
           <a href={absoluteUrl("/privacy")}>{t.privacy}</a>

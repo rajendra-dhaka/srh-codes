@@ -1,4 +1,4 @@
-export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://srhcodes.online";
+export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.srhcodes.online";
 
 export const site = {
   name: "SRH Codes",
@@ -115,6 +115,14 @@ export const keywordPages = [
         title: "No server upload required",
         text: "Your PDF is handled locally in the browser, which is useful for invoices and customer address documents.",
       },
+      {
+        title: "Verify the crop before a full print run",
+        text: "Open both generated PDFs, confirm that the shipping barcode and billing totals are complete, and print one page at actual size before processing a large batch.",
+      },
+      {
+        title: "Courier and quantity batches",
+        text: "The Labels workspace can read supported Flipkart label text, group pages by detected courier and quantity, and create separate shipping, billing, and picklist outputs for each packing batch.",
+      },
     ],
   },
   {
@@ -143,6 +151,14 @@ export const keywordPages = [
       {
         title: "Useful for marketplace sellers",
         text: "The same workspace also supports Flipkart label crop, performance analysis, GST summaries, and marketplace report workflows.",
+      },
+      {
+        title: "Courier-wise quantity batches",
+        text: "Process multiple seller PDFs together, then open All couriers or an individual courier and download Qty 1, Multi qty, or All labels as 4-per-page or 6-per-page PDFs with a matching picklist.",
+      },
+      {
+        title: "Check readability before bulk printing",
+        text: "Four-up output gives larger text and barcodes. Six-up saves paper but should be tested with your printer and barcode scanner before a full dispatch batch.",
       },
     ],
   },

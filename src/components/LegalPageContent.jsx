@@ -7,18 +7,24 @@ const copy = {
     en: {
       title: "About SRH Codes",
       sections: [
-        ["", "SRH Codes builds browser-based tools for Indian ecommerce sellers who work with marketplace labels, invoices, GST reports, order data, returns, ads, and seller performance reports."],
-        ["What we build", "Current tools include Flipkart label crop, Meesho 4-in-1 label PDF generation, Meesho GST helper calculations, and marketplace performance analysis workflows."],
+        ["", "SRH Codes is an independent collection of browser-based tools and original workflow guides built around everyday problems faced by Indian ecommerce sellers: marketplace labels, invoices, GST reports, order data, returns, ads, fees, and packing operations."],
+        ["Why it exists", "The project grew from real seller workflows where repetitive PDF formatting, report reconciliation, and portal preparation consumed time that small sellers could not always delegate to specialist staff."],
+        ["What we build", "Current tools include courier and quantity label processing, Flipkart shipping and billing crop, Meesho 4-up and 6-up PDFs, Amazon fee and listing-price estimates, GSTR-1 and GSTR-3B workflow helpers, and marketplace performance analysis."],
+        ["How content is prepared", "Guides explain the source records, calculation method, verification checks, and limitations behind each workflow. Marketplace formats, tax rules, and fee tables can change, so dated guidance is reviewed and corrected when source formats change."],
         ["Privacy-first workflow", "Label PDFs and seller reports are processed in the browser where possible. The current workflow does not intentionally store uploaded business documents on our servers."],
+        ["Independence", "Marketplace names are used only to describe compatible workflows. SRH Codes is not affiliated with, sponsored by, or endorsed by Amazon, Flipkart, Meesho, GSTN, or their group companies."],
         ["Jurisdiction", "All legal matters are subject to Rajasthan, India."],
       ],
     },
     hi: {
       title: "SRH Codes के बारे में",
       sections: [
-        ["", "SRH Codes Indian ecommerce sellers के लिए browser-based tools बनाता है जो marketplace labels, invoices, GST reports, ऑर्डर data, returns, ads और seller performance reports के साथ काम करते हैं."],
-        ["हम क्या build करते हैं", "Current tools में फ्लिपकार्ट label crop, मीशो 4-in-1 label PDF generation, मीशो GST helper calculations और marketplace performance analysis workflows हैं."],
+        ["", "SRH Codes Indian ecommerce sellers की daily problems के लिए independent browser-based tools और original workflow guides बनाता है: marketplace labels, invoices, GST reports, ऑर्डर data, returns, ads, fees और packing operations."],
+        ["यह क्यों बनाया", "यह project real seller workflows से बना जहाँ repetitive PDF formatting, report reconciliation और portal preparation में बहुत समय लगता था."],
+        ["हम क्या build करते हैं", "Current tools में courier/quantity label processing, फ्लिपकार्ट shipping-billing crop, मीशो 4-up/6-up PDFs, Amazon fee और listing-price estimates, GSTR-1/GSTR-3B helpers और performance analysis हैं."],
+        ["Content कैसे prepare होता है", "Guides source records, calculation method, verification checks और limitations समझाती हैं. Marketplace format, tax rules या fees बदलने पर dated guidance review की जाती है."],
         ["Privacy-first workflow", "Label PDFs और seller reports जहाँ possible हो browser में process होते हैं. Current workflow uploaded business documents को intentionally servers पर store नहीं करता."],
+        ["Independence", "Marketplace names सिर्फ compatible workflows describe करने के लिए हैं. SRH Codes Amazon, Flipkart, मीशो या GSTN से affiliated या endorsed नहीं है."],
         ["Jurisdiction", "All legal matters Rajasthan, India के subject हैं."],
       ],
     },

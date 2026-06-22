@@ -1,4 +1,5 @@
 import { absoluteUrl, keywordPages } from "../lib/site";
+import { guides } from "../lib/guides";
 
 export default function sitemap() {
   const now = new Date();
@@ -14,6 +15,18 @@ export default function sitemap() {
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.9,
+    })),
+    {
+      url: absoluteUrl("/guides"),
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    ...guides.map((guide) => ({
+      url: absoluteUrl(`/guides/${guide.slug}`),
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.75,
     })),
     {
       url: absoluteUrl("/privacy"),

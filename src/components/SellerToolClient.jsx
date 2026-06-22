@@ -125,6 +125,7 @@ const shellCopy = {
     contact: "Contact",
     privacy: "Privacy",
     terms: "Terms",
+    guides: "Guides",
   },
   hi: {
     command: "कमांड सेंटर",
@@ -145,6 +146,7 @@ const shellCopy = {
     contact: "कॉन्टैक्ट",
     privacy: "प्राइवेसी",
     terms: "टर्म्स",
+    guides: "गाइड्स",
   },
 };
 
@@ -345,32 +347,25 @@ const processingCopy = {
     seller: "Seller account",
     analyze: "Process labels",
     analyzing: "Analyzing PDFs...",
-    downloadLabels: "Labels PDF",
     downloadShipping: "Shipping PDF",
     downloadBilling: "Billing PDF",
     printShipping: "Print shipping",
     printBilling: "Print billing",
-    printLabels: "Print labels",
     downloadPicklist: "Picklist PDF",
+    downloadFour: "4/page PDF",
+    downloadSix: "6/page PDF",
     courierGroups: "Courier-wise label actions",
     allCouriers: "All couriers",
     singleQty: "Qty 1",
     multiQty: "Multi qty",
     allLabels: "All labels",
     noSubset: "No labels in this group",
-    formattedDownloads: "A4 formatted downloads",
-    a4FourHint: "4 labels per A4 page",
-    a4SixHint: "6 labels per A4 page",
-    original: "Original sorted pages",
-    a4Four: "A4 - 4 labels per page",
-    a4Six: "A4 - 6 labels per page",
     summary: "Packing summary",
     marketplacePending: (marketplace) => `${marketplace} label processing workflow is coming next. Meesho and Flipkart tabs support courier-wise labels, quantity groups, print PDFs, and picklist generation today.`,
     courierCounts: "Courier pickup counts",
     sellerCounts: "Seller account counts",
     qtyCounts: "SKU and quantity picklist",
     skuCounts: "Top SKU counts",
-    tableTitle: "Sorted label preview",
     unknown: "Unknown",
     noData: "Upload label PDFs and click Process to create courier-wise labels, print PDFs, and picklists.",
     extractionNote: "If any page appears as Unknown, review the PDF source. Scanned/image-only labels may not expose text for automatic sorting.",
@@ -392,32 +387,25 @@ const processingCopy = {
     seller: "Seller account",
     analyze: "Labels process करो",
     analyzing: "PDFs analyze हो रही हैं...",
-    downloadLabels: "Labels PDF",
     downloadShipping: "Shipping PDF",
     downloadBilling: "Billing PDF",
     printShipping: "Shipping print",
     printBilling: "Billing print",
-    printLabels: "Labels print",
     downloadPicklist: "Picklist PDF",
+    downloadFour: "4/page PDF",
+    downloadSix: "6/page PDF",
     courierGroups: "Courier-wise label actions",
     allCouriers: "All couriers",
     singleQty: "Qty 1",
     multiQty: "Multi qty",
     allLabels: "All labels",
     noSubset: "इस group में labels नहीं हैं",
-    formattedDownloads: "A4 formatted downloads",
-    a4FourHint: "A4 page पर 4 labels",
-    a4SixHint: "A4 page पर 6 labels",
-    original: "Original sorted pages",
-    a4Four: "A4 - 4 labels per page",
-    a4Six: "A4 - 6 labels per page",
     summary: "Packing summary",
     marketplacePending: (marketplace) => `${marketplace} label processing workflow next आएगा. अभी Meesho और Flipkart tabs courier-wise labels, quantity groups, print PDFs और picklist generation support करते हैं.`,
     courierCounts: "Courier pickup counts",
     sellerCounts: "Seller account counts",
     qtyCounts: "SKU और quantity picklist",
     skuCounts: "Top SKU counts",
-    tableTitle: "Sorted label preview",
     unknown: "Unknown",
     noData: "Label PDFs upload करके Process click करो, फिर courier-wise labels, print PDFs और picklists बन जाएंगी.",
     extractionNote: "अगर कोई page Unknown आए, PDF source review करो. Scanned/image-only labels automatic sorting के लिए text expose नहीं कर सकते.",
@@ -3112,6 +3100,7 @@ function CommandBar({ activeNav, lang, setLang }) {
           }}>हिन्दी</button>
         </div>
         <nav className="legal-links" aria-label="Site information">
+          <a href="/guides">{s.guides}</a>
           <a href="/about">{s.about}</a>
           <a href="/contact">{s.contact}</a>
           <a href="/privacy">{s.privacy}</a>
@@ -3472,7 +3461,6 @@ function LabelProcessingTool() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [items, setItems] = useState([]);
-  const [outputs, setOutputs] = useState(null);
   const [toast, setToast] = useState("");
 
   const sortedItems = useMemo(() => sortForPacking(items), [items]);
@@ -3481,14 +3469,13 @@ function LabelProcessingTool() {
     courier: countBy(sortedItems, "courier"),
     seller: countBy(sortedItems, "seller"),
     skuQty: countBySkuQty(sortedItems),
-    sku: countBy(sortedItems, "sku").slice(0, 8),
+    sku: countBy(sortedItems, "sku").slice(0, 5),
   }), [sortedItems]);
 
   const onFiles = (selectedFiles) => {
     const pdfFiles = Array.from(selectedFiles || []).filter((file) => /\.pdf$/i.test(file.name) || file.type === "application/pdf");
     setFiles(pdfFiles);
     setItems([]);
-    setOutputs(null);
     setToast("");
     setError("");
     trackEvent("label_processing_upload", { file_count: pdfFiles.length });
@@ -3506,7 +3493,6 @@ function LabelProcessingTool() {
       trackEvent("label_processing_start", { file_count: files.length, sort_mode: "auto_packing" });
       const extracted = await extractLabelPages(files);
       setItems(extracted);
-      setOutputs({ ready: true });
       setToast("Courier-wise labels and picklists are ready.");
       trackEvent("label_processing_complete", { label_count: extracted.length, sort_mode: "auto_packing" });
     } catch (err) {
@@ -3531,12 +3517,18 @@ function LabelProcessingTool() {
         saveBytes(bytes, filename);
         setToast(`${filename} downloaded.`);
       } else {
-        const bytes = platform === "flipkart" && outputKind !== "labels"
-          ? await buildFlipkartCroppedPdf(sorted, outputKind)
-          : await buildOriginalSortedPdf(sorted);
-        const filename = platform === "flipkart" && outputKind !== "labels"
-          ? `${scope}-${subset}-${outputKind}.pdf`
-          : `${scope}-${subset}-labels.pdf`;
+        const meeshoLayout = platform === "meesho" && outputKind.startsWith("a4-");
+        const labelsPerPage = meeshoLayout ? Number(outputKind.replace("a4-", "")) : 0;
+        const bytes = meeshoLayout
+          ? await buildMeeshoLayoutFromPages(sorted.map((item) => item.page), labelsPerPage)
+          : platform === "flipkart" && outputKind !== "labels"
+            ? await buildFlipkartCroppedPdf(sorted, outputKind)
+            : await buildOriginalSortedPdf(sorted);
+        const filename = meeshoLayout
+          ? `${scope}-${subset}-${labelsPerPage}-per-page-labels.pdf`
+          : platform === "flipkart" && outputKind !== "labels"
+            ? `${scope}-${subset}-${outputKind}.pdf`
+            : `${scope}-${subset}-labels.pdf`;
         if (action === "print") {
           printPdfBytes(bytes);
           setToast(`${scopeName} ${subsetName} ${outputKind} opened for printing.`);
@@ -3554,27 +3546,6 @@ function LabelProcessingTool() {
       });
     } catch (err) {
       setError(err.message || "Output generation failed.");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const downloadA4Layout = async (labelsPerPage) => {
-    if (!sortedItems.length) {
-      setError("Process labels before generating A4 output.");
-      return;
-    }
-    setBusy(true);
-    setError("");
-    try {
-      const pages = sortedItems.map((item) => item.page);
-      const bytes = await buildMeeshoLayoutFromPages(pages, labelsPerPage);
-      const filename = `all-couriers-${labelsPerPage}-up-labels.pdf`;
-      saveBytes(bytes, filename);
-      setToast(`${filename} downloaded.`);
-      trackEvent("label_processing_a4_download", { labels_per_page: labelsPerPage });
-    } catch (err) {
-      setError(err.message || "A4 PDF generation failed.");
     } finally {
       setBusy(false);
     }
@@ -3598,7 +3569,6 @@ function LabelProcessingTool() {
               setPlatform(id);
               setFiles([]);
               setItems([]);
-              setOutputs(null);
               setError("");
               setToast("");
             }}>{marketLabel(id)}</button>
@@ -3629,21 +3599,6 @@ function LabelProcessingTool() {
             {busy ? t.analyzing : t.analyze}
           </button>
 
-          {platform === "meesho" && outputs && sortedItems.length ? (
-            <div className="download-panel inline">
-              <h2>{t.formattedDownloads}</h2>
-              <div className="download-grid">
-                <button onClick={() => downloadA4Layout(4)} disabled={busy}>
-                  <LayoutGrid size={18} />
-                  <span><strong>{t.a4Four}</strong><small>{t.a4FourHint}</small></span>
-                </button>
-                <button onClick={() => downloadA4Layout(6)} disabled={busy}>
-                  <LayoutGrid size={18} />
-                  <span><strong>{t.a4Six}</strong><small>{t.a4SixHint}</small></span>
-                </button>
-              </div>
-            </div>
-          ) : null}
         </div>
 
         <div className="processing-summary">
@@ -3697,24 +3652,6 @@ function LabelProcessingTool() {
         </section>
       ) : null}
 
-      {["meesho", "flipkart"].includes(platform) && sortedItems.length ? (
-        <section className="portal-card">
-          <h2>{t.tableTitle}</h2>
-          <CompactTable
-            rows={sortedItems.slice(0, 80).map((item, index) => ({
-              sequence: index + 1,
-              seller: item.seller,
-              courier: item.courier,
-              sku: item.sku,
-              qty: item.qty || 1,
-              orderId: item.orderId || "-",
-              source: item.fileName,
-              page: item.pageIndex + 1,
-            }))}
-            columns={["sequence", "seller", "courier", "sku", "qty", "orderId", "source", "page"]}
-          />
-        </section>
-      ) : null}
       {toast && <div className="snackbar">{toast}</div>}
     </section>
   );
@@ -3761,11 +3698,11 @@ function CourierActionCard({ title, rows, t, busy, onAction, platform, featured 
                 </>
               ) : (
                 <>
-                  <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "download", title, option.label)}>
-                    <Download size={15} /> {t.downloadLabels}
+                  <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "download", title, option.label, "a4-4")}>
+                    <LayoutGrid size={15} /> {t.downloadFour}
                   </button>
-                  <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "print", title, option.label)}>
-                    <Printer size={15} /> {t.printLabels}
+                  <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "download", title, option.label, "a4-6")}>
+                    <LayoutGrid size={15} /> {t.downloadSix}
                   </button>
                 </>
               )}
