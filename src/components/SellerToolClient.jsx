@@ -354,6 +354,15 @@ const processingCopy = {
     downloadPicklist: "Picklist PDF",
     downloadFour: "4/page PDF",
     downloadSix: "6/page PDF",
+    downloadPdf: "Download PDF",
+    printPdf: "Print PDF",
+    labelPart: "Label part",
+    fullLabel: "Full label",
+    shippingOnly: "Shipping only",
+    billingOnly: "Billing only",
+    layout: "Layout",
+    onePerPage: "1/page",
+    ninePerPage: "9/page",
     courierGroups: "Courier-wise label actions",
     allCouriers: "All couriers",
     singleQty: "Qty 1",
@@ -394,6 +403,15 @@ const processingCopy = {
     downloadPicklist: "Picklist PDF",
     downloadFour: "4/page PDF",
     downloadSix: "6/page PDF",
+    downloadPdf: "PDF download",
+    printPdf: "PDF print",
+    labelPart: "Label part",
+    fullLabel: "Full label",
+    shippingOnly: "Shipping only",
+    billingOnly: "Billing only",
+    layout: "Layout",
+    onePerPage: "1/page",
+    ninePerPage: "9/page",
     courierGroups: "Courier-wise label actions",
     allCouriers: "All couriers",
     singleQty: "Qty 1",
@@ -2531,6 +2549,91 @@ const courierMatchers = [
   ["Amazon Shipping", /\bAMAZON\s*SHIPPING\b/i],
 ];
 
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function numberOr(value, fallback) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function getTextItemBox(item) {
+  const transform = item.transform || [];
+  const left = numberOr(transform[4], 0);
+  const bottom = numberOr(transform[5], 0);
+  const width = numberOr(item.width, 0);
+  const height = numberOr(item.height, Math.abs(numberOr(transform[3], transform[0] || 8)));
+  return {
+    left,
+    bottom,
+    right: left + width,
+    top: bottom + height,
+  };
+}
+
+function normalizeCropBox(cropBox, width, height) {
+  const left = clamp(Math.min(cropBox.left, cropBox.right), 0, width - 4);
+  const right = clamp(Math.max(cropBox.left, cropBox.right), left + 4, width);
+  const bottom = clamp(Math.min(cropBox.bottom, cropBox.top), 0, height - 4);
+  const top = clamp(Math.max(cropBox.bottom, cropBox.top), bottom + 4, height);
+  return { left, bottom, right, top };
+}
+
+function getPdfTextBounds(items, pageSize) {
+  let left = Infinity;
+  let bottom = Infinity;
+  let right = -Infinity;
+  let top = -Infinity;
+
+  items.forEach((item) => {
+    if (!String(item.str || "").trim()) return;
+    const box = getTextItemBox(item);
+    left = Math.min(left, box.left);
+    bottom = Math.min(bottom, box.bottom);
+    right = Math.max(right, box.right);
+    top = Math.max(top, box.top);
+  });
+
+  if (!Number.isFinite(left)) {
+    return meeshoFilledCropBox(pageSize.width, pageSize.height);
+  }
+
+  const pad = 8;
+  return normalizeCropBox({
+    left: left - pad,
+    bottom: bottom - pad,
+    right: right + pad,
+    top: top + pad,
+  }, pageSize.width, pageSize.height);
+}
+
+function detectTaxInvoiceBox(items) {
+  const boxes = items
+    .map((item) => ({
+      text: String(item.str || "").replace(/\s+/g, " ").trim(),
+      ...getTextItemBox(item),
+    }))
+    .filter((item) => item.text);
+
+  const direct = boxes.find((item) => /\bTAX\s+INVOICE\b/i.test(item.text));
+  if (direct) return direct;
+
+  for (let index = 0; index < boxes.length - 1; index += 1) {
+    if (/^TAX$/i.test(boxes[index].text) && /^INVOICE$/i.test(boxes[index + 1].text)) {
+      return {
+        text: "TAX INVOICE",
+        left: Math.min(boxes[index].left, boxes[index + 1].left),
+        bottom: Math.min(boxes[index].bottom, boxes[index + 1].bottom),
+        right: Math.max(boxes[index].right, boxes[index + 1].right),
+        top: Math.max(boxes[index].top, boxes[index + 1].top),
+      };
+    }
+  }
+
+  return null;
+}
+
 async function extractLabelPages(files) {
   const pages = [];
   for (let fileIndex = 0; fileIndex < files.length; fileIndex += 1) {
@@ -2544,17 +2647,21 @@ async function extractLabelPages(files) {
       isEvalSupported: false,
     }).promise;
     for (let pageIndex = 0; pageIndex < source.getPageCount(); pageIndex += 1) {
+      const sourcePage = source.getPage(pageIndex);
       const pdfPage = await textDoc.getPage(pageIndex + 1);
       const content = await pdfPage.getTextContent();
       const text = content.items.map((item) => item.str || "").join(" ");
+      const pageSize = sourcePage.getSize();
       pages.push({
         id: `${fileIndex}-${pageIndex}`,
         fileName: file.name,
         source,
-        page: source.getPage(pageIndex),
+        page: sourcePage,
         pageIndex,
         originalIndex: pages.length,
         text,
+        textBounds: getPdfTextBounds(content.items, pageSize),
+        taxInvoiceBox: detectTaxInvoiceBox(content.items),
         seller: detectSellerAccount(text, file.name),
         courier: detectCourierPartner(text),
         sku: detectSku(text),
@@ -2728,11 +2835,61 @@ async function buildFlipkartCroppedPdf(items, kind) {
   return output.save();
 }
 
-async function buildMeeshoLayoutFromPages(pages, labelsPerPage = 4) {
+function getMeeshoLayout(labelsPerPage) {
+  if (labelsPerPage === 9) {
+    return { columns: 3, rows: 3, margin: 10, gapX: 6, gapY: 6, rotate: false };
+  }
+  if (labelsPerPage === 6) {
+    return { columns: 2, rows: 3, margin: 10, gapX: 8, gapY: 8, rotate: true };
+  }
+  return { columns: 2, rows: 2, margin: 18, gapX: 12, gapY: 12, rotate: false };
+}
+
+function meeshoSectionCropBox(item, section = "full") {
+  const { width, height } = item.page.getSize();
+  const full = normalizeCropBox(item.textBounds || meeshoFilledCropBox(width, height), width, height);
+
+  if (section === "shipping" || section === "billing") {
+    const splitY = item.taxInvoiceBox
+      ? clamp(item.taxInvoiceBox.top + 8, full.bottom + 30, full.top - 30)
+      : clamp(height * 0.58, full.bottom + 30, full.top - 30);
+
+    if (section === "shipping") {
+      return normalizeCropBox({ ...full, bottom: splitY }, width, height);
+    }
+    return normalizeCropBox({ ...full, top: splitY }, width, height);
+  }
+
+  return full;
+}
+
+function parseMeeshoOutputKind(outputKind) {
+  const match = String(outputKind || "").match(/^meesho:(full|shipping|billing):(\d+)$/);
+  if (!match) return null;
+  return {
+    section: match[1],
+    labelsPerPage: Number(match[2]) || 4,
+  };
+}
+
+function meeshoOutputKind(section, labelsPerPage) {
+  return `meesho:${section}:${labelsPerPage}`;
+}
+
+async function buildMeeshoOutputPdf(items, section = "full", labelsPerPage = 4) {
   const output = await PDFDocument.create();
-  const layout = labelsPerPage === 6
-    ? { columns: 2, rows: 3, margin: 10, gapX: 8, gapY: 8, rotate: true, cropBottomWhitespace: true }
-    : { columns: 2, rows: 2, margin: 18, gapX: 12, gapY: 12 };
+  if (labelsPerPage === 1) {
+    for (const item of items) {
+      const cropBox = meeshoSectionCropBox(item, section);
+      await addCroppedPage(output, item.page, cropBox, {
+        width: cropBox.right - cropBox.left,
+        height: cropBox.top - cropBox.bottom,
+      });
+    }
+    return output.save();
+  }
+
+  const layout = getMeeshoLayout(labelsPerPage);
   const slotWidth = (A4.width - layout.margin * 2 - layout.gapX * (layout.columns - 1)) / layout.columns;
   const slotHeight = (A4.height - layout.margin * 2 - layout.gapY * (layout.rows - 1)) / layout.rows;
   const slots = Array.from({ length: labelsPerPage }, (_, index) => {
@@ -2745,18 +2902,15 @@ async function buildMeeshoLayoutFromPages(pages, labelsPerPage = 4) {
     };
   });
 
-  for (let i = 0; i < pages.length; i += labelsPerPage) {
+  for (let i = 0; i < items.length; i += labelsPerPage) {
     const page = output.addPage([A4.width, A4.height]);
     for (let offset = 0; offset < labelsPerPage; offset += 1) {
-      const sourcePage = pages[i + offset];
-      if (!sourcePage) continue;
-      const { width, height } = sourcePage.getSize();
-      const cropBox = layout.cropBottomWhitespace
-        ? meeshoFilledCropBox(width, height)
-        : null;
-      const embedded = cropBox ? await output.embedPage(sourcePage, cropBox) : await output.embedPage(sourcePage);
-      const croppedWidth = cropBox ? cropBox.right - cropBox.left : width;
-      const croppedHeight = cropBox ? cropBox.top - cropBox.bottom : height;
+      const item = items[i + offset];
+      if (!item) continue;
+      const cropBox = meeshoSectionCropBox(item, section);
+      const embedded = await output.embedPage(item.page, cropBox);
+      const croppedWidth = cropBox.right - cropBox.left;
+      const croppedHeight = cropBox.top - cropBox.bottom;
       const sourceWidth = layout.rotate ? croppedHeight : croppedWidth;
       const sourceHeight = layout.rotate ? croppedWidth : croppedHeight;
       const scale = Math.min(slotWidth / sourceWidth, slotHeight / sourceHeight);
@@ -2784,6 +2938,11 @@ async function buildMeeshoLayoutFromPages(pages, labelsPerPage = 4) {
     }
   }
   return output.save();
+}
+
+async function buildMeeshoLayoutFromPages(pages, labelsPerPage = 4) {
+  const items = pages.map((page, index) => ({ page, originalIndex: index }));
+  return buildMeeshoOutputPdf(items, "full", labelsPerPage);
 }
 
 function meeshoFilledCropBox(width, height) {
@@ -3517,15 +3676,14 @@ function LabelProcessingTool() {
         saveBytes(bytes, filename);
         setToast(`${filename} downloaded.`);
       } else {
-        const meeshoLayout = platform === "meesho" && outputKind.startsWith("a4-");
-        const labelsPerPage = meeshoLayout ? Number(outputKind.replace("a4-", "")) : 0;
-        const bytes = meeshoLayout
-          ? await buildMeeshoLayoutFromPages(sorted.map((item) => item.page), labelsPerPage)
+        const meeshoOutput = platform === "meesho" ? parseMeeshoOutputKind(outputKind) : null;
+        const bytes = meeshoOutput
+          ? await buildMeeshoOutputPdf(sorted, meeshoOutput.section, meeshoOutput.labelsPerPage)
           : platform === "flipkart" && outputKind !== "labels"
             ? await buildFlipkartCroppedPdf(sorted, outputKind)
             : await buildOriginalSortedPdf(sorted);
-        const filename = meeshoLayout
-          ? `${scope}-${subset}-${labelsPerPage}-per-page-labels.pdf`
+        const filename = meeshoOutput
+          ? `${scope}-${subset}-${meeshoOutput.section}-${meeshoOutput.labelsPerPage}-per-page-labels.pdf`
           : platform === "flipkart" && outputKind !== "labels"
             ? `${scope}-${subset}-${outputKind}.pdf`
             : `${scope}-${subset}-labels.pdf`;
@@ -3697,14 +3855,13 @@ function CourierActionCard({ title, rows, t, busy, onAction, platform, featured 
                   </button>
                 </>
               ) : (
-                <>
-                  <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "download", title, option.label, "a4-4")}>
-                    <LayoutGrid size={15} /> {t.downloadFour}
-                  </button>
-                  <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "download", title, option.label, "a4-6")}>
-                    <LayoutGrid size={15} /> {t.downloadSix}
-                  </button>
-                </>
+                <MeeshoActionControls
+                  option={option}
+                  title={title}
+                  t={t}
+                  busy={busy}
+                  onAction={onAction}
+                />
               )}
               <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "picklist", title, option.label)}>
                 <ClipboardList size={15} /> {t.downloadPicklist}
@@ -3714,6 +3871,43 @@ function CourierActionCard({ title, rows, t, busy, onAction, platform, featured 
         ))}
       </div>
     </article>
+  );
+}
+
+function MeeshoActionControls({ option, title, t, busy, onAction }) {
+  const [section, setSection] = useState("full");
+  const [labelsPerPage, setLabelsPerPage] = useState("4");
+  const outputKind = meeshoOutputKind(section, labelsPerPage);
+  const disabled = busy || !option.rows.length;
+
+  return (
+    <>
+      <div className="mini-select-row">
+        <label>
+          <span>{t.labelPart}</span>
+          <select value={section} onChange={(event) => setSection(event.target.value)} disabled={disabled}>
+            <option value="full">{t.fullLabel}</option>
+            <option value="shipping">{t.shippingOnly}</option>
+            <option value="billing">{t.billingOnly}</option>
+          </select>
+        </label>
+        <label>
+          <span>{t.layout}</span>
+          <select value={labelsPerPage} onChange={(event) => setLabelsPerPage(event.target.value)} disabled={disabled}>
+            <option value="1">{t.onePerPage}</option>
+            <option value="4">{t.downloadFour}</option>
+            <option value="6">{t.downloadSix}</option>
+            <option value="9">{t.ninePerPage}</option>
+          </select>
+        </label>
+      </div>
+      <button disabled={disabled} onClick={() => onAction(option.rows, "download", title, option.label, outputKind)}>
+        <Download size={15} /> {t.downloadPdf}
+      </button>
+      <button disabled={disabled} onClick={() => onAction(option.rows, "print", title, option.label, outputKind)}>
+        <Printer size={15} /> {t.printPdf}
+      </button>
+    </>
   );
 }
 
