@@ -7,7 +7,7 @@ export const site = {
   contactEmail: "shree.anjaneya.1304@gmail.com",
   jurisdiction: "Rajasthan, India",
   description:
-    "Free ecommerce seller tools for Flipkart and Meesho labels, Amazon fees and pricing, GSTR-1 tables, GSTR-2B ITC reconciliation, guided GSTR-3B filing checks, performance insights, and marketplace data analysis.",
+    "Free label processing tools for ecommerce sellers: crop Flipkart and Meesho labels, create 4-up and 6-up label PDFs, sort labels courier-wise or SKU-wise, generate picklists, plus Amazon calculators, GST helpers, and seller analytics.",
   url: siteUrl,
   keywords: [
     "flipkart label crop",

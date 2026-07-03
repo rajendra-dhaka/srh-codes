@@ -2105,6 +2105,15 @@ main {
   margin-bottom: 16px;
 }
 
+.amazon-processing-layout {
+  align-items: start;
+}
+
+.amazon-label-workbench {
+  display: grid;
+  gap: 12px;
+}
+
 .label-dropzone.compact {
   min-height: 210px;
 }
@@ -2128,6 +2137,151 @@ main {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 12px;
+}
+
+.amazon-option-section {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.amazon-option-section > strong {
+  color: #17324d;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.amazon-option-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.amazon-option-card {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid #d9e4f2;
+  border-radius: 8px;
+  background: #fbfdff;
+  color: #17324d;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.amazon-option-card span {
+  font-weight: 900;
+}
+
+.amazon-option-card small {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.amazon-option-card.active {
+  border-color: #17324d;
+  background: #17324d;
+  color: #ffffff;
+}
+
+.amazon-option-card.active small {
+  color: #d8e6f4;
+}
+
+.amazon-toggle-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 11px 12px;
+  border: 1px solid #d9e4f2;
+  border-radius: 8px;
+  background: #fbfdff;
+  color: #17324d;
+  font-weight: 900;
+}
+
+.amazon-toggle-line input {
+  width: 18px;
+  height: 18px;
+  accent-color: #17324d;
+}
+
+.amazon-action-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.amazon-action-row button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #d9e4f2;
+  border-radius: 8px;
+  background: #fbfdff;
+  color: #17324d;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.amazon-action-row button:hover {
+  border-color: #00a6a6;
+  background: #e9f7f7;
+}
+
+.amazon-preview-table {
+  margin-top: 12px;
+  border: 1px solid #e5edf6;
+  border-radius: 8px;
+  background: #fbfdff;
+  overflow-x: auto;
+}
+
+.amazon-preview-table h3 {
+  margin: 0;
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5edf6;
+  background: #f2fbfb;
+  color: #17324d;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.amazon-preview-table table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+}
+
+.amazon-preview-table th,
+.amazon-preview-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5edf6;
+  text-align: left;
+  font-size: 13px;
+}
+
+.amazon-preview-table th {
+  color: #17324d;
+  font-weight: 900;
+}
+
+.amazon-preview-table td {
+  color: #475569;
+  font-weight: 800;
+}
+
+.amazon-preview-table tr:last-child td {
+  border-bottom: 0;
 }
 
 .count-list {
@@ -3440,7 +3594,9 @@ tr:nth-child(even) td {
   }
 
   .courier-card-grid,
-  .qty-action-grid {
+  .qty-action-grid,
+  .amazon-option-grid,
+  .amazon-action-row {
     grid-template-columns: 1fr;
   }
 
@@ -3522,6 +3678,10 @@ tr:nth-child(even) td {
 .theme-dark .icon-btn,
 .theme-dark .workspace-card,
 .theme-dark .label-workbench,
+.theme-dark .amazon-option-card,
+.theme-dark .amazon-toggle-line,
+.theme-dark .amazon-action-row button,
+.theme-dark .amazon-preview-table,
 .theme-dark .label-preview-panel,
 .theme-dark .download-panel,
 .theme-dark .processing-summary,
@@ -3690,6 +3850,9 @@ tr:nth-child(even) td {
 .theme-dark .label-preview-panel h2,
 .theme-dark .download-panel h2,
 .theme-dark .processing-summary h2,
+.theme-dark .amazon-option-section > strong,
+.theme-dark .amazon-preview-table h3,
+.theme-dark .amazon-preview-table th,
 .theme-dark .count-list h3,
 .theme-dark .print-modal h2 {
   color: #eef6ff;
@@ -3698,8 +3861,30 @@ tr:nth-child(even) td {
 .theme-dark .workspace-card small,
 .theme-dark .workspace-card em,
 .theme-dark .label-dropzone em,
+.theme-dark .amazon-option-card small,
+.theme-dark .amazon-preview-table td,
 .theme-dark .download-grid small {
   color: #b8c7dc;
+}
+
+.theme-dark .amazon-preview-table h3 {
+  background: #172033;
+  border-bottom-color: #2f4058;
+}
+
+.theme-dark .amazon-preview-table th,
+.theme-dark .amazon-preview-table td {
+  border-bottom-color: #2f4058;
+}
+
+.theme-dark .amazon-option-card.active {
+  background: #00a6a6;
+  border-color: #00a6a6;
+  color: #06111f;
+}
+
+.theme-dark .amazon-option-card.active small {
+  color: #07363c;
 }
 
 .theme-dark .count-list h3 {

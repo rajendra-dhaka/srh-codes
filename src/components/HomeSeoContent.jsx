@@ -14,14 +14,14 @@ const seoLinks = [
 const homeCopy = {
   en: {
     kicker: "Free ecommerce seller tools",
-    h1: "Flipkart label cropper, Meesho label maker, Amazon calculator, GSTR-1 and GSTR-3B helper, and seller analytics",
+    h1: "Label processing tools for Meesho, Flipkart, and Amazon sellers",
     intro:
-      "Browser-based tools for Flipkart label cropping, Meesho 4-up and 6-up A4 label PDFs, Amazon fees and listing price calculation, sorted label downloads, ecommerce analytics, GSTR-1 portal values, GSTR-2B ITC reconciliation, and guided GSTR-3B filing checks.",
+      "Sort, crop, print, and download marketplace label PDFs from one browser workspace. Create Meesho 4-up and 6-up A4 label PDFs, crop Flipkart shipping and billing labels, process Amazon labels with SKU notes, generate courier-wise picklists, then use Amazon calculators, GST helpers, and seller analytics when needed.",
     flipkart: "Flipkart label crop",
     meesho: "Meesho label maker",
-    analytics: "Seller analytics",
+    analytics: "Label sorting",
     why: "Why sellers use it",
-    whyTitle: "Label PDF tools, GST helpers, and data analysis for Indian marketplace sellers",
+    whyTitle: "Label PDF workflows first, with GST and seller analytics built in",
     features: [
       ["Flipkart shipping label cropper", "Upload Flipkart label PDFs and download separate shipping and 4x6 portrait billing PDFs for cleaner packing and printing."],
       ["Meesho 4-up and 6-up label maker", "Convert Meesho labels into 4-per-page or 6-per-page A4 PDFs for normal page printers."],
@@ -53,14 +53,14 @@ const homeCopy = {
   },
   hi: {
     kicker: "फ्री ecommerce seller tools",
-    h1: "फ्लिपकार्ट label cropper, मीशो label maker, Amazon calculator, GSTR-1 और GSTR-3B helper और seller analytics",
+    h1: "मीशो, फ्लिपकार्ट और Amazon sellers के लिए label processing tools",
     intro:
-      "Browser-based tools जिससे फ्लिपकार्ट label crop, मीशो 4-up और 6-up A4 PDFs, Amazon fees और listing price calculation, sorted label downloads, ecommerce analytics, GSTR-1 portal values, GSTR-2B ITC reconciliation और guided GSTR-3B filing checks easy होते हैं.",
+      "Ek browser workspace me marketplace label PDFs sort, crop, print aur download karo. मीशो 4-up और 6-up A4 label PDFs banao, फ्लिपकार्ट shipping और billing labels crop karo, Amazon labels me SKU notes process karo, courier-wise picklists generate karo, aur जरूरत पड़े तो Amazon calculators, GST helpers और seller analytics use karo.",
     flipkart: "फ्लिपकार्ट label crop",
     meesho: "मीशो label maker",
-    analytics: "Seller analytics",
+    analytics: "Label sorting",
     why: "Sellers इसे क्यों use करते हैं",
-    whyTitle: "Indian marketplace sellers के लिए label PDF tools, GST helpers और data analysis",
+    whyTitle: "Pehle label PDF workflows, saath me GST और seller analytics",
     features: [
       ["फ्लिपकार्ट shipping label cropper", "फ्लिपकार्ट label PDFs upload करो और clean shipping plus separate 4x6 portrait billing PDFs download करो."],
       ["मीशो 4-up और 6-up label maker", "मीशो labels को 4-per-page या 6-per-page A4 PDFs में convert करो."],
