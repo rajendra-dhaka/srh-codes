@@ -7,7 +7,7 @@ export const site = {
   contactEmail: "shree.anjaneya.1304@gmail.com",
   jurisdiction: "Rajasthan, India",
   description:
-    "Free label processing tools for ecommerce sellers: crop Flipkart and Meesho labels, create 4-up and 6-up label PDFs, sort labels courier-wise or SKU-wise, generate picklists, plus Amazon calculators, GST helpers, and seller analytics.",
+    "Free label processing tools for ecommerce sellers: separate Amazon shipping and billing pages, handle multi-page invoices and multi-SKU Amazon orders, crop Flipkart and Meesho labels, create 4-up and 6-up label PDFs, sort courier-wise or SKU-wise, generate picklists, plus Amazon calculators, GST helpers, and seller analytics.",
   url: siteUrl,
   keywords: [
     "flipkart label crop",
@@ -32,6 +32,13 @@ export const site = {
     "sort labels by courier partner",
     "sort shipping labels by sku",
     "label printer 4x6 pdf",
+    "amazon label separator",
+    "amazon shipping label separator",
+    "amazon billing invoice separator",
+    "amazon print documents pdf separator",
+    "amazon shipping billing pdf split",
+    "amazon multi page invoice labels",
+    "amazon multi sku invoice labels",
     "amazon easy ship fee calculator",
     "amazon listing price calculator",
     "amazon listing price calculator with gst",
@@ -73,6 +80,10 @@ export const landingFeatures = [
   {
     title: "Courier and SKU label sorting",
     text: "Upload multiple label PDFs, sort courier-wise or SKU-wise, download combined or courier-wise sorted label PDFs, print courier-wise label PDFs, and generate a packing picklist with seller account and courier pickup counts.",
+  },
+  {
+    title: "Amazon shipping and billing PDF separator",
+    text: "Upload Amazon Print Documents PDFs, separate shipping labels from billing invoice pages, keep multi-page invoices attached to the correct shipment, detect multiple SKUs on one Amazon invoice, and download shipping, billing, or combined PDFs.",
   },
   {
     title: "Amazon fee and listing price calculator",

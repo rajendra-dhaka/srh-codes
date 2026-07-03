@@ -16,7 +16,7 @@ const homeCopy = {
     kicker: "Free ecommerce seller tools",
     h1: "Label processing tools for Meesho, Flipkart, and Amazon sellers",
     intro:
-      "Sort, crop, print, and download marketplace label PDFs from one browser workspace. Create Meesho 4-up and 6-up A4 label PDFs, crop Flipkart shipping and billing labels, process Amazon labels with SKU notes, generate courier-wise picklists, then use Amazon calculators, GST helpers, and seller analytics when needed.",
+      "Sort, crop, split, print, and download marketplace label PDFs from one browser workspace. Separate Amazon shipping labels from billing invoice pages, handle multi-page invoices and multi-SKU Amazon orders, create Meesho 4-up and 6-up A4 label PDFs, crop Flipkart shipping and billing labels, generate courier-wise picklists, then use Amazon calculators, GST helpers, and seller analytics when needed.",
     flipkart: "Flipkart label crop",
     meesho: "Meesho label maker",
     analytics: "Label sorting",
@@ -26,6 +26,7 @@ const homeCopy = {
       ["Flipkart shipping label cropper", "Upload Flipkart label PDFs and download separate shipping and 4x6 portrait billing PDFs for cleaner packing and printing."],
       ["Meesho 4-up and 6-up label maker", "Convert Meesho labels into 4-per-page or 6-per-page A4 PDFs for normal page printers."],
       ["Courier and SKU label sorting", "Sort multiple label PDFs by courier partner, SKU, seller account, or courier plus SKU, then download one combined sorted PDF, courier-wise separate label PDFs, print-ready PDFs, and packing picklists."],
+      ["Amazon shipping and billing PDF separator", "Upload Amazon Print Documents PDFs, separate shipping labels and billing invoice pages, keep multi-page invoices with the correct shipment, detect multiple SKUs in one invoice, and download shipping-only, billing-only, or combined PDFs."],
       ["Amazon listing price calculator with GST", "Estimate Easy Ship fee, volumetric weight, referral fee, closing fee, GST-inclusive cost price, GST already paid on costs, balance GST to pay, break-even price, profit, and margin before listing Amazon India products."],
       ["Private browser processing", "PDFs and reports are processed in your browser. Files do not need to be uploaded to a server."],
       ["GSTR-1 and GSTR-3B filing helper", "Prepare Meesho GSTR-1 tables, reconcile GSTR-2B eligible ITC, estimate GSTR-3B set-off, and follow a beginner-friendly portal filing guide."],
@@ -55,7 +56,7 @@ const homeCopy = {
     kicker: "फ्री ecommerce seller tools",
     h1: "मीशो, फ्लिपकार्ट और Amazon sellers के लिए label processing tools",
     intro:
-      "Ek browser workspace me marketplace label PDFs sort, crop, print aur download karo. मीशो 4-up और 6-up A4 label PDFs banao, फ्लिपकार्ट shipping और billing labels crop karo, Amazon labels me SKU notes process karo, courier-wise picklists generate karo, aur जरूरत पड़े तो Amazon calculators, GST helpers और seller analytics use karo.",
+      "Ek browser workspace me marketplace label PDFs sort, crop, split, print aur download karo. Amazon shipping labels ko billing invoice pages se separate karo, multi-page invoices aur multi-SKU Amazon orders handle karo, मीशो 4-up और 6-up A4 label PDFs banao, फ्लिपकार्ट shipping और billing labels crop karo, courier-wise picklists generate karo, aur जरूरत पड़े तो Amazon calculators, GST helpers और seller analytics use karo.",
     flipkart: "फ्लिपकार्ट label crop",
     meesho: "मीशो label maker",
     analytics: "Label sorting",
@@ -65,6 +66,7 @@ const homeCopy = {
       ["फ्लिपकार्ट shipping label cropper", "फ्लिपकार्ट label PDFs upload करो और clean shipping plus separate 4x6 portrait billing PDFs download करो."],
       ["मीशो 4-up और 6-up label maker", "मीशो labels को 4-per-page या 6-per-page A4 PDFs में convert करो."],
       ["Courier और SKU label sorting", "Multiple label PDFs को courier partner, SKU, seller account, या courier plus SKU से sort करो, फिर combined sorted PDF, courier-wise separate label PDFs, print-ready PDFs और packing picklists download करो."],
+      ["Amazon shipping और billing PDF separator", "Amazon Print Documents PDFs upload करके shipping labels और billing invoice pages separate करो, multi-page invoices सही shipment से attach रखो, एक invoice के multiple SKUs detect करो, और shipping-only, billing-only या combined PDFs download करो."],
       ["Amazon listing price calculator with GST", "Amazon India products list करने से पहले Easy Ship fee, volumetric weight, referral fee, closing fee, GST-inclusive cost price, costs पर already paid GST, balance GST, break-even price, profit और margin estimate करो."],
       ["Private browser processing", "PDFs और reports browser में process होते हैं. Files server पर upload करने की जरूरत नहीं होती."],
       ["GSTR-1 और GSTR-3B filing helper", "मीशो GSTR-1 tables prepare करो, GSTR-2B eligible ITC reconcile करो, GSTR-3B set-off estimate करो और beginner-friendly portal guide follow करो."],

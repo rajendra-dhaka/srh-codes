@@ -357,6 +357,8 @@ const processingCopy = {
     downloadPdf: "Download PDF",
     printPdf: "Print PDF",
     amazonNoteMode: "Shipping label note",
+    amazonNoNote: "Clean shipping labels only",
+    amazonNoNoteHint: "Separate shipping/billing pages without SKU/title overlay.",
     amazonSkuOnly: "SKU + quantity",
     amazonSkuWithTitle: "Title + SKU + quantity",
     amazonInvoiceMode: "Invoice pages",
@@ -364,11 +366,16 @@ const processingCopy = {
     amazonKeepInvoice: "Keep invoice pages",
     amazonSortSku: "Sort labels by SKU before download",
     amazonPrepare: "Prepare Amazon labels",
-    amazonDownload: "Download prepared labels",
-    amazonPrint: "Print prepared labels",
+    amazonDownload: "Download combined PDF",
+    amazonPrint: "Print combined PDF",
+    amazonDownloadShipping: "Download shipping labels",
+    amazonPrintShipping: "Print shipping labels",
+    amazonDownloadBilling: "Download billing pages",
+    amazonPrintBilling: "Print billing pages",
     amazonOrders: "Amazon orders",
-    amazonPreview: "Prepared label preview",
-    amazonHelp: "Upload Amazon Print Documents PDF. The tool pairs every shipping page with the next invoice page, reads SKU/title/quantity from the invoice, and writes the selected note on the shipping label.",
+    amazonItems: "Line items",
+    amazonPreview: "Line item preview",
+    amazonHelp: "Upload Amazon Print Documents PDF. The tool separates shipping and billing pages using page text markers like Ship To, AWB, Order ID, and Tax Invoice, so multi-page invoices stay attached to the right shipping label.",
     labelPart: "Label part",
     fullLabel: "Full label",
     shippingOnly: "Shipping only",
@@ -419,6 +426,8 @@ const processingCopy = {
     downloadPdf: "PDF download",
     printPdf: "PDF print",
     amazonNoteMode: "Shipping label note",
+    amazonNoNote: "Clean shipping labels only",
+    amazonNoNoteHint: "SKU/title overlay ke bina shipping/billing pages separate करो.",
     amazonSkuOnly: "SKU + quantity",
     amazonSkuWithTitle: "Title + SKU + quantity",
     amazonInvoiceMode: "Invoice pages",
@@ -426,11 +435,16 @@ const processingCopy = {
     amazonKeepInvoice: "Invoice pages keep करो",
     amazonSortSku: "Download से पहले labels SKU wise sort करो",
     amazonPrepare: "Amazon labels prepare करो",
-    amazonDownload: "Prepared labels download",
-    amazonPrint: "Prepared labels print",
+    amazonDownload: "Combined PDF download",
+    amazonPrint: "Combined PDF print",
+    amazonDownloadShipping: "Shipping labels download",
+    amazonPrintShipping: "Shipping labels print",
+    amazonDownloadBilling: "Billing pages download",
+    amazonPrintBilling: "Billing pages print",
     amazonOrders: "Amazon orders",
-    amazonPreview: "Prepared label preview",
-    amazonHelp: "Amazon Print Documents PDF upload करो. Tool हर shipping page को next invoice page से pair करता है, invoice से SKU/title/quantity read करता है, और selected note shipping label पर लिखता है.",
+    amazonItems: "Line items",
+    amazonPreview: "Line item preview",
+    amazonHelp: "Amazon Print Documents PDF upload करो. Tool Ship To, AWB, Order ID और Tax Invoice जैसे markers से shipping और billing pages separate करता है, इसलिए multi-page invoice सही shipping label के साथ रहता है.",
     labelPart: "Label part",
     fullLabel: "Full label",
     shippingOnly: "Shipping only",
@@ -2859,13 +2873,46 @@ function extractAmazonSkuFromParen(value) {
   const reserved = new Set(["CGST", "SGST", "IGST", "GST", "INR", "RS", "HSN", "TOTAL"]);
   const candidates = normalizeAmazonText(value)
     .replace(/[₹,]/g, " ")
-    .match(/\b[A-Z][A-Z0-9._/-]{2,60}\b/g) || [];
-  const filtered = candidates.filter((candidate) => !reserved.has(candidate.toUpperCase()));
+    .match(/\b[A-Z0-9][A-Z0-9._/-]{2,60}\b/g) || [];
+  const filtered = candidates.filter((candidate) => (
+    !reserved.has(candidate.toUpperCase()) && /[A-Z]/i.test(candidate) && !/^\d+(?:\.\d+)?$/.test(candidate)
+  ));
   return filtered[filtered.length - 1] || "";
+}
+
+function extractAmazonQty(value) {
+  const text = normalizeAmazonText(value);
+  const withDiscount = text.match(/(?:₹|INR|Rs\.?)?\s*[\d,.]+\s+-?(?:₹|INR|Rs\.?)?\s*[\d,.]+\s+(\d{1,3})\s+(?:₹|INR|Rs\.?)?\s*[\d,.]+/i);
+  if (withDiscount?.[1]) return Number(withDiscount[1]) || 1;
+  const direct = text.match(/(?:₹|INR|Rs\.?)?\s*[\d,.]+\s+(\d{1,3})\s+(?:₹|INR|Rs\.?)?\s*[\d,.]+/i)
+    || text.match(/\b(?:Qty|Quantity)\b\D{0,24}(\d{1,3})/i);
+  return Number(direct?.[1]) || 1;
+}
+
+function parseAmazonInvoiceLineItems(text) {
+  const items = [];
+  const asinPattern = /\|\s*([A-Z0-9]{10})\s*\(\s*([^)]+?)\s*\)\s*HSN\s*:?\s*\d+/gi;
+  const rowStartPattern = /(?:Total\s+Amount|(?:₹|INR|Rs\.?)\s*[\d,.]+)\s+\d+\s+/gi;
+  for (const match of text.matchAll(asinPattern)) {
+    const before = text.slice(0, match.index);
+    const rowStarts = [...before.matchAll(rowStartPattern)];
+    const rowStart = rowStarts[rowStarts.length - 1];
+    const title = rowStart ? before.slice(rowStart.index + rowStart[0].length) : before.slice(Math.max(0, before.length - 260));
+    const sku = extractAmazonSkuFromParen(match[2]);
+    if (!sku) continue;
+    items.push({
+      title: cleanAmazonTitle(title),
+      asin: match[1],
+      sku,
+      qty: extractAmazonQty(match[2]),
+    });
+  }
+  return items;
 }
 
 function parseAmazonInvoiceText(rawText) {
   const text = normalizeAmazonText(rawText);
+  const lineItems = parseAmazonInvoiceLineItems(text);
   const productMatch = text.match(/\|\s*([A-Z0-9]{10})\s*\(\s*([^)]+?)\s*\)\s*HSN\s*:?\s*\d+/i)
     || text.match(/\b([A-Z0-9]{10})\s*\(\s*([^)]+?)\s*\)\s*HSN\s*:?\s*\d+/i);
   const orderId = text.match(/\b(?:Order\s*(?:ID|No\.?|Number)|Order\s*#)\s*[:#-]?\s*([0-9-]{8,})/i)?.[1]
@@ -2874,39 +2921,147 @@ function parseAmazonInvoiceText(rawText) {
   const parenValue = productMatch?.[2] || "";
   const hsnTail = productMatch ? text.slice(productMatch.index + productMatch[0].length) : text;
   const titleSource = productMatch ? text.slice(Math.max(0, productMatch.index - 780), productMatch.index) : "";
-  const qty = parenValue.match(/(?:₹|INR|Rs\.?)?\s*[\d,.]+\s+(\d{1,3})\s+(?:₹|INR|Rs\.?)?\s*[\d,.]+/i)?.[1]
-    || hsnTail.match(/(?:₹|INR|Rs\.?)?\s*[\d,.]+\s+(\d{1,3})\s+(?:₹|INR|Rs\.?)?\s*[\d,.]+/i)?.[1]
-    || text.match(/\b(?:Qty|Quantity)\b\D{0,24}(\d{1,3})/i)?.[1]
-    || 1;
+  const fallbackItem = productMatch ? {
+    title: cleanAmazonTitle(titleSource),
+    asin: productMatch[1],
+    sku: extractAmazonSkuFromParen(parenValue),
+    qty: extractAmazonQty(parenValue) || extractAmazonQty(hsnTail),
+  } : null;
+  const items = lineItems.length ? lineItems : fallbackItem?.sku ? [fallbackItem] : [];
+  const firstItem = items[0] || {};
 
   return {
-    title: productMatch ? cleanAmazonTitle(titleSource) : "",
-    asin: productMatch?.[1] || "",
-    sku: productMatch ? extractAmazonSkuFromParen(parenValue) : "",
-    qty: Number(qty) || 1,
+    title: firstItem.title || "",
+    asin: firstItem.asin || "",
+    sku: firstItem.sku || "",
+    qty: items.reduce((sum, item) => sum + (Number(item.qty) || 1), 0) || 1,
     orderId,
+    lineItems: items,
   };
+}
+
+const amazonShippingMarkers = [
+  [/\bAWB\b/i, 3],
+  [/\bShip\s*To\b/i, 2],
+  [/\bOrder\s*Id\b/i, 1],
+  [/\bShip\s*Date\b/i, 2],
+  [/\bDelivery\s*Station\b/i, 2],
+  [/\bBox\s+\d+\s+of\s+\d+\b/i, 2],
+  [/\bATSPL\b/i, 2],
+  [/\bAmazon\s+Transportation\s+Services\b/i, 2],
+];
+
+const amazonBillingMarkers = [
+  [/\bTax\s+Invoice\b/i, 4],
+  [/\bInvoice\s+Details\b/i, 3],
+  [/\bBilling\s+Address\b/i, 2],
+  [/\bShipping\s+Address\b/i, 2],
+  [/\bHSN\b/i, 2],
+  [/\bTaxable\s+Value\b/i, 2],
+  [/\bPage\s+\d+\s+of\s+\d+\b/i, 2],
+  [/\bGSTIN\b/i, 1],
+  [/\bInvoice\s+(?:No|Number|Date)\b/i, 1],
+];
+
+function markerScore(text, markers) {
+  return markers.reduce((sum, [pattern, weight]) => sum + (pattern.test(text) ? weight : 0), 0);
+}
+
+function classifyAmazonPage(page) {
+  const text = normalizeAmazonText(page?.text || "");
+  const shippingScore = markerScore(text, amazonShippingMarkers);
+  const billingScore = markerScore(text, amazonBillingMarkers);
+  if (billingScore >= 4 && billingScore >= shippingScore) return "billing";
+  if (shippingScore >= 3 && shippingScore > billingScore) return "shipping";
+  if (shippingScore > 0 && billingScore === 0) return "shipping";
+  if (billingScore > 0) return "billing";
+  return "unknown";
 }
 
 function pairAmazonOrders(pages) {
   const orders = [];
   const sortedPages = [...pages].sort((a, b) => a.originalIndex - b.originalIndex);
-  for (let index = 0; index < sortedPages.length; index += 2) {
-    const shipping = sortedPages[index];
-    const invoice = sortedPages[index + 1] || null;
-    if (!shipping) continue;
-    const invoiceInfo = parseAmazonInvoiceText(invoice?.text || "");
+  let currentOrder = null;
+
+  const finishOrder = () => {
+    if (!currentOrder) return;
+    const invoiceText = currentOrder.invoicePages.map((page) => page.text || "").join(" ");
+    const invoiceInfo = parseAmazonInvoiceText(invoiceText);
     orders.push({
-      ...shipping,
-      invoice,
-      title: invoiceInfo.title || shipping.title || "",
+      ...currentOrder.shipping,
+      invoice: currentOrder.invoicePages[0] || null,
+      invoicePages: currentOrder.invoicePages,
+      title: invoiceInfo.title || currentOrder.shipping.title || "",
       asin: invoiceInfo.asin || "",
-      sku: invoiceInfo.sku || shipping.sku || UNKNOWN,
-      qty: invoiceInfo.qty || shipping.qty || 1,
-      orderId: invoiceInfo.orderId || shipping.orderId || "",
+      sku: invoiceInfo.sku || currentOrder.shipping.sku || UNKNOWN,
+      qty: invoiceInfo.qty || currentOrder.shipping.qty || 1,
+      orderId: invoiceInfo.orderId || currentOrder.shipping.orderId || "",
+      lineItems: invoiceInfo.lineItems?.length ? invoiceInfo.lineItems : [{
+        title: invoiceInfo.title || currentOrder.shipping.title || "",
+        asin: invoiceInfo.asin || "",
+        sku: invoiceInfo.sku || currentOrder.shipping.sku || UNKNOWN,
+        qty: invoiceInfo.qty || currentOrder.shipping.qty || 1,
+      }],
     });
+    currentOrder = null;
+  };
+
+  for (const page of sortedPages) {
+    const pageKind = classifyAmazonPage(page);
+    if (pageKind === "shipping") {
+      finishOrder();
+      currentOrder = { shipping: page, invoicePages: [] };
+    } else if (pageKind === "billing" && currentOrder) {
+      currentOrder.invoicePages.push(page);
+    } else if (pageKind === "billing") {
+      continue;
+    } else if (pageKind === "unknown") {
+      if (!currentOrder || currentOrder.invoicePages.length) {
+        finishOrder();
+        currentOrder = { shipping: page, invoicePages: [] };
+      } else {
+        currentOrder.invoicePages.push(page);
+      }
+    }
   }
+  finishOrder();
   return orders;
+}
+
+function flattenAmazonLineItems(orders) {
+  return orders.flatMap((order, orderIndex) => {
+    const lineItems = order.lineItems?.length ? order.lineItems : [order];
+    return lineItems.map((item, itemIndex) => ({
+      ...item,
+      orderSeq: orderIndex + 1,
+      itemSeq: itemIndex + 1,
+      orderId: order.orderId,
+      originalIndex: order.originalIndex,
+    }));
+  });
+}
+
+function amazonSkuSummary(order) {
+  const lineItems = order.lineItems?.length ? order.lineItems : [order];
+  return lineItems
+    .map((item) => `${item.sku || UNKNOWN} x${Number(item.qty) || 1}`)
+    .join(" | ");
+}
+
+function amazonPackingNoteLines(order, mode) {
+  const lineItems = (order.lineItems?.length ? order.lineItems : [order]).filter(Boolean);
+  const visibleItems = lineItems.slice(0, 2);
+  const lines = visibleItems.map((item) => {
+    const sku = item.sku || UNKNOWN;
+    const qty = Number(item.qty) || 1;
+    if (mode !== "description") return `${sku} (QTY-${qty})`;
+    const title = truncate(item.title || "Product title unavailable", 112);
+    return `${sku} (QTY-${qty}) -> ${title}`;
+  });
+  if (lineItems.length > visibleItems.length) {
+    lines.push(`+${lineItems.length - visibleItems.length} more items`);
+  }
+  return lines.length ? lines : [`${order.sku || UNKNOWN} (QTY-${Number(order.qty) || 1})`];
 }
 
 function wrapPdfText(text, maxChars = 70, maxLines = 2) {
@@ -2931,11 +3086,14 @@ function wrapPdfText(text, maxChars = 70, maxLines = 2) {
 }
 
 function drawAmazonInfoBox(page, fonts, order, mode) {
+  if (mode === "clean") return;
   const { width, height } = page.getSize();
-  const x = 32;
-  const boxWidth = width - 64;
-  const boxHeight = mode === "description" ? 58 : 42;
-  const y = Math.max(116, Math.min(height * 0.18, height - boxHeight - 34));
+  const x = 44;
+  const boxWidth = width - 88;
+  const noteLines = amazonPackingNoteLines(order, mode);
+  const bodyLineHeight = mode === "description" ? 9.2 : 10.2;
+  const boxHeight = 22 + noteLines.length * bodyLineHeight;
+  const y = Math.max(152, Math.min(164, height * 0.19));
   page.drawRectangle({
     x,
     y,
@@ -2943,53 +3101,33 @@ function drawAmazonInfoBox(page, fonts, order, mode) {
     height: boxHeight,
     color: rgb(1, 1, 1),
     borderColor: rgb(0.08, 0.2, 0.32),
-    borderWidth: 1.2,
+    borderWidth: 1,
     opacity: 0.96,
   });
   page.drawRectangle({
     x,
-    y: y + boxHeight - 15,
+    y: y + boxHeight - 13,
     width: boxWidth,
-    height: 15,
+    height: 13,
     color: rgb(0.08, 0.2, 0.32),
   });
   page.drawText("PACKING NOTE", {
     x: x + 10,
-    y: y + boxHeight - 11,
-    size: 8,
+    y: y + boxHeight - 9.8,
+    size: 7,
     font: fonts.bold,
     color: rgb(1, 1, 1),
   });
 
-  const skuText = `SKU: ${order.sku || UNKNOWN}`;
-  const qtyText = `Qty: ${Number(order.qty) || 1}`;
-  if (mode === "description") {
-    const titleLines = wrapPdfText(order.title || order.sku || "Product detail unavailable", 86, 2);
-    titleLines.forEach((line, index) => {
-      page.drawText(line, {
-        x: x + 10,
-        y: y + boxHeight - 29 - index * 10,
-        size: 8.5,
-        font: fonts.regular,
-        color: rgb(0.08, 0.2, 0.32),
-      });
-    });
-    page.drawText(`${skuText}  |  ${qtyText}`, {
+  noteLines.forEach((line, index) => {
+    page.drawText(line, {
       x: x + 10,
-      y: y + 8,
-      size: 9.5,
-      font: fonts.bold,
+      y: y + boxHeight - 24 - index * bodyLineHeight,
+      size: mode === "description" ? (line.length > 132 ? 5.8 : line.length > 112 ? 6.2 : 6.7) : 7.6,
+      font: line.startsWith("+") ? fonts.bold : fonts.regular,
       color: rgb(0.02, 0.45, 0.48),
     });
-  } else {
-    page.drawText(`${skuText}  |  ${qtyText}`, {
-      x: x + 10,
-      y: y + 13,
-      size: 12,
-      font: fonts.bold,
-      color: rgb(0.02, 0.45, 0.48),
-    });
-  }
+  });
 }
 
 async function buildAmazonPreparedPdf(orders, options) {
@@ -3009,18 +3147,44 @@ async function buildAmazonPreparedPdf(orders, options) {
     shippingPage.drawPage(embeddedShipping, { x: 0, y: 0, width, height });
     drawAmazonInfoBox(shippingPage, fonts, order, options.mode);
 
-    if (options.keepInvoice && order.invoice?.page) {
-      const invoiceSize = order.invoice.page.getSize();
-      const embeddedInvoice = await output.embedPage(order.invoice.page);
-      const invoicePage = output.addPage([invoiceSize.width, invoiceSize.height]);
-      invoicePage.drawPage(embeddedInvoice, {
-        x: 0,
-        y: 0,
-        width: invoiceSize.width,
-        height: invoiceSize.height,
-      });
+    if (options.keepInvoice) {
+      for (const invoice of order.invoicePages || (order.invoice ? [order.invoice] : [])) {
+        if (!invoice?.page) continue;
+        const invoiceSize = invoice.page.getSize();
+        const embeddedInvoice = await output.embedPage(invoice.page);
+        const invoicePage = output.addPage([invoiceSize.width, invoiceSize.height]);
+        invoicePage.drawPage(embeddedInvoice, {
+          x: 0,
+          y: 0,
+          width: invoiceSize.width,
+          height: invoiceSize.height,
+        });
+      }
     }
   }
+  return output.save();
+}
+
+async function buildAmazonBillingPdf(orders, options = {}) {
+  const output = await PDFDocument.create();
+  const rows = options.sortBySku
+    ? [...orders].sort((a, b) => sortKey(a.sku).localeCompare(sortKey(b.sku), "en", { numeric: true }) || a.originalIndex - b.originalIndex)
+    : [...orders];
+
+  for (const order of rows) {
+    for (const invoice of order.invoicePages || (order.invoice ? [order.invoice] : [])) {
+      if (!invoice?.page) continue;
+      const { width, height } = invoice.page.getSize();
+      const embeddedInvoice = await output.embedPage(invoice.page);
+      const page = output.addPage([width, height]);
+      page.drawPage(embeddedInvoice, { x: 0, y: 0, width, height });
+    }
+  }
+
+  if (!output.getPageCount()) {
+    throw new Error("No Amazon billing pages were found.");
+  }
+
   return output.save();
 }
 
@@ -3860,9 +4024,10 @@ function LabelProcessingTool() {
     sku: countBy(sortedItems, "sku").slice(0, 5),
   }), [sortedItems]);
   const amazonCounts = useMemo(() => ({
-    sku: countBy(amazonOrders, "sku").slice(0, 5),
-    skuQty: countBySkuQty(amazonOrders).slice(0, 5),
+    sku: countBy(flattenAmazonLineItems(amazonOrders), "sku").slice(0, 5),
+    skuQty: countBySkuQty(flattenAmazonLineItems(amazonOrders)).slice(0, 5),
   }), [amazonOrders]);
+  const amazonLineItems = useMemo(() => flattenAmazonLineItems(amazonOrders), [amazonOrders]);
 
   const onFiles = (selectedFiles) => {
     const pdfFiles = Array.from(selectedFiles || []).filter((file) => /\.pdf$/i.test(file.name) || file.type === "application/pdf");
@@ -3885,7 +4050,7 @@ function LabelProcessingTool() {
       trackEvent("label_processing_start", { file_count: files.length, sort_mode: "auto_packing" });
       const extracted = await extractLabelPages(files);
       setItems(extracted);
-      const orderCount = platform === "amazon" ? Math.ceil(extracted.length / 2) : extracted.length;
+      const orderCount = platform === "amazon" ? pairAmazonOrders(extracted).length : extracted.length;
       setToast(platform === "amazon" ? "Amazon labels are ready." : "Courier-wise labels and picklists are ready.");
       trackEvent("label_processing_complete", { label_count: orderCount, marketplace: platform, sort_mode: "auto_packing" });
     } catch (err) {
@@ -3943,20 +4108,27 @@ function LabelProcessingTool() {
     }
   };
 
-  const runAmazonAction = async (action) => {
+  const runAmazonAction = async (action, outputKind = "prepared") => {
     if (!amazonOrders.length) return;
     setBusy(true);
     setError("");
     try {
-      const bytes = await buildAmazonPreparedPdf(amazonOrders, {
-        mode: amazonInfoMode === "description" ? "description" : "sku",
-        keepInvoice: amazonKeepInvoice,
-        sortBySku: amazonSortBySku,
-      });
-      const filename = `amazon-${amazonInfoMode === "description" ? "sku-title" : "sku"}-${amazonKeepInvoice ? "with-invoice" : "shipping-only"}-labels.pdf`;
+      const modeName = amazonInfoMode === "description" ? "sku-title" : amazonInfoMode === "clean" ? "clean" : "sku";
+      const bytes = outputKind === "billing"
+        ? await buildAmazonBillingPdf(amazonOrders, { sortBySku: amazonSortBySku })
+        : await buildAmazonPreparedPdf(amazonOrders, {
+          mode: amazonInfoMode,
+          keepInvoice: outputKind === "combined" ? amazonKeepInvoice : false,
+          sortBySku: amazonSortBySku,
+        });
+      const filename = outputKind === "billing"
+        ? "amazon-billing-pages.pdf"
+        : outputKind === "combined"
+          ? `amazon-${modeName}-${amazonKeepInvoice ? "with-invoice" : "shipping-only"}-labels.pdf`
+          : `amazon-${modeName}-shipping-labels.pdf`;
       if (action === "print") {
         printPdfBytes(bytes);
-        setToast("Amazon labels opened for printing.");
+        setToast(outputKind === "billing" ? "Amazon billing pages opened for printing." : "Amazon labels opened for printing.");
       } else {
         saveBytes(bytes, filename);
         setToast(`${filename} downloaded.`);
@@ -3964,6 +4136,7 @@ function LabelProcessingTool() {
       trackEvent("amazon_label_output", {
         action,
         mode: amazonInfoMode,
+        output_kind: outputKind,
         keep_invoice: amazonKeepInvoice,
         sort_by_sku: amazonSortBySku,
         order_count: amazonOrders.length,
@@ -4013,6 +4186,14 @@ function LabelProcessingTool() {
             <div className="amazon-option-section">
               <strong>{t.amazonNoteMode}</strong>
               <div className="amazon-option-grid">
+                <button
+                  type="button"
+                  className={amazonInfoMode === "clean" ? "amazon-option-card active" : "amazon-option-card"}
+                  onClick={() => setAmazonInfoMode("clean")}
+                >
+                  <span>{t.amazonNoNote}</span>
+                  <small>{t.amazonNoNoteHint}</small>
+                </button>
                 <button
                   type="button"
                   className={amazonInfoMode === "sku" ? "amazon-option-card active" : "amazon-option-card"}
@@ -4069,13 +4250,40 @@ function LabelProcessingTool() {
             </button>
 
             {amazonOrders.length ? (
-              <div className="amazon-action-row">
-                <button disabled={busy} onClick={() => runAmazonAction("download")}>
-                  <Download size={16} /> {t.amazonDownload}
-                </button>
-                <button disabled={busy} onClick={() => runAmazonAction("print")}>
-                  <Printer size={16} /> {t.amazonPrint}
-                </button>
+              <div className="amazon-action-panel">
+                <div>
+                  <strong>Shipping labels</strong>
+                  <div className="amazon-action-row">
+                    <button disabled={busy} onClick={() => runAmazonAction("download", "shipping")}>
+                      <Download size={16} /> {t.amazonDownloadShipping}
+                    </button>
+                    <button disabled={busy} onClick={() => runAmazonAction("print", "shipping")}>
+                      <Printer size={16} /> {t.amazonPrintShipping}
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <strong>Billing pages</strong>
+                  <div className="amazon-action-row">
+                    <button disabled={busy} onClick={() => runAmazonAction("download", "billing")}>
+                      <Download size={16} /> {t.amazonDownloadBilling}
+                    </button>
+                    <button disabled={busy} onClick={() => runAmazonAction("print", "billing")}>
+                      <Printer size={16} /> {t.amazonPrintBilling}
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <strong>Combined PDF</strong>
+                  <div className="amazon-action-row">
+                    <button disabled={busy} onClick={() => runAmazonAction("download", "combined")}>
+                      <Download size={16} /> {t.amazonDownload}
+                    </button>
+                    <button disabled={busy} onClick={() => runAmazonAction("print", "combined")}>
+                      <Printer size={16} /> {t.amazonPrint}
+                    </button>
+                  </div>
+                </div>
               </div>
             ) : null}
           </div>
@@ -4087,8 +4295,8 @@ function LabelProcessingTool() {
                 <div className="processing-kpis">
                   <MiniMetric label="PDF files" value={files.length} tone="blue" />
                   <MiniMetric label={t.amazonOrders} value={amazonOrders.length} tone="green" />
-                  <MiniMetric label="SKUs" value={countBy(amazonOrders, "sku").length} tone="orange" />
-                  <MiniMetric label="Invoices" value={amazonKeepInvoice ? "Kept" : "Removed"} tone="purple" />
+                  <MiniMetric label={t.amazonItems} value={amazonLineItems.length} tone="orange" />
+                  <MiniMetric label="Billing pages" value={amazonOrders.reduce((sum, order) => sum + (order.invoicePages?.length || 0), 0)} tone="purple" />
                 </div>
                 <CountList title={t.skuCounts} rows={amazonCounts.sku} />
                 <CountList title={t.qtyCounts} rows={amazonCounts.skuQty} />
@@ -4105,13 +4313,13 @@ function LabelProcessingTool() {
                       </tr>
                     </thead>
                     <tbody>
-                      {amazonOrders.slice(0, 5).map((order, index) => (
-                        <tr key={order.id || `${order.source}-${order.pageIndex}`}>
-                          <td>{index + 1}</td>
-                          <td>{truncate(order.sku, 28)}</td>
-                          <td>{order.qty || 1}</td>
-                          <td>{truncate(order.title, 52)}</td>
-                          <td>{truncate(order.orderId, 24)}</td>
+                      {amazonLineItems.slice(0, 8).map((item) => (
+                        <tr key={`${item.orderSeq}-${item.itemSeq}-${item.sku}`}>
+                          <td>{item.orderSeq}.{item.itemSeq}</td>
+                          <td>{truncate(item.sku, 28)}</td>
+                          <td>{item.qty || 1}</td>
+                          <td>{truncate(item.title, 52)}</td>
+                          <td>{truncate(item.orderId, 24)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -4124,7 +4332,7 @@ function LabelProcessingTool() {
                 <p>{t.amazonHelp}</p>
               </div>
             )}
-            <div className="workflow-note">Amazon Print Documents usually come as shipping page followed by invoice page for each order.</div>
+            <div className="workflow-note">Amazon pages are separated with shipping and invoice text markers, then invoice pages stay attached until the next shipping label.</div>
           </div>
         </section>
       ) : (
