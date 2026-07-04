@@ -2885,20 +2885,22 @@ function extractAmazonQty(value) {
 
 function parseAmazonInvoiceLineItems(text) {
   const items = [];
-  const asinPattern = /\|\s*([A-Z0-9]{10})\s*\(\s*([^)]+?)\s*\)\s*HSN\s*:?\s*\d+/gi;
+  const asinPattern = /\|\s*([A-Z0-9]{10})\b([\s\S]{0,650}?)\(\s*([^)]+?)\s*\)\s*HSN\s*:?\s*\d+/gi;
   const rowStartPattern = /(?:Total\s+Amount|(?:₹|INR|Rs\.?)\s*[\d,.]+)\s+\d+\s+/gi;
   for (const match of text.matchAll(asinPattern)) {
     const before = text.slice(0, match.index);
     const rowStarts = [...before.matchAll(rowStartPattern)];
     const rowStart = rowStarts[rowStarts.length - 1];
     const title = rowStart ? before.slice(rowStart.index + rowStart[0].length) : before.slice(Math.max(0, before.length - 260));
-    const sku = extractAmazonSkuFromParen(match[2]);
+    const sku = extractAmazonSkuFromParen(match[3]);
     if (!sku) continue;
+    const after = text.slice(match.index + match[0].length, match.index + match[0].length + 320);
+    const rowContext = `${match[2]} ${match[3]} ${after}`;
     items.push({
       title: cleanAmazonTitle(title),
       asin: match[1],
       sku,
-      qty: extractAmazonQty(match[2]),
+      qty: extractAmazonQty(rowContext),
     });
   }
   return items;
@@ -2907,19 +2909,20 @@ function parseAmazonInvoiceLineItems(text) {
 function parseAmazonInvoiceText(rawText) {
   const text = normalizeAmazonText(rawText);
   const lineItems = parseAmazonInvoiceLineItems(text);
-  const productMatch = text.match(/\|\s*([A-Z0-9]{10})\s*\(\s*([^)]+?)\s*\)\s*HSN\s*:?\s*\d+/i)
+  const productMatch = text.match(/\|\s*([A-Z0-9]{10})\b([\s\S]{0,650}?)\(\s*([^)]+?)\s*\)\s*HSN\s*:?\s*\d+/i)
     || text.match(/\b([A-Z0-9]{10})\s*\(\s*([^)]+?)\s*\)\s*HSN\s*:?\s*\d+/i);
   const orderId = text.match(/\b(?:Order\s*(?:ID|No\.?|Number)|Order\s*#)\s*[:#-]?\s*([0-9-]{8,})/i)?.[1]
     || text.match(/\b(\d{3}-\d{7}-\d{7})\b/)?.[1]
     || "";
-  const parenValue = productMatch?.[2] || "";
+  const parenValue = productMatch?.[3] || productMatch?.[2] || "";
   const hsnTail = productMatch ? text.slice(productMatch.index + productMatch[0].length) : text;
+  const rowValue = productMatch?.[3] ? `${productMatch[2]} ${productMatch[3]} ${hsnTail.slice(0, 320)}` : parenValue;
   const titleSource = productMatch ? text.slice(Math.max(0, productMatch.index - 780), productMatch.index) : "";
   const fallbackItem = productMatch ? {
     title: cleanAmazonTitle(titleSource),
     asin: productMatch[1],
     sku: extractAmazonSkuFromParen(parenValue),
-    qty: extractAmazonQty(parenValue) || extractAmazonQty(hsnTail),
+    qty: extractAmazonQty(rowValue) || extractAmazonQty(hsnTail),
   } : null;
   const items = lineItems.length ? lineItems : fallbackItem?.sku ? [fallbackItem] : [];
   const firstItem = items[0] || {};
