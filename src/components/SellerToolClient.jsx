@@ -3100,7 +3100,7 @@ function drawAmazonInfoBox(page, fonts, order, mode) {
     width: boxWidth,
     height: boxHeight,
     color: rgb(1, 1, 1),
-    borderColor: rgb(0.08, 0.2, 0.32),
+    borderColor: rgb(0, 0, 0),
     borderWidth: 1,
     opacity: 0.96,
   });
@@ -3109,7 +3109,7 @@ function drawAmazonInfoBox(page, fonts, order, mode) {
     y: y + boxHeight - 13,
     width: boxWidth,
     height: 13,
-    color: rgb(0.08, 0.2, 0.32),
+    color: rgb(0, 0, 0),
   });
   page.drawText("PACKING NOTE", {
     x: x + 10,
@@ -3125,7 +3125,7 @@ function drawAmazonInfoBox(page, fonts, order, mode) {
       y: y + boxHeight - 24 - index * bodyLineHeight,
       size: mode === "description" ? (line.length > 132 ? 5.8 : line.length > 112 ? 6.2 : 6.7) : 7.6,
       font: line.startsWith("+") ? fonts.bold : fonts.regular,
-      color: rgb(0.02, 0.45, 0.48),
+      color: rgb(0, 0, 0),
     });
   });
 }
