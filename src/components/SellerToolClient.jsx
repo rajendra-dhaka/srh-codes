@@ -361,9 +361,6 @@ const processingCopy = {
     amazonNoNoteHint: "Separate shipping/billing pages without SKU/title overlay.",
     amazonSkuOnly: "SKU + quantity",
     amazonSkuWithTitle: "Title + SKU + quantity",
-    amazonInvoiceMode: "Invoice pages",
-    amazonRemoveInvoice: "Remove invoice pages",
-    amazonKeepInvoice: "Keep invoice pages",
     amazonSortSku: "Sort labels by SKU before download",
     amazonPrepare: "Prepare Amazon labels",
     amazonDownload: "Download combined PDF",
@@ -430,9 +427,6 @@ const processingCopy = {
     amazonNoNoteHint: "SKU/title overlay ke bina shipping/billing pages separate करो.",
     amazonSkuOnly: "SKU + quantity",
     amazonSkuWithTitle: "Title + SKU + quantity",
-    amazonInvoiceMode: "Invoice pages",
-    amazonRemoveInvoice: "Invoice pages remove करो",
-    amazonKeepInvoice: "Invoice pages keep करो",
     amazonSortSku: "Download से पहले labels SKU wise sort करो",
     amazonPrepare: "Amazon labels prepare करो",
     amazonDownload: "Combined PDF download",
@@ -4001,17 +3995,24 @@ function RateField({ label, value, onChange, help }) {
   );
 }
 
+function initialLabelPlatform() {
+  if (typeof window === "undefined") return "meesho";
+  const path = window.location.pathname.toLowerCase();
+  if (path.includes("amazon-label")) return "amazon";
+  if (path.includes("flipkart-label")) return "flipkart";
+  return "meesho";
+}
+
 function LabelProcessingTool() {
   const { lang } = useLanguage();
   const t = processingCopy[lang] || processingCopy.en;
-  const [platform, setPlatform] = useState("meesho");
+  const [platform, setPlatform] = useState(initialLabelPlatform);
   const [files, setFiles] = useState([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [items, setItems] = useState([]);
   const [toast, setToast] = useState("");
   const [amazonInfoMode, setAmazonInfoMode] = useState("sku");
-  const [amazonKeepInvoice, setAmazonKeepInvoice] = useState(false);
   const [amazonSortBySku, setAmazonSortBySku] = useState(true);
 
   const sortedItems = useMemo(() => sortForPacking(items), [items]);
@@ -4118,13 +4119,13 @@ function LabelProcessingTool() {
         ? await buildAmazonBillingPdf(amazonOrders, { sortBySku: amazonSortBySku })
         : await buildAmazonPreparedPdf(amazonOrders, {
           mode: amazonInfoMode,
-          keepInvoice: outputKind === "combined" ? amazonKeepInvoice : false,
+          keepInvoice: outputKind === "combined",
           sortBySku: amazonSortBySku,
         });
       const filename = outputKind === "billing"
         ? "amazon-billing-pages.pdf"
         : outputKind === "combined"
-          ? `amazon-${modeName}-${amazonKeepInvoice ? "with-invoice" : "shipping-only"}-labels.pdf`
+          ? `amazon-${modeName}-combined-labels-and-invoices.pdf`
           : `amazon-${modeName}-shipping-labels.pdf`;
       if (action === "print") {
         printPdfBytes(bytes);
@@ -4137,7 +4138,7 @@ function LabelProcessingTool() {
         action,
         mode: amazonInfoMode,
         output_kind: outputKind,
-        keep_invoice: amazonKeepInvoice,
+        keep_invoice: outputKind === "combined",
         sort_by_sku: amazonSortBySku,
         order_count: amazonOrders.length,
       });
@@ -4209,28 +4210,6 @@ function LabelProcessingTool() {
                 >
                   <span>{t.amazonSkuWithTitle}</span>
                   <small>Adds product identity on shipping label.</small>
-                </button>
-              </div>
-            </div>
-
-            <div className="amazon-option-section">
-              <strong>{t.amazonInvoiceMode}</strong>
-              <div className="amazon-option-grid">
-                <button
-                  type="button"
-                  className={!amazonKeepInvoice ? "amazon-option-card active" : "amazon-option-card"}
-                  onClick={() => setAmazonKeepInvoice(false)}
-                >
-                  <span>{t.amazonRemoveInvoice}</span>
-                  <small>Shipping labels only.</small>
-                </button>
-                <button
-                  type="button"
-                  className={amazonKeepInvoice ? "amazon-option-card active" : "amazon-option-card"}
-                  onClick={() => setAmazonKeepInvoice(true)}
-                >
-                  <span>{t.amazonKeepInvoice}</span>
-                  <small>Shipping plus invoice pages.</small>
                 </button>
               </div>
             </div>

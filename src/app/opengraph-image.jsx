@@ -47,10 +47,10 @@ export default function Image() {
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
             <div style={{ fontSize: 62, fontWeight: 900, lineHeight: 1.03, letterSpacing: -2 }}>
-              Flipkart label cropper, Meesho labels, GST helper and seller analytics
+              Amazon, Flipkart and Meesho label PDF tools
             </div>
             <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-              {["Flipkart crop", "Meesho 4-up / 6-up", "Courier sorting", "GSTR-1 helper"].map((item) => (
+              {["Amazon label split", "Flipkart crop", "Meesho 4/6/9-up", "GST helper"].map((item) => (
                 <div
                   key={item}
                   style={{

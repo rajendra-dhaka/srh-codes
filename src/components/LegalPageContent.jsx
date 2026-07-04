@@ -9,7 +9,7 @@ const copy = {
       sections: [
         ["", "SRH Codes is an independent collection of browser-based tools and original workflow guides built around everyday problems faced by Indian ecommerce sellers: marketplace labels, invoices, GST reports, order data, returns, ads, fees, and packing operations."],
         ["Why it exists", "The project grew from real seller workflows where repetitive PDF formatting, report reconciliation, and portal preparation consumed time that small sellers could not always delegate to specialist staff."],
-        ["What we build", "Current tools include courier and quantity label processing, Flipkart shipping and billing crop, Meesho 4-up and 6-up PDFs, Amazon fee and listing-price estimates, GSTR-1 and GSTR-3B workflow helpers, and marketplace performance analysis."],
+        ["What we build", "Current tools include Amazon shipping and billing label separation, Amazon SKU and title notes on shipping labels, Flipkart shipping and billing crop, Meesho 4-up, 6-up, and 9-up PDFs, courier and quantity label processing, Amazon fee and listing-price estimates, GSTR-1 and GSTR-3B workflow helpers, and marketplace performance analysis."],
         ["How content is prepared", "Guides explain the source records, calculation method, verification checks, and limitations behind each workflow. Marketplace formats, tax rules, and fee tables can change, so dated guidance is reviewed and corrected when source formats change."],
         ["Privacy-first workflow", "Label PDFs and seller reports are processed in the browser where possible. The current workflow does not intentionally store uploaded business documents on our servers."],
         ["Independence", "Marketplace names are used only to describe compatible workflows. SRH Codes is not affiliated with, sponsored by, or endorsed by Amazon, Flipkart, Meesho, GSTN, or their group companies."],
@@ -21,7 +21,7 @@ const copy = {
       sections: [
         ["", "SRH Codes Indian ecommerce sellers की daily problems के लिए independent browser-based tools और original workflow guides बनाता है: marketplace labels, invoices, GST reports, ऑर्डर data, returns, ads, fees और packing operations."],
         ["यह क्यों बनाया", "यह project real seller workflows से बना जहाँ repetitive PDF formatting, report reconciliation और portal preparation में बहुत समय लगता था."],
-        ["हम क्या build करते हैं", "Current tools में courier/quantity label processing, फ्लिपकार्ट shipping-billing crop, मीशो 4-up/6-up PDFs, Amazon fee और listing-price estimates, GSTR-1/GSTR-3B helpers और performance analysis हैं."],
+        ["हम क्या build करते हैं", "Current tools में Amazon shipping-billing label separation, Amazon shipping labels पर SKU/title notes, फ्लिपकार्ट shipping-billing crop, मीशो 4-up/6-up/9-up PDFs, courier/quantity label processing, Amazon fee और listing-price estimates, GSTR-1/GSTR-3B helpers और performance analysis हैं."],
         ["Content कैसे prepare होता है", "Guides source records, calculation method, verification checks और limitations समझाती हैं. Marketplace format, tax rules या fees बदलने पर dated guidance review की जाती है."],
         ["Privacy-first workflow", "Label PDFs और seller reports जहाँ possible हो browser में process होते हैं. Current workflow uploaded business documents को intentionally servers पर store नहीं करता."],
         ["Independence", "Marketplace names सिर्फ compatible workflows describe करने के लिए हैं. SRH Codes Amazon, Flipkart, मीशो या GSTN से affiliated या endorsed नहीं है."],

@@ -8,7 +8,7 @@ const adsenseClientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 export const metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} - Flipkart, Meesho Label, GST and Seller Analytics Tools`,
+    default: `${site.name} - Amazon, Flipkart, Meesho Label, GST and Seller Tools`,
     template: `%s | ${site.name}`,
   },
   description: site.description,
@@ -30,7 +30,7 @@ export const metadata = {
     type: "website",
     url: absoluteUrl("/"),
     siteName: site.name,
-    title: `${site.name} - Free Label PDF, GST and Seller Analytics Tools`,
+    title: `${site.name} - Amazon, Flipkart and Meesho Label PDF Tools`,
     description: site.description,
     images: [
       {
@@ -43,7 +43,7 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: `${site.name} - Free Label PDF, GST and Seller Analytics Tools`,
+    title: `${site.name} - Amazon, Flipkart and Meesho Label PDF Tools`,
     description: site.description,
     images: [absoluteUrl("/twitter-image")],
   },

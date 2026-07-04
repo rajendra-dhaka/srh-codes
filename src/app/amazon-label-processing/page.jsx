@@ -1,37 +1,41 @@
 import SellerToolClient from "../../components/SellerToolClient";
 import { absoluteUrl, keywordPages, site } from "../../lib/site";
 
-const page = keywordPages.find((item) => item.slug === "meesho-label-4-in-1");
+const page = keywordPages.find((item) => item.slug === "amazon-label-processing");
 
 export const metadata = {
   title: page.title,
   description: page.description,
   keywords: [page.primaryKeyword, ...page.related],
   alternates: {
-    canonical: absoluteUrl("/meesho-label-4-in-1"),
+    canonical: absoluteUrl("/amazon-label-processing"),
   },
   openGraph: {
     title: page.title,
     description: page.description,
-    url: absoluteUrl("/meesho-label-4-in-1"),
+    url: absoluteUrl("/amazon-label-processing"),
     siteName: site.name,
     type: "website",
   },
 };
 
-export default function MeeshoLabelPage() {
+export default function AmazonLabelProcessingPage() {
   const faq = [
     {
-      question: "Can I print four, six, or nine Meesho labels on one A4 page?",
-      answer: "Yes. Upload the Meesho label PDF and generate 4-up, 6-up, or 9-up A4 PDF output.",
+      question: "Can I separate Amazon shipping labels and invoice pages?",
+      answer: "Yes. Upload Amazon Print Documents PDFs and generate separate shipping-label and billing-invoice PDF downloads.",
     },
     {
-      question: "Does the tool change the barcode or label data?",
-      answer: "No. The tool embeds the original label pages and scales them into the selected 4-up, 6-up, or 9-up A4 layout.",
+      question: "Can I remove Amazon invoice pages before printing labels?",
+      answer: "Yes. Use remove invoice mode for clean shipping labels, or keep invoices when you need a combined PDF.",
     },
     {
-      question: "Do I need to upload the PDF to a server?",
-      answer: "No. Processing happens locally in your browser.",
+      question: "Can the tool print SKU and product title on Amazon shipping labels?",
+      answer: "Yes. Choose clean labels, SKU plus quantity, or title plus SKU plus quantity before generating the shipping PDF.",
+    },
+    {
+      question: "Does it handle multi-page invoices?",
+      answer: "Yes. Billing pages after a shipping label stay attached until the next shipping label, so multi-page invoices remain grouped with the correct order.",
     },
   ];
   const jsonLd = {
@@ -56,7 +60,7 @@ export default function MeeshoLabelPage() {
           <h1>{page.h1}</h1>
           <p>{page.description}</p>
           <div className="seo-actions">
-            <a href="#tool">Open Meesho label tool</a>
+            <a href="#tool">Open Amazon label tool</a>
             <a href={absoluteUrl("/")}>All seller tools</a>
           </div>
         </div>
@@ -72,7 +76,7 @@ export default function MeeshoLabelPage() {
           ))}
         </div>
         <section className="faq-block">
-          <h2>Meesho label PDF FAQ</h2>
+          <h2>Amazon label processing FAQ</h2>
           {faq.map((item) => (
             <details key={item.question}>
               <summary>{item.question}</summary>

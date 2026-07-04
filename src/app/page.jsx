@@ -5,7 +5,7 @@ import { absoluteUrl, site } from "../lib/site";
 export const metadata = {
   title: "Free Label Processing Tools for Meesho, Flipkart and Amazon Sellers",
   description:
-    "Sort courier-wise labels, crop Flipkart and Meesho shipping and billing PDFs, create 4-up and 6-up label sheets, generate picklists, and use GST and seller analytics tools.",
+    "Separate Amazon shipping and billing PDFs, add SKU notes on Amazon labels, crop Flipkart labels, create Meesho 4-up, 6-up, and 9-up label sheets, sort courier-wise labels, generate picklists, and use GST and seller analytics tools.",
   alternates: {
     canonical: absoluteUrl("/"),
   },
@@ -29,6 +29,10 @@ function JsonLd() {
       "Flipkart label crop",
       "Meesho 4-up label PDF",
       "Meesho 6-up label PDF",
+      "Meesho 9-up label PDF",
+      "Amazon shipping label separator",
+      "Amazon SKU on shipping label",
+      "Amazon invoice remove or keep",
       "Courier-wise label sorting",
       "SKU-wise label sorting",
       "Sorted label PDF download",
