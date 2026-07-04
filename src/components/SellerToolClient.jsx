@@ -3091,7 +3091,7 @@ function drawAmazonInfoBox(page, fonts, order, mode) {
   const x = 44;
   const boxWidth = width - 88;
   const noteLines = amazonPackingNoteLines(order, mode);
-  const bodyLineHeight = mode === "description" ? 9.2 : 10.2;
+  const bodyLineHeight = mode === "description" ? 11.2 : 10.2;
   const boxHeight = 22 + noteLines.length * bodyLineHeight;
   const y = Math.max(152, Math.min(164, height * 0.19));
   page.drawRectangle({
@@ -3123,8 +3123,8 @@ function drawAmazonInfoBox(page, fonts, order, mode) {
     page.drawText(line, {
       x: x + 10,
       y: y + boxHeight - 24 - index * bodyLineHeight,
-      size: mode === "description" ? (line.length > 132 ? 5.8 : line.length > 112 ? 6.2 : 6.7) : 7.6,
-      font: line.startsWith("+") ? fonts.bold : fonts.regular,
+      size: mode === "description" ? (line.length > 132 ? 7.8 : line.length > 112 ? 8.2 : 8.7) : 7.6,
+      font: mode === "description" || line.startsWith("+") ? fonts.bold : fonts.regular,
       color: rgb(0, 0, 0),
     });
   });
