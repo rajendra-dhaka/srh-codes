@@ -3052,8 +3052,8 @@ function amazonPackingNoteLines(order, mode) {
     const sku = item.sku || UNKNOWN;
     const qty = Number(item.qty) || 1;
     if (mode !== "description") return `${sku} (QTY-${qty})`;
-    const title = truncate(item.title || "Product title unavailable", 112);
-    return `${sku} (QTY-${qty}) -> ${title}`;
+    const title = truncate(item.title || "", 112);
+    return title ? `${sku} (QTY-${qty}) -> ${title}` : `${sku} (QTY-${qty})`;
   });
   if (lineItems.length > visibleItems.length) {
     lines.push(`+${lineItems.length - visibleItems.length} more items`);
@@ -3088,7 +3088,7 @@ function drawAmazonInfoBox(page, fonts, order, mode) {
   const x = 44;
   const boxWidth = width - 88;
   const noteLines = amazonPackingNoteLines(order, mode);
-  const bodyLineHeight = mode === "description" ? 11.2 : 10.2;
+  const bodyLineHeight = mode === "description" ? 13.6 : 10.2;
   const boxHeight = 22 + noteLines.length * bodyLineHeight;
   const y = Math.max(152, Math.min(164, height * 0.19));
   page.drawRectangle({
@@ -3119,8 +3119,8 @@ function drawAmazonInfoBox(page, fonts, order, mode) {
   noteLines.forEach((line, index) => {
     page.drawText(line, {
       x: x + 10,
-      y: y + boxHeight - 24 - index * bodyLineHeight,
-      size: mode === "description" ? (line.length > 132 ? 7.8 : line.length > 112 ? 8.2 : 8.7) : 7.6,
+      y: y + boxHeight - 25.5 - index * bodyLineHeight,
+      size: mode === "description" ? (line.length > 132 ? 9.8 : line.length > 112 ? 10.2 : 10.7) : 7.6,
       font: mode === "description" || line.startsWith("+") ? fonts.bold : fonts.regular,
       color: rgb(0, 0, 0),
     });
