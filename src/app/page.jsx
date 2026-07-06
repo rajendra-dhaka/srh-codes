@@ -3,9 +3,9 @@ import HomeSeoContent from "../components/HomeSeoContent";
 import { absoluteUrl, site } from "../lib/site";
 
 export const metadata = {
-  title: "Free Label Processing Tools for Meesho, Flipkart and Amazon Sellers",
+  title: "Free Shipping Label Crop Tool for Meesho, Flipkart and Amazon Sellers",
   description:
-    "Separate Amazon shipping and billing PDFs, add SKU notes on Amazon labels, crop Flipkart labels, create Meesho 4-up, 6-up, and 9-up label sheets, sort courier-wise labels, generate picklists, and use GST and seller analytics tools.",
+    "Free shipping label crop tool for Meesho label crop, Flipkart label crop, and Amazon label crop workflows. Split invoices, create Meesho 4-up, 6-up, and 9-up label sheets, sort courier-wise labels, generate picklists, and use GST and seller analytics tools.",
   alternates: {
     canonical: absoluteUrl("/"),
   },
@@ -26,13 +26,22 @@ function JsonLd() {
       priceCurrency: "INR",
     },
     featureList: [
+      "Shipping label crop tool",
+      "Label cropper",
       "Flipkart label crop",
+      "Flipkart crop label",
+      "Flipkart label cropper",
+      "Meesho label crop",
+      "Meesho crop label",
+      "Meesho label cropper",
       "Meesho 4-up label PDF",
       "Meesho 6-up label PDF",
       "Meesho 9-up label PDF",
+      "Amazon label crop",
+      "Amazon crop label",
       "Amazon shipping label separator",
       "Amazon SKU on shipping label",
-      "Amazon invoice remove or keep",
+      "Amazon billing invoice separator",
       "Courier-wise label sorting",
       "SKU-wise label sorting",
       "Sorted label PDF download",

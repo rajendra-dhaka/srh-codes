@@ -7,10 +7,14 @@ export const site = {
   contactEmail: "shree.anjaneya.1304@gmail.com",
   jurisdiction: "Rajasthan, India",
   description:
-    "Free label processing tools for ecommerce sellers: separate Amazon shipping and billing pages, add SKU or title notes to Amazon shipping labels, handle multi-page invoices and multi-SKU Amazon orders, crop Flipkart and Meesho labels, create 4-up, 6-up, and 9-up label PDFs, sort courier-wise or SKU-wise, generate picklists, plus Amazon calculators, GST helpers, and seller analytics.",
+    "Free shipping label crop tool and label cropper for ecommerce sellers: Meesho label crop, Flipkart label crop, Amazon label crop, Amazon shipping and billing separation, SKU or title notes on Amazon labels, Meesho 4-up, 6-up, and 9-up PDFs, courier-wise sorting, picklists, Amazon calculators, GST helpers, and seller analytics.",
   url: siteUrl,
   keywords: [
     "flipkart label crop",
+    "flipkart crop label",
+    "flipkart label cropper",
+    "flipkart cropper",
+    "flipkart label cutter",
     "flipkart shipping label crop",
     "flipkart invoice crop",
     "meesho label 4 in 1",
@@ -21,7 +25,15 @@ export const site = {
     "meesho 9 up labels",
     "meesho shipping label pdf",
     "meesho label crop",
+    "meesho crop label",
+    "meesho label cropper",
+    "meesho crop pdf",
+    "meesho shipping label crop",
     "ecommerce label cropper",
+    "label crop",
+    "label cropper",
+    "shipping label crop",
+    "shipping label crop tool",
     "seller shipping label tool",
     "marketplace label pdf tool",
     "courier wise label sorting",
@@ -35,6 +47,9 @@ export const site = {
     "sort shipping labels by sku",
     "label printer 4x6 pdf",
     "amazon label separator",
+    "amazon label crop",
+    "amazon crop label",
+    "amazon label",
     "amazon shipping label crop",
     "amazon sku on shipping label",
     "amazon title sku shipping label",
@@ -108,12 +123,16 @@ export const landingFeatures = [
 export const keywordPages = [
   {
     slug: "flipkart-label-crop",
-    title: "Flipkart Label Crop Tool",
+    title: "Flipkart Label Crop Tool - Shipping Label Cropper",
     h1: "Flipkart Label Crop Tool for Shipping and Billing PDFs",
     description:
-      "Crop Flipkart label PDFs into a clean shipping label and a separate 4x6 portrait billing PDF for label printers.",
+      "Crop Flipkart label PDFs into a clean shipping label and a separate 4x6 portrait billing PDF for label printers. Use it as a Flipkart label cropper, crop label tool, or label cutter for packing workflows.",
     primaryKeyword: "flipkart label crop",
     related: [
+      "flipkart crop label",
+      "flipkart label cropper",
+      "flipkart cropper",
+      "flipkart label cutter",
       "flipkart shipping label crop",
       "flipkart invoice label crop",
       "flipkart label printer pdf",
@@ -122,11 +141,11 @@ export const keywordPages = [
     sections: [
       {
         title: "Create separate shipping and billing PDFs",
-        text: "The tool reads each Flipkart PDF page, crops the shipping label up to the dotted line, and exports the billing invoice as a separate 4x6 portrait PDF.",
+        text: "The Flipkart label crop tool reads each PDF page, crops the shipping label up to the dotted line, and exports the billing invoice as a separate 4x6 portrait PDF.",
       },
       {
-        title: "Built for seller packing desks",
-        text: "Use it before printing labels for dispatch. The output is designed for faster handling on shipping label and packing desk workflows.",
+        title: "Flipkart crop label and label cutter workflow",
+        text: "Use it before printing labels for dispatch. The output is designed for faster handling when sellers search for a Flipkart crop label, Flipkart cropper, or Flipkart label cutter workflow.",
       },
       {
         title: "No server upload required",
@@ -139,6 +158,46 @@ export const keywordPages = [
       {
         title: "Courier and quantity batches",
         text: "The Labels workspace can read supported Flipkart label text, group pages by detected courier and quantity, and create separate shipping, billing, and picklist outputs for each packing batch.",
+      },
+    ],
+  },
+  {
+    slug: "meesho-label-crop",
+    title: "Meesho Label Crop Tool - Shipping Label Cropper",
+    h1: "Meesho Label Crop Tool for Shipping Labels and PDFs",
+    description:
+      "Crop and format Meesho shipping label PDFs for printing. Use the Meesho label cropper to create 4-up, 6-up, or 9-up A4 outputs, sort courier-wise labels, and prepare packing picklists.",
+    primaryKeyword: "meesho label crop",
+    related: [
+      "meesho crop label",
+      "meesho label cropper",
+      "meesho shipping label crop",
+      "meesho crop pdf",
+      "meesho label 4 in 1",
+      "meesho label 4 per page",
+      "meesho label 6 per page",
+      "meesho label 9 per page",
+    ],
+    sections: [
+      {
+        title: "Meesho label crop for A4 printing",
+        text: "Upload Meesho shipping label PDFs and create compact print-ready pages with 4 labels, 6 labels, or 9 labels per A4 sheet.",
+      },
+      {
+        title: "Meesho crop label and crop PDF workflow",
+        text: "The tool helps sellers who need a Meesho crop label, Meesho label cropper, or Meesho crop PDF workflow before printing dispatch labels.",
+      },
+      {
+        title: "Courier-wise label sorting",
+        text: "Process multiple Meesho PDFs together, group labels by courier partner and quantity, and download matching picklists for packing.",
+      },
+      {
+        title: "No server upload required",
+        text: "Label PDFs are processed in your browser, which keeps customer address and order documents on your device during the workflow.",
+      },
+      {
+        title: "Check barcode readability",
+        text: "Four-up output gives larger barcodes. Six-up and nine-up save paper but should be tested with your printer and scanner before bulk dispatch.",
       },
     ],
   },
@@ -182,18 +241,58 @@ export const keywordPages = [
     ],
   },
   {
+    slug: "amazon-label-crop",
+    title: "Amazon Label Crop Tool - Shipping Label Separator",
+    h1: "Amazon Label Crop Tool for Shipping Labels and Invoices",
+    description:
+      "Crop and separate Amazon Print Documents PDFs into shipping labels, billing pages, and combined PDFs. Add SKU, quantity, or product title notes to Amazon shipping labels.",
+    primaryKeyword: "amazon label crop",
+    related: [
+      "amazon crop label",
+      "amazon label",
+      "amazon shipping label crop",
+      "amazon label separator",
+      "amazon print documents pdf separator",
+      "amazon sku on shipping label",
+      "amazon billing invoice separator",
+    ],
+    sections: [
+      {
+        title: "Amazon label crop and shipping label split",
+        text: "Upload Amazon Print Documents PDFs and separate shipping labels from Tax Invoice or billing pages using page text markers like AWB, Ship To, Order ID, and Tax Invoice.",
+      },
+      {
+        title: "Download shipping, billing, or combined PDFs",
+        text: "Generate shipping-only labels, billing-only invoice pages, or a combined PDF with all attached invoice pages after processing.",
+      },
+      {
+        title: "Add SKU and quantity on Amazon labels",
+        text: "Choose clean labels, SKU plus quantity, or title plus SKU plus quantity. The tool reads multi-SKU and multi-quantity invoice rows for better packing notes.",
+      },
+      {
+        title: "Handle multi-page invoices",
+        text: "Billing pages after a shipping label stay attached until the next shipping label, so multi-page Amazon invoices remain matched with the correct order.",
+      },
+      {
+        title: "Process multiple Amazon PDFs together",
+        text: "Upload multiple Print Documents PDFs in one session and download a combined set of prepared Amazon label PDFs for dispatch.",
+      },
+    ],
+  },
+  {
     slug: "amazon-label-processing",
     title: "Amazon Label Processing Tool - Shipping, Billing and SKU Notes",
     h1: "Amazon Label Processing Tool for Shipping Labels and Billing PDFs",
     description:
-      "Separate Amazon Print Documents PDFs into shipping labels and billing invoices, remove or keep invoice pages, add SKU, quantity, or product title notes on shipping labels, and handle multi-page invoices.",
+      "Separate Amazon Print Documents PDFs into shipping labels and billing invoices, download shipping-only, billing-only, or combined PDFs, add SKU, quantity, or product title notes on shipping labels, and handle multi-page invoices.",
     primaryKeyword: "amazon label processing",
     related: [
       "amazon shipping label crop",
       "amazon label separator",
       "amazon shipping billing pdf split",
+      "amazon label crop",
+      "amazon crop label",
       "amazon sku on shipping label",
-      "amazon invoice remove keep",
       "amazon print documents pdf separator",
       "amazon billing invoice separator",
       "amazon multi page invoice labels",
@@ -205,8 +304,8 @@ export const keywordPages = [
         text: "Upload one or more Amazon Print Documents PDFs and split shipping labels from Tax Invoice or billing pages using text markers such as AWB, Ship To, Tax Invoice, Billing Address, HSN, and Page 1 of 2.",
       },
       {
-        title: "Remove or keep Amazon invoices",
-        text: "Download clean shipping-label PDFs when invoices are not needed, or keep all attached billing pages with the correct shipping label for records and combined printing.",
+        title: "Download shipping, billing, or combined PDFs",
+        text: "Download clean shipping-label PDFs when invoices are not needed, billing-only PDFs for records, or combined PDFs that keep all attached billing pages with the correct shipping label.",
       },
       {
         title: "Add SKU and quantity on Amazon shipping labels",
@@ -217,8 +316,47 @@ export const keywordPages = [
         text: "Billing pages after a shipping label stay attached until the next shipping label, so two-page invoices and multiple products on one invoice remain matched to the correct Amazon order.",
       },
       {
-        title: "Download shipping, billing, or combined PDFs",
+        title: "Multiple PDF upload support",
         text: "Use separate buttons for shipping labels, billing invoices, and combined PDFs. Multiple uploaded Amazon PDFs can be processed together in one browser session.",
+      },
+    ],
+  },
+  {
+    slug: "shipping-label-crop-tool",
+    title: "Shipping Label Crop Tool for Amazon, Flipkart and Meesho",
+    h1: "Shipping Label Crop Tool for Marketplace Sellers",
+    description:
+      "Free shipping label crop tool for Amazon, Flipkart, and Meesho sellers. Crop labels, split invoices, create 4-up, 6-up, or 9-up PDFs, sort courier-wise labels, and print packing-ready PDFs.",
+    primaryKeyword: "shipping label crop tool",
+    related: [
+      "label crop",
+      "shipping label crop",
+      "label cropper",
+      "marketplace label crop",
+      "amazon label crop",
+      "flipkart label crop",
+      "meesho label crop",
+    ],
+    sections: [
+      {
+        title: "One label cropper for major marketplaces",
+        text: "Use one browser workspace to crop or format Amazon, Flipkart, and Meesho label PDFs before printing dispatch labels.",
+      },
+      {
+        title: "Amazon, Flipkart, and Meesho workflows",
+        text: "Amazon labels can be separated into shipping and billing PDFs. Flipkart labels can be cropped into shipping and billing outputs. Meesho labels can be arranged as 4-up, 6-up, or 9-up A4 PDFs.",
+      },
+      {
+        title: "Courier-wise and SKU-wise sorting",
+        text: "The Labels tool can group supported marketplace PDFs by courier partner, SKU, quantity, and seller account to speed up packing desk work.",
+      },
+      {
+        title: "Private browser processing",
+        text: "PDFs are processed in your browser, so customer address and invoice documents do not need to be uploaded to a server for label formatting.",
+      },
+      {
+        title: "Print-ready downloads",
+        text: "Download shipping labels, billing pages, combined PDFs, 4-per-page outputs, 6-per-page outputs, 9-per-page outputs, and matching picklists where supported.",
       },
     ],
   },

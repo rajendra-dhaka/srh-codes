@@ -26,6 +26,10 @@ export default function FlipkartLabelCropPage() {
       answer: "Yes. Upload the Flipkart PDF and generate separate shipping and billing downloads.",
     },
     {
+      question: "Can I use this as a Flipkart label cropper or label cutter?",
+      answer: "Yes. The tool works as a Flipkart label cropper for creating cleaner shipping-label and billing-label PDF outputs before printing.",
+    },
+    {
       question: "Is the billing PDF suitable for a 4x6 label printer?",
       answer: "The billing output is generated as a portrait 4x6 PDF for label-printer workflows.",
     },
@@ -98,4 +102,3 @@ function KeywordContent({ page, faq }) {
     </main>
   );
 }
-

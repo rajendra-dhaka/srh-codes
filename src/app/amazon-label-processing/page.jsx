@@ -26,8 +26,8 @@ export default function AmazonLabelProcessingPage() {
       answer: "Yes. Upload Amazon Print Documents PDFs and generate separate shipping-label and billing-invoice PDF downloads.",
     },
     {
-      question: "Can I remove Amazon invoice pages before printing labels?",
-      answer: "Yes. Use remove invoice mode for clean shipping labels, or keep invoices when you need a combined PDF.",
+      question: "Can I download shipping labels without Amazon invoice pages?",
+      answer: "Yes. After processing, use the shipping-label download for clean labels, the billing-pages download for invoices, or the combined PDF when both are needed.",
     },
     {
       question: "Can the tool print SKU and product title on Amazon shipping labels?",
