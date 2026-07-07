@@ -397,6 +397,8 @@ const processingCopy = {
     advancedBatches: "Courier-wise advanced batches",
     quantityGroup: "Quantity group",
     outputType: "Output type",
+    chooseOutput: "Choose output",
+    chooseOutputHint: "Select this before processing. The generated PDF will follow these settings.",
     croppedShipping: "Split: shipping only",
     croppedBilling: "Split: billing only",
     croppedCombined: "Split: shipping + billing",
@@ -486,6 +488,8 @@ const processingCopy = {
     advancedBatches: "Courier-wise advanced batches",
     quantityGroup: "Quantity group",
     outputType: "Output type",
+    chooseOutput: "Output choose करो",
+    chooseOutputHint: "Process से पहले select करो. Generated PDF इन्हीं settings से बनेगा.",
     croppedShipping: "Split: shipping only",
     croppedBilling: "Split: billing only",
     croppedCombined: "Split: shipping + billing",
@@ -4113,6 +4117,12 @@ function LabelProcessingTool() {
   const [amazonSortBySku, setAmazonSortBySku] = useState(true);
   const [uploadInputKey, setUploadInputKey] = useState(0);
   const [labelSortMode, setLabelSortMode] = useState("auto");
+  const [labelQuantityGroup, setLabelQuantityGroup] = useState("all");
+  const [labelOutputType, setLabelOutputType] = useState("shipping");
+  const [labelLayoutSection, setLabelLayoutSection] = useState("full");
+  const [labelPrinterType, setLabelPrinterType] = useState("normal");
+  const [labelNormalLayout, setLabelNormalLayout] = useState("4");
+  const [labelThermalLayout, setLabelThermalLayout] = useState("4x6");
 
   const sortedItems = useMemo(() => sortLabels(items, labelSortMode), [items, labelSortMode]);
   const courierGroups = useMemo(() => groupItemsByCourier(sortedItems), [sortedItems]);
@@ -4128,6 +4138,28 @@ function LabelProcessingTool() {
     skuQty: countBySkuQty(flattenAmazonLineItems(amazonOrders)).slice(0, 5),
   }), [amazonOrders]);
   const amazonLineItems = useMemo(() => flattenAmazonLineItems(amazonOrders), [amazonOrders]);
+  const getConfiguredRows = (sourceRows) => {
+    const groups = splitByQuantity(sourceRows);
+    if (labelQuantityGroup === "single") return groups.single;
+    if (labelQuantityGroup === "multi") return groups.multi;
+    return groups.all;
+  };
+  const getConfiguredOutputKind = () => {
+    if (platform === "meesho") {
+      if (labelOutputType === "shipping") return meeshoOutputKind("shipping", "1");
+      if (labelOutputType === "billing") return meeshoOutputKind("billing", "1");
+      if (labelOutputType === "combined") return meeshoOutputKind("full", "1");
+      if (labelOutputType === "layout") {
+        const layout = labelPrinterType === "thermal" ? labelThermalLayout : labelNormalLayout;
+        return meeshoOutputKind(labelLayoutSection, layout);
+      }
+      return "labels";
+    }
+    if (labelOutputType === "shipping" || labelOutputType === "billing") return labelOutputType;
+    return "labels";
+  };
+  const quantityLabel = labelQuantityGroup === "single" ? t.singleQty : labelQuantityGroup === "multi" ? t.multiQty : t.allLabels;
+  const selectedOutputRows = useMemo(() => getConfiguredRows(sortedItems), [sortedItems, labelQuantityGroup]);
 
   const onFiles = (selectedFiles) => {
     const pdfFiles = Array.from(selectedFiles || []).filter((file) => /\.pdf$/i.test(file.name) || file.type === "application/pdf");
@@ -4208,6 +4240,15 @@ function LabelProcessingTool() {
     }
   };
 
+  const runConfiguredOutputAction = (rows, action, scopeName = t.allCouriers) => {
+    const selectedRows = getConfiguredRows(rows);
+    if (labelOutputType === "picklist") {
+      runOutputAction(selectedRows, "picklist", scopeName, quantityLabel);
+      return;
+    }
+    runOutputAction(selectedRows, action, scopeName, quantityLabel, getConfiguredOutputKind());
+  };
+
   const runAmazonAction = async (action, outputKind = "prepared") => {
     if (!amazonOrders.length) return;
     setBusy(true);
@@ -4268,6 +4309,7 @@ function LabelProcessingTool() {
               setItems([]);
               setError("");
               setToast("");
+              setLabelOutputType("shipping");
               setUploadInputKey((key) => key + 1);
             }}>{marketLabel(id)}</button>
           ))}
@@ -4454,6 +4496,26 @@ function LabelProcessingTool() {
             </select>
           </label>
 
+          {files.length ? (
+            <LabelOutputOptions
+              t={t}
+              platform={platform}
+              quantityGroup={labelQuantityGroup}
+              setQuantityGroup={setLabelQuantityGroup}
+              outputType={labelOutputType}
+              setOutputType={setLabelOutputType}
+              layoutSection={labelLayoutSection}
+              setLayoutSection={setLabelLayoutSection}
+              printerType={labelPrinterType}
+              setPrinterType={setLabelPrinterType}
+              normalLayout={labelNormalLayout}
+              setNormalLayout={setLabelNormalLayout}
+              thermalLayout={labelThermalLayout}
+              setThermalLayout={setLabelThermalLayout}
+              busy={busy}
+            />
+          ) : null}
+
           {error && <div className="error"><AlertTriangle size={18} />{error}</div>}
           <button className="primary-action label-process" onClick={analyze} disabled={busy}>
             {busy ? t.analyzing : t.analyze}
@@ -4479,14 +4541,12 @@ function LabelProcessingTool() {
                   </div>
                   <span>{sortedItems.length} labels</span>
                 </div>
-                <LabelOutputSetup
-                  title={t.allCouriers}
-                  rows={sortedItems}
+                <ReadyOutputActions
                   t={t}
+                  rows={selectedOutputRows}
                   busy={busy}
-                  platform={platform}
-                  onAction={runOutputAction}
-                  compact
+                  outputType={labelOutputType}
+                  onAction={(action) => runConfiguredOutputAction(sortedItems, action, t.allCouriers)}
                 />
               </div>
               <div className="summary-accordion-stack">
@@ -4517,14 +4577,12 @@ function LabelProcessingTool() {
                   <span>{group.courier}</span>
                   <em>{group.rows.length} labels</em>
                 </summary>
-                <LabelOutputSetup
-                  title={group.courier}
-                  rows={group.rows}
+                <ReadyOutputActions
                   t={t}
+                  rows={getConfiguredRows(group.rows)}
                   busy={busy}
-                  platform={platform}
-                  onAction={runOutputAction}
-                  compact
+                  outputType={labelOutputType}
+                  onAction={(action) => runConfiguredOutputAction(group.rows, action, group.courier)}
                 />
               </details>
             ))}
@@ -4537,23 +4595,28 @@ function LabelProcessingTool() {
   );
 }
 
-function LabelOutputSetup({ title, rows, t, busy, onAction, platform }) {
-  const groups = splitByQuantity(rows);
-  const [quantityGroup, setQuantityGroup] = useState("all");
-  const [outputType, setOutputType] = useState(platform === "meesho" ? "shipping" : "shipping");
-  const [layoutSection, setLayoutSection] = useState("full");
-  const [printerType, setPrinterType] = useState("normal");
-  const [normalLayout, setNormalLayout] = useState("4");
-  const [thermalLayout, setThermalLayout] = useState("4x6");
+function LabelOutputOptions({
+  t,
+  platform,
+  quantityGroup,
+  setQuantityGroup,
+  outputType,
+  setOutputType,
+  layoutSection,
+  setLayoutSection,
+  printerType,
+  setPrinterType,
+  normalLayout,
+  setNormalLayout,
+  thermalLayout,
+  setThermalLayout,
+  busy,
+}) {
   const quantityOptions = [
-    { key: "all", label: t.allLabels, rows: groups.all },
-    { key: "single", label: t.singleQty, rows: groups.single },
-    { key: "multi", label: t.multiQty, rows: groups.multi },
+    { key: "all", label: t.allLabels },
+    { key: "single", label: t.singleQty },
+    { key: "multi", label: t.multiQty },
   ];
-  const selectedOption = quantityOptions.find((option) => option.key === quantityGroup) || quantityOptions[0];
-  const pieces = rows.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
-  const disabled = busy || !selectedOption.rows.length;
-  const selectedLayout = printerType === "thermal" ? thermalLayout : normalLayout;
   const outputOptions = platform === "meesho"
     ? [
         { key: "shipping", label: t.croppedShipping },
@@ -4569,60 +4632,35 @@ function LabelOutputSetup({ title, rows, t, busy, onAction, platform }) {
         { key: "picklist", label: t.downloadPicklist },
       ];
 
-  const getOutputKind = () => {
-    if (platform === "meesho") {
-      if (outputType === "shipping") return meeshoOutputKind("shipping", "1");
-      if (outputType === "billing") return meeshoOutputKind("billing", "1");
-      if (outputType === "combined") return meeshoOutputKind("full", "1");
-      if (outputType === "layout") return meeshoOutputKind(layoutSection, selectedLayout);
-      return "labels";
-    }
-    if (outputType === "shipping" || outputType === "billing") return outputType;
-    return "labels";
-  };
-
-  const runConfiguredAction = (action) => {
-    if (outputType === "picklist") {
-      onAction(selectedOption.rows, "picklist", title, selectedOption.label);
-      return;
-    }
-    onAction(selectedOption.rows, action, title, selectedOption.label, getOutputKind());
-  };
-
   return (
-    <article className="label-output-setup">
-      <div className="courier-card-head">
+    <div className="label-output-options">
+      <div className="quick-output-head">
         <div>
-          <h3>{title}</h3>
-          <p>{rows.length} labels · {pieces} pieces</p>
+          <h3>{t.chooseOutput}</h3>
+          <p>{t.chooseOutputHint}</p>
         </div>
-        <span>{groups.multi.length} multi qty</span>
       </div>
-      <div className="output-setup-grid">
-        <label>
-          <span>{t.quantityGroup}</span>
-          <select value={quantityGroup} onChange={(event) => setQuantityGroup(event.target.value)} disabled={busy}>
-            {quantityOptions.map((option) => (
-              <option key={option.key} value={option.key}>
-                {option.label} ({option.rows.length})
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          <span>{t.outputType}</span>
-          <select value={outputType} onChange={(event) => setOutputType(event.target.value)} disabled={busy}>
-            {outputOptions.map((option) => (
-              <option key={option.key} value={option.key}>{option.label}</option>
-            ))}
-          </select>
-        </label>
+      <div className="radio-option-grid">
+        <OptionRadioGroup
+          title={t.quantityGroup}
+          value={quantityGroup}
+          onChange={setQuantityGroup}
+          options={quantityOptions}
+          disabled={busy}
+        />
+        <OptionRadioGroup
+          title={t.outputType}
+          value={outputType}
+          onChange={setOutputType}
+          options={outputOptions}
+          disabled={busy}
+        />
       </div>
       {platform === "meesho" && outputType === "layout" ? (
         <div className="output-setup-grid output-layout-grid">
           <label>
             <span>{t.labelPart}</span>
-            <select value={layoutSection} onChange={(event) => setLayoutSection(event.target.value)} disabled={disabled}>
+            <select value={layoutSection} onChange={(event) => setLayoutSection(event.target.value)} disabled={busy}>
               <option value="full">{t.fullLabel}</option>
               <option value="shipping">{t.shippingOnly}</option>
               <option value="billing">{t.billingOnly}</option>
@@ -4630,7 +4668,7 @@ function LabelOutputSetup({ title, rows, t, busy, onAction, platform }) {
           </label>
           <label>
             <span>{t.printerType}</span>
-            <select value={printerType} onChange={(event) => setPrinterType(event.target.value)} disabled={disabled}>
+            <select value={printerType} onChange={(event) => setPrinterType(event.target.value)} disabled={busy}>
               <option value="normal">{t.normalPrinter}</option>
               <option value="thermal">{t.thermalPrinter}</option>
             </select>
@@ -4638,12 +4676,12 @@ function LabelOutputSetup({ title, rows, t, busy, onAction, platform }) {
           <label>
             <span>{t.layout}</span>
             {printerType === "thermal" ? (
-              <select value={thermalLayout} onChange={(event) => setThermalLayout(event.target.value)} disabled={disabled}>
+              <select value={thermalLayout} onChange={(event) => setThermalLayout(event.target.value)} disabled={busy}>
                 <option value="3x5">{t.thermal3x5}</option>
                 <option value="4x6">{t.thermal4x6}</option>
               </select>
             ) : (
-              <select value={normalLayout} onChange={(event) => setNormalLayout(event.target.value)} disabled={disabled}>
+              <select value={normalLayout} onChange={(event) => setNormalLayout(event.target.value)} disabled={busy}>
                 <option value="1">{t.onePerPage}</option>
                 <option value="4">{t.downloadFour}</option>
                 <option value="6">{t.downloadSix}</option>
@@ -4653,21 +4691,51 @@ function LabelOutputSetup({ title, rows, t, busy, onAction, platform }) {
           </label>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function OptionRadioGroup({ title, value, onChange, options, disabled }) {
+  return (
+    <fieldset className="option-radio-group">
+      <legend>{title}</legend>
+      <div>
+        {options.map((option) => (
+          <label key={option.key} className={value === option.key ? "active" : ""}>
+            <input
+              type="radio"
+              value={option.key}
+              checked={value === option.key}
+              onChange={() => onChange(option.key)}
+              disabled={disabled}
+            />
+            <span>{option.label}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
+function ReadyOutputActions({ t, rows, busy, outputType, onAction }) {
+  const disabled = busy || !rows.length;
+  return (
+    <article className="label-output-setup">
       <div className="output-ready-line">
         <div>
           <strong>{t.outputReady}</strong>
-          <small>{selectedOption.rows.length ? `${selectedOption.rows.length} labels selected · ${t.outputReadyHint}` : t.noSubset}</small>
+          <small>{rows.length ? `${rows.length} labels selected · ${t.outputReadyHint}` : t.noSubset}</small>
         </div>
         {outputType === "picklist" ? (
-          <button disabled={disabled} onClick={() => runConfiguredAction("download")}>
+          <button disabled={disabled} onClick={() => onAction("download")}>
             <ClipboardList size={15} /> {t.downloadPicklist}
           </button>
         ) : (
           <div className="output-final-actions">
-            <button disabled={disabled} onClick={() => runConfiguredAction("download")}>
+            <button disabled={disabled} onClick={() => onAction("download")}>
               <Download size={15} /> {t.downloadPdf}
             </button>
-            <button disabled={disabled} onClick={() => runConfiguredAction("print")}>
+            <button disabled={disabled} onClick={() => onAction("print")}>
               <Printer size={15} /> {t.printPdf}
             </button>
           </div>

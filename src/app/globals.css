@@ -2503,8 +2503,70 @@ main {
   padding: 12px;
 }
 
+.label-output-options {
+  border: 1px solid #d9e4f2;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 12px;
+}
+
 .quick-output-panel .label-output-setup {
   border-color: #cde9e9;
+}
+
+.radio-option-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.option-radio-group {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.option-radio-group legend {
+  margin-bottom: 7px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.option-radio-group > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 8px;
+}
+
+.option-radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  border: 1px solid #d9e4f2;
+  border-radius: 8px;
+  background: #fbfdff;
+  color: #17324d;
+  padding: 9px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.option-radio-group label.active {
+  border-color: #00a6a6;
+  background: #e9f7f7;
+  box-shadow: inset 0 0 0 1px rgba(0, 166, 166, 0.25);
+}
+
+.option-radio-group input {
+  accent-color: #00a6a6;
+  flex: 0 0 auto;
+}
+
+.option-radio-group input:disabled {
+  cursor: not-allowed;
 }
 
 .output-setup-grid {
@@ -4069,6 +4131,7 @@ tr:nth-child(even) td {
 .theme-dark .courier-accordion-card,
 .theme-dark .quick-output-panel,
 .theme-dark .label-output-setup,
+.theme-dark .label-output-options,
 .theme-dark .output-ready-line,
 .theme-dark .qty-action-group,
 .theme-dark .label-sort-control,
@@ -4081,6 +4144,7 @@ tr:nth-child(even) td {
 .theme-dark .label-sort-control select,
 .theme-dark .mini-select-row select,
 .theme-dark .output-setup-grid select,
+.theme-dark .option-radio-group label,
 .theme-dark .business-hero,
 .theme-dark .tabs,
 .theme-dark .kpi,
@@ -4247,6 +4311,7 @@ tr:nth-child(even) td {
 .theme-dark .section-title-row h2,
 .theme-dark .courier-card-head h3,
 .theme-dark .output-ready-line strong,
+.theme-dark .option-radio-group label,
 .theme-dark .courier-accordion-card > summary,
 .theme-dark .print-modal h2 {
   color: #eef6ff;
@@ -4295,9 +4360,16 @@ tr:nth-child(even) td {
 
 .theme-dark .quick-output-head p,
 .theme-dark .output-ready-line small,
+.theme-dark .option-radio-group legend,
 .theme-dark .count-accordion summary em,
 .theme-dark .courier-accordion-card > summary em {
   color: #b8c7dc;
+}
+
+.theme-dark .option-radio-group label.active {
+  background: #0f3b46;
+  border-color: #00a6a6;
+  color: #eef6ff;
 }
 
 .theme-dark .count-row {
