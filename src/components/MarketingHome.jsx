@@ -67,8 +67,8 @@ const products = [
 
 const marketplaces = [
   { name: "Meesho", src: "/marketplaces/meesho.png" },
-  { name: "Flipkart", src: "/marketplaces/flipkart.jpg" },
-  { name: "Amazon", src: "/marketplaces/amazon.jpg" },
+  { name: "Flipkart", src: "/marketplaces/flipkart.png" },
+  { name: "Amazon", src: "/marketplaces/amazon.png" },
 ];
 
 const workflows = [

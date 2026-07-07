@@ -107,8 +107,8 @@ const marketplaces = [
 ];
 const marketplaceIcons = {
   meesho: "/marketplaces/meesho.png",
-  flipkart: "/marketplaces/flipkart.jpg",
-  amazon: "/marketplaces/amazon.jpg",
+  flipkart: "/marketplaces/flipkart.png",
+  amazon: "/marketplaces/amazon.png",
 };
 
 const emptyPerformanceData = () => ({
