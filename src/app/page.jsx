@@ -1,5 +1,6 @@
 import SellerToolClient from "../components/SellerToolClient";
 import HomeSeoContent from "../components/HomeSeoContent";
+import MarketingHome from "../components/MarketingHome";
 import { absoluteUrl, site } from "../lib/site";
 
 export const metadata = {
@@ -59,6 +60,7 @@ export default function HomePage() {
   return (
     <>
       <JsonLd />
+      <MarketingHome />
       <div id="tool" className="tool-shell first-tool">
         <SellerToolClient />
       </div>

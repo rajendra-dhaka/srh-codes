@@ -1,7 +1,23 @@
 :root {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: #172033;
-  background: #f4f7fb;
+  background: #fbfaf7;
+  --bg: #fbfaf7;
+  --surface: #ffffff;
+  --surface-soft: #f7f3ea;
+  --ink: #20231a;
+  --muted: #676b5f;
+  --line: #e7e2d8;
+  --brand: #2477ff;
+  --brand-strong: #0f5fe8;
+  --accent: #25271b;
+  --success: #0f9f6e;
+  --warning: #e3a008;
+  --danger: #e5484d;
+  --shadow-sm: 0 10px 24px rgba(32, 35, 26, 0.06);
+  --shadow-md: 0 24px 70px rgba(32, 35, 26, 0.11);
+  --radius: 18px;
+  --radius-lg: 30px;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -14,8 +30,13 @@ body {
   margin: 0;
   min-width: 320px;
   background:
-    linear-gradient(180deg, #f2f7fb 0, #ffffff 260px, #f6f8fb 520px),
-    #f6f8fb;
+    linear-gradient(180deg, #fffdf8 0, #fbfaf7 420px, #f8fafc 820px),
+    var(--bg);
+}
+
+html,
+body {
+  overflow-x: clip;
 }
 
 a {
@@ -25,6 +46,15 @@ a {
 button,
 input {
   font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: rgba(36, 119, 255, 0.18);
 }
 
 .super-main,
@@ -4619,4 +4649,869 @@ tr:nth-child(even) td {
     justify-content: center;
   }
 
+}
+
+/* Modern SRH product site */
+.marketing-site {
+  width: min(1800px, calc(100% - 36px));
+  margin: 0 auto;
+  color: var(--ink);
+}
+
+.marketing-nav {
+  position: sticky;
+  top: 16px;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 18px;
+  min-height: 76px;
+  margin: 22px auto 0;
+  padding: 12px 18px;
+  border: 1px solid rgba(231, 226, 216, 0.88);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(20px);
+}
+
+.marketing-brand,
+.marketing-nav nav,
+.nav-cta,
+.hero-badge,
+.hero-actions a,
+.product-card a,
+.floating-chip {
+  display: inline-flex;
+  align-items: center;
+}
+
+.marketing-brand {
+  gap: 11px;
+  color: var(--ink);
+  font-size: 22px;
+  font-weight: 950;
+  text-decoration: none;
+}
+
+.marketing-brand img {
+  width: 42px;
+  height: 42px;
+}
+
+.marketing-nav nav {
+  justify-content: center;
+  gap: 8px;
+}
+
+.marketing-nav nav a {
+  padding: 10px 13px;
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 850;
+  text-decoration: none;
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.marketing-nav nav a:hover {
+  background: #f2f5fb;
+  color: var(--ink);
+}
+
+.nav-cta {
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 19px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 900;
+  text-decoration: none;
+  box-shadow: 0 12px 28px rgba(32, 35, 26, 0.16);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.nav-cta:hover,
+.primary-link:hover,
+.product-card:hover {
+  transform: translateY(-2px);
+}
+
+.marketing-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(440px, 0.98fr);
+  align-items: center;
+  gap: 38px;
+  min-height: calc(100vh - 120px);
+  padding: clamp(66px, 8vw, 118px) min(5vw, 70px) clamp(44px, 7vw, 90px);
+}
+
+.hero-copy {
+  max-width: 780px;
+}
+
+.hero-badge {
+  gap: 8px;
+  width: fit-content;
+  padding: 8px 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 850;
+  box-shadow: var(--shadow-sm);
+}
+
+.hero-badge svg {
+  color: var(--brand);
+}
+
+.marketing-hero h1 {
+  max-width: 850px;
+  margin: 26px 0 0;
+  color: var(--ink);
+  font-size: clamp(54px, 7vw, 108px);
+  line-height: 0.96;
+  letter-spacing: 0;
+}
+
+.marketing-hero h1 strong {
+  display: block;
+  color: var(--brand);
+  font-weight: 950;
+}
+
+.marketing-hero p {
+  max-width: 740px;
+  margin-top: 22px;
+  color: var(--muted);
+  font-size: clamp(18px, 1.6vw, 23px);
+  line-height: 1.48;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.hero-actions a {
+  justify-content: center;
+  min-height: 54px;
+  padding: 0 22px;
+  border-radius: 13px;
+  font-size: 16px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.primary-link {
+  gap: 10px;
+  background: var(--brand);
+  color: #ffffff;
+  box-shadow: 0 14px 30px rgba(36, 119, 255, 0.25);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.secondary-link {
+  border: 1px solid var(--line);
+  background: #ffffff;
+  color: var(--ink);
+}
+
+.hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 42px;
+}
+
+.hero-stats span {
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.hero-stats strong {
+  display: block;
+  color: var(--ink);
+  font-size: 34px;
+  line-height: 1;
+}
+
+.hero-visual {
+  position: relative;
+  min-height: 560px;
+  display: grid;
+  place-items: center;
+}
+
+.hero-visual::before {
+  content: "";
+  position: absolute;
+  inset: 42px 0 0 52px;
+  border-radius: 34px;
+  background: #d9df87;
+  transform: rotate(-4deg);
+}
+
+.preview-window {
+  position: relative;
+  z-index: 1;
+  width: min(620px, 100%);
+  border: 1px solid rgba(32, 35, 26, 0.08);
+  border-radius: 34px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 30px 80px rgba(32, 35, 26, 0.18);
+}
+
+.preview-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 18px;
+  background: #f6efe4;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.preview-bar span {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #ff6b57;
+}
+
+.preview-bar span:nth-child(2) {
+  background: #ffc84a;
+}
+
+.preview-bar span:nth-child(3) {
+  background: #32c482;
+}
+
+.preview-bar em {
+  margin-left: 8px;
+  font-style: normal;
+}
+
+.preview-body {
+  position: relative;
+  min-height: 470px;
+  padding: 52px;
+  background:
+    linear-gradient(135deg, rgba(36, 119, 255, 0.12), transparent 42%),
+    linear-gradient(160deg, #fffaf0 0%, #eef8ff 100%);
+}
+
+.label-card {
+  width: min(320px, 82%);
+  min-height: 168px;
+  padding: 22px;
+  border: 1px solid rgba(32, 35, 26, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 20px 46px rgba(32, 35, 26, 0.14);
+}
+
+.label-card b,
+.label-card i,
+.label-card small {
+  display: block;
+}
+
+.label-card b {
+  color: var(--brand);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+.label-card i {
+  margin-top: 28px;
+  color: var(--ink);
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 950;
+}
+
+.label-card small {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.mock-b {
+  margin: -38px 0 0 auto;
+  transform: rotate(3deg);
+}
+
+.floating-chip {
+  position: absolute;
+  gap: 8px;
+  left: 30px;
+  bottom: 38px;
+  padding: 11px 14px;
+  border: 1px solid rgba(32, 35, 26, 0.09);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow: var(--shadow-sm);
+}
+
+.floating-chip.second {
+  left: auto;
+  right: 26px;
+  bottom: 104px;
+}
+
+.marketing-section,
+.workflow-section,
+.workspace-intro {
+  width: min(1320px, 100%);
+  margin: 0 auto;
+  padding: 78px 0;
+}
+
+.section-kicker {
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.marketing-section > h2,
+.workflow-section > h2,
+.workspace-intro h2 {
+  max-width: 820px;
+  margin: 10px 0 0;
+  color: var(--ink);
+  font-size: clamp(34px, 4.2vw, 62px);
+  line-height: 1.02;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  margin-top: 42px;
+}
+
+.product-card {
+  position: relative;
+  min-height: 430px;
+  display: flex;
+  flex-direction: column;
+  padding: 34px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.product-card:hover {
+  border-color: rgba(36, 119, 255, 0.34);
+  box-shadow: var(--shadow-md);
+}
+
+.product-icon {
+  width: 76px;
+  height: 76px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: #edf4ff;
+  color: var(--brand);
+}
+
+.product-card small {
+  display: block;
+  margin-top: 34px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.product-card h3 {
+  margin: 12px 0 0;
+  color: var(--ink);
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+.product-card p {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+.product-card a {
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+  min-height: 50px;
+  margin-top: auto;
+  border-radius: 12px;
+  background: var(--brand);
+  color: #ffffff;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.workflow-section {
+  padding-top: 40px;
+}
+
+.workflow-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 34px;
+}
+
+.workflow-card {
+  min-height: 250px;
+  padding: 28px;
+  border-radius: 28px;
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+
+.workflow-card span {
+  color: rgba(32, 35, 26, 0.34);
+  font-size: 48px;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.workflow-card svg {
+  display: block;
+  margin-top: 24px;
+  color: var(--brand);
+}
+
+.workflow-card h3 {
+  margin: 20px 0 0;
+  font-size: 25px;
+}
+
+.workflow-card p {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.48;
+}
+
+.workspace-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 42px;
+  border-radius: 28px;
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.workspace-intro .section-kicker,
+.workspace-intro h2,
+.workspace-intro p,
+.workspace-intro svg {
+  color: #ffffff;
+}
+
+.workspace-intro p {
+  max-width: 720px;
+  margin-top: 12px;
+  font-size: 18px;
+  line-height: 1.5;
+  opacity: 0.78;
+}
+
+/* Modern app shell overrides */
+.tool-shell {
+  border-top: 0;
+}
+
+.tool-shell .super-app {
+  width: min(1800px, calc(100% - 36px));
+  grid-template-columns: 286px minmax(0, 1fr);
+  gap: 18px;
+  min-height: auto;
+  margin: 0 auto 44px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 34px;
+  background: rgba(255, 255, 255, 0.66);
+  box-shadow: var(--shadow-md);
+}
+
+.super-sidebar {
+  border-radius: 24px;
+  background: #20231a;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.brand-block,
+.drawer-head {
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+.side-nav button,
+.sidebar-card,
+.theme-toggle,
+.drawer-lang,
+.command-bar,
+.portal-card,
+.label-workbench,
+.processing-summary,
+.gst-upload-panel,
+.gst-guidance,
+.upload-box,
+.chart-panel,
+.table-panel,
+.decision-card,
+.accordion-card,
+.business-hero,
+.workspace-card,
+.label-output-options,
+.label-output-setup,
+.quick-output-panel,
+.courier-accordion-card,
+.courier-action-card,
+.label-dropzone,
+.label-sort-control,
+.count-list,
+.output-ready-line,
+.doc-upload,
+.platform-switch,
+.market-tabs,
+.tabs,
+.placeholder {
+  border-radius: 16px;
+}
+
+.command-bar {
+  top: 18px;
+  border-color: rgba(231, 226, 216, 0.9);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: var(--shadow-sm);
+}
+
+.command-bar h1,
+.module-header h1,
+h1 {
+  color: var(--ink);
+}
+
+.eyebrow,
+.module-header span,
+.section-head span,
+.seo-section span,
+.seo-section-head span,
+.seo-intent-strip span {
+  color: var(--brand);
+}
+
+.primary-action,
+.platform-switch button.active,
+.market-tabs button.active,
+.tabs button.active,
+.global-lang button.active,
+.output-ready-line button,
+.count-row strong,
+.quick-output-head > span,
+.section-title-row > span,
+.courier-card-head > span {
+  background: var(--brand);
+  color: #ffffff;
+}
+
+.primary-action,
+.output-ready-line button,
+.download-grid button,
+.mini-action-row button,
+.amazon-action-row button,
+.platform-switch button,
+.market-tabs button,
+.tabs button,
+.option-radio-group label,
+.amazon-option-card {
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.primary-action:hover:not(:disabled),
+.output-ready-line button:hover:not(:disabled),
+.download-grid button:hover,
+.mini-action-row button:hover:not(:disabled),
+.amazon-action-row button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(36, 119, 255, 0.15);
+}
+
+.label-dropzone {
+  background:
+    linear-gradient(180deg, rgba(36, 119, 255, 0.05), rgba(255, 255, 255, 0.94)),
+    #ffffff;
+}
+
+.label-drop-icon,
+.doc-icon,
+.workspace-icon,
+.product-icon {
+  border-radius: 16px;
+}
+
+.processing-layout,
+.shipping-calculator-grid,
+.gst-layout,
+.portal-grid {
+  gap: 18px;
+}
+
+.processing-summary,
+.label-workbench,
+.portal-card,
+.gst-upload-panel,
+.gst-guidance,
+.business-hero,
+.chart-panel,
+.table-panel,
+.decision-card,
+.upload-box,
+.workspace-card {
+  border-color: var(--line);
+  box-shadow: var(--shadow-sm);
+}
+
+.seo-intent-strip,
+.seo-feature-grid article,
+.seo-link-list a,
+.faq-block,
+.legal-page,
+.guides-index > header,
+.guide-header,
+.guide-body > article,
+.guide-body > aside,
+.guide-card-grid a {
+  border-color: var(--line);
+  border-radius: 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+.seo-intent-strip {
+  margin-top: 34px;
+  padding: 22px;
+}
+
+.seo-section h2,
+.seo-intent-strip h1,
+.seo-link-list strong,
+.seo-feature-grid h3 {
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-copy,
+  .hero-visual,
+  .product-card,
+  .workflow-card,
+  .workspace-intro,
+  .tool-shell .super-app {
+    animation: srhFadeUp 520ms ease both;
+  }
+
+  .hero-visual {
+    animation-delay: 80ms;
+  }
+
+  .product-card:nth-child(2),
+  .workflow-card:nth-child(2) {
+    animation-delay: 70ms;
+  }
+
+  .product-card:nth-child(3),
+  .workflow-card:nth-child(3) {
+    animation-delay: 140ms;
+  }
+}
+
+@keyframes srhFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1180px) {
+  .marketing-hero,
+  .product-grid,
+  .workflow-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .marketing-hero {
+    min-height: auto;
+    padding-inline: 18px;
+  }
+
+  .hero-visual {
+    min-height: 500px;
+  }
+
+  .product-card {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 980px) {
+  .marketing-site,
+  .tool-shell .super-app {
+    width: min(100% - 22px, 1800px);
+  }
+
+  .marketing-nav {
+    position: static;
+    grid-template-columns: 1fr auto;
+  }
+
+  .marketing-nav nav {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    overflow-x: auto;
+  }
+
+  .tool-shell .super-app {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .super-sidebar {
+    border-radius: 0 24px 24px 0;
+  }
+
+  .workspace-intro {
+    grid-template-columns: 1fr;
+    padding: 28px;
+  }
+}
+
+@media (max-width: 620px) {
+  .marketing-site {
+    width: min(100% - 16px, 1800px);
+  }
+
+  .marketing-nav {
+    min-height: auto;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 16px;
+  }
+
+  .marketing-nav nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    overflow: visible;
+  }
+
+  .marketing-nav nav a {
+    min-width: 0;
+    text-align: center;
+  }
+
+  .marketing-brand span {
+    font-size: 18px;
+  }
+
+  .nav-cta {
+    min-height: 42px;
+    padding: 0 13px;
+    font-size: 13px;
+  }
+
+  .marketing-hero {
+    gap: 24px;
+    padding: 52px 6px 34px;
+  }
+
+  .marketing-hero h1 {
+    font-size: clamp(42px, 14vw, 64px);
+  }
+
+  .hero-actions a {
+    width: 100%;
+  }
+
+  .hero-stats {
+    gap: 14px;
+  }
+
+  .hero-stats span {
+    flex: 1 1 100%;
+  }
+
+  .hero-visual {
+    min-height: 390px;
+  }
+
+  .preview-body {
+    min-height: 330px;
+    padding: 24px;
+  }
+
+  .label-card {
+    width: 90%;
+    min-height: 132px;
+    padding: 18px;
+  }
+
+  .label-card i {
+    margin-top: 18px;
+    font-size: 22px;
+  }
+
+  .floating-chip {
+    position: static;
+    width: fit-content;
+    margin-top: 12px;
+  }
+
+  .marketing-section,
+  .workflow-section {
+    padding: 48px 0;
+  }
+
+  .product-card {
+    padding: 24px;
+  }
+
+  .workflow-card {
+    border-radius: 20px;
+  }
+
+  .workspace-intro {
+    border-radius: 22px;
+    padding: 24px;
+  }
 }
