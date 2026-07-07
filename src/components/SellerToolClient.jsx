@@ -393,8 +393,16 @@ const processingCopy = {
     downloadCombined: "Combined PDF",
     printCombined: "Print combined",
     outputActions: "Print & download",
-    outputActionsHint: "Direct output for the selected sort order. Courier-wise advanced batches are below.",
+    outputActionsHint: "Choose quantity group, output type, and printer once. Then download or print.",
     advancedBatches: "Courier-wise advanced batches",
+    quantityGroup: "Quantity group",
+    outputType: "Output type",
+    croppedShipping: "Split: shipping only",
+    croppedBilling: "Split: billing only",
+    croppedCombined: "Split: shipping + billing",
+    noCropLayout: "No crop: print layout",
+    outputReady: "Ready output",
+    outputReadyHint: "Uses your selected sorting and quantity group.",
     courierGroups: "Courier-wise label actions",
     allCouriers: "All couriers",
     singleQty: "Qty 1",
@@ -474,8 +482,16 @@ const processingCopy = {
     downloadCombined: "Combined PDF",
     printCombined: "Combined print",
     outputActions: "Print & download",
-    outputActionsHint: "Selected sort order ke हिसाब से direct output. Courier-wise advanced batches नीचे हैं.",
+    outputActionsHint: "Quantity group, output type aur printer ek baar select करो. फिर download या print करो.",
     advancedBatches: "Courier-wise advanced batches",
+    quantityGroup: "Quantity group",
+    outputType: "Output type",
+    croppedShipping: "Split: shipping only",
+    croppedBilling: "Split: billing only",
+    croppedCombined: "Split: shipping + billing",
+    noCropLayout: "No crop: print layout",
+    outputReady: "Ready output",
+    outputReadyHint: "Selected sorting aur quantity group use होगा.",
     courierGroups: "Courier-wise label actions",
     allCouriers: "All couriers",
     singleQty: "Qty 1",
@@ -4463,7 +4479,7 @@ function LabelProcessingTool() {
                   </div>
                   <span>{sortedItems.length} labels</span>
                 </div>
-                <CourierActionCard
+                <LabelOutputSetup
                   title={t.allCouriers}
                   rows={sortedItems}
                   t={t}
@@ -4501,7 +4517,7 @@ function LabelProcessingTool() {
                   <span>{group.courier}</span>
                   <em>{group.rows.length} labels</em>
                 </summary>
-                <CourierActionCard
+                <LabelOutputSetup
                   title={group.courier}
                   rows={group.rows}
                   t={t}
@@ -4521,17 +4537,60 @@ function LabelProcessingTool() {
   );
 }
 
-function CourierActionCard({ title, rows, t, busy, onAction, platform, featured = false, compact = false }) {
+function LabelOutputSetup({ title, rows, t, busy, onAction, platform }) {
   const groups = splitByQuantity(rows);
-  const options = [
+  const [quantityGroup, setQuantityGroup] = useState("all");
+  const [outputType, setOutputType] = useState(platform === "meesho" ? "shipping" : "shipping");
+  const [layoutSection, setLayoutSection] = useState("full");
+  const [printerType, setPrinterType] = useState("normal");
+  const [normalLayout, setNormalLayout] = useState("4");
+  const [thermalLayout, setThermalLayout] = useState("4x6");
+  const quantityOptions = [
+    { key: "all", label: t.allLabels, rows: groups.all },
     { key: "single", label: t.singleQty, rows: groups.single },
     { key: "multi", label: t.multiQty, rows: groups.multi },
-    { key: "all", label: t.allLabels, rows: groups.all },
   ];
+  const selectedOption = quantityOptions.find((option) => option.key === quantityGroup) || quantityOptions[0];
   const pieces = rows.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
+  const disabled = busy || !selectedOption.rows.length;
+  const selectedLayout = printerType === "thermal" ? thermalLayout : normalLayout;
+  const outputOptions = platform === "meesho"
+    ? [
+        { key: "shipping", label: t.croppedShipping },
+        { key: "billing", label: t.croppedBilling },
+        { key: "combined", label: t.croppedCombined },
+        { key: "layout", label: t.noCropLayout },
+        { key: "picklist", label: t.downloadPicklist },
+      ]
+    : [
+        { key: "shipping", label: t.croppedShipping },
+        { key: "billing", label: t.croppedBilling },
+        { key: "combined", label: t.croppedCombined },
+        { key: "picklist", label: t.downloadPicklist },
+      ];
+
+  const getOutputKind = () => {
+    if (platform === "meesho") {
+      if (outputType === "shipping") return meeshoOutputKind("shipping", "1");
+      if (outputType === "billing") return meeshoOutputKind("billing", "1");
+      if (outputType === "combined") return meeshoOutputKind("full", "1");
+      if (outputType === "layout") return meeshoOutputKind(layoutSection, selectedLayout);
+      return "labels";
+    }
+    if (outputType === "shipping" || outputType === "billing") return outputType;
+    return "labels";
+  };
+
+  const runConfiguredAction = (action) => {
+    if (outputType === "picklist") {
+      onAction(selectedOption.rows, "picklist", title, selectedOption.label);
+      return;
+    }
+    onAction(selectedOption.rows, action, title, selectedOption.label, getOutputKind());
+  };
 
   return (
-    <article className={`${featured ? "courier-action-card featured" : "courier-action-card"} ${compact ? "compact" : ""}`}>
+    <article className="label-output-setup">
       <div className="courier-card-head">
         <div>
           <h3>{title}</h3>
@@ -4539,87 +4598,28 @@ function CourierActionCard({ title, rows, t, busy, onAction, platform, featured 
         </div>
         <span>{groups.multi.length} multi qty</span>
       </div>
-      <div className="qty-action-grid">
-        {options.map((option) => (
-          <div className="qty-action-group" key={option.key}>
-            <strong>{option.label}</strong>
-            <small>{option.rows.length ? `${option.rows.length} labels` : t.noSubset}</small>
-            <div className="mini-action-row">
-              {platform === "flipkart" ? (
-                <>
-                  <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "download", title, option.label, "shipping")}>
-                    <Download size={15} /> {t.downloadShipping}
-                  </button>
-                  <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "download", title, option.label, "billing")}>
-                    <Download size={15} /> {t.downloadBilling}
-                  </button>
-                  <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "print", title, option.label, "shipping")}>
-                    <Printer size={15} /> {t.printShipping}
-                  </button>
-                  <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "print", title, option.label, "billing")}>
-                    <Printer size={15} /> {t.printBilling}
-                  </button>
-                </>
-              ) : (
-                <MeeshoActionControls
-                  option={option}
-                  title={title}
-                  t={t}
-                  busy={busy}
-                  onAction={onAction}
-                />
-              )}
-              <button disabled={busy || !option.rows.length} onClick={() => onAction(option.rows, "picklist", title, option.label)}>
-                <ClipboardList size={15} /> {t.downloadPicklist}
-              </button>
-            </div>
-          </div>
-        ))}
+      <div className="output-setup-grid">
+        <label>
+          <span>{t.quantityGroup}</span>
+          <select value={quantityGroup} onChange={(event) => setQuantityGroup(event.target.value)} disabled={busy}>
+            {quantityOptions.map((option) => (
+              <option key={option.key} value={option.key}>
+                {option.label} ({option.rows.length})
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>{t.outputType}</span>
+          <select value={outputType} onChange={(event) => setOutputType(event.target.value)} disabled={busy}>
+            {outputOptions.map((option) => (
+              <option key={option.key} value={option.key}>{option.label}</option>
+            ))}
+          </select>
+        </label>
       </div>
-    </article>
-  );
-}
-
-function MeeshoActionControls({ option, title, t, busy, onAction }) {
-  const [layoutSection, setLayoutSection] = useState("full");
-  const [printerType, setPrinterType] = useState("normal");
-  const [normalLayout, setNormalLayout] = useState("4");
-  const [thermalLayout, setThermalLayout] = useState("4x6");
-  const selectedLayout = printerType === "thermal" ? thermalLayout : normalLayout;
-  const outputKind = meeshoOutputKind(layoutSection, selectedLayout);
-  const disabled = busy || !option.rows.length;
-
-  return (
-    <>
-      <div className="meesho-output-block">
-        <strong>{t.standardOutputs}</strong>
-        <small>{t.standardOutputHint}</small>
-        <div className="mini-action-row two-col">
-          <button disabled={disabled} onClick={() => onAction(option.rows, "download", title, option.label, meeshoOutputKind("shipping", "1"))}>
-            <Download size={15} /> {t.downloadShipping}
-          </button>
-          <button disabled={disabled} onClick={() => onAction(option.rows, "print", title, option.label, meeshoOutputKind("shipping", "1"))}>
-            <Printer size={15} /> {t.printShipping}
-          </button>
-          <button disabled={disabled} onClick={() => onAction(option.rows, "download", title, option.label, meeshoOutputKind("billing", "1"))}>
-            <Download size={15} /> {t.downloadBilling}
-          </button>
-          <button disabled={disabled} onClick={() => onAction(option.rows, "print", title, option.label, meeshoOutputKind("billing", "1"))}>
-            <Printer size={15} /> {t.printBilling}
-          </button>
-          <button disabled={disabled} onClick={() => onAction(option.rows, "download", title, option.label, meeshoOutputKind("full", "1"))}>
-            <Download size={15} /> {t.downloadCombined}
-          </button>
-          <button disabled={disabled} onClick={() => onAction(option.rows, "print", title, option.label, meeshoOutputKind("full", "1"))}>
-            <Printer size={15} /> {t.printCombined}
-          </button>
-        </div>
-      </div>
-
-      <div className="meesho-output-block">
-        <strong>{t.layoutOutputs}</strong>
-        <small>{t.layoutOutputHint}</small>
-        <div className="mini-select-row two-col">
+      {platform === "meesho" && outputType === "layout" ? (
+        <div className="output-setup-grid output-layout-grid">
           <label>
             <span>{t.labelPart}</span>
             <select value={layoutSection} onChange={(event) => setLayoutSection(event.target.value)} disabled={disabled}>
@@ -4652,16 +4652,28 @@ function MeeshoActionControls({ option, title, t, busy, onAction }) {
             )}
           </label>
         </div>
-        <div className="mini-action-row two-col">
-          <button disabled={disabled} onClick={() => onAction(option.rows, "download", title, option.label, outputKind)}>
-            <Download size={15} /> {t.downloadPdf}
-          </button>
-          <button disabled={disabled} onClick={() => onAction(option.rows, "print", title, option.label, outputKind)}>
-            <Printer size={15} /> {t.printPdf}
-          </button>
+      ) : null}
+      <div className="output-ready-line">
+        <div>
+          <strong>{t.outputReady}</strong>
+          <small>{selectedOption.rows.length ? `${selectedOption.rows.length} labels selected · ${t.outputReadyHint}` : t.noSubset}</small>
         </div>
+        {outputType === "picklist" ? (
+          <button disabled={disabled} onClick={() => runConfiguredAction("download")}>
+            <ClipboardList size={15} /> {t.downloadPicklist}
+          </button>
+        ) : (
+          <div className="output-final-actions">
+            <button disabled={disabled} onClick={() => runConfiguredAction("download")}>
+              <Download size={15} /> {t.downloadPdf}
+            </button>
+            <button disabled={disabled} onClick={() => runConfiguredAction("print")}>
+              <Printer size={15} /> {t.printPdf}
+            </button>
+          </div>
+        )}
       </div>
-    </>
+    </article>
   );
 }
 
