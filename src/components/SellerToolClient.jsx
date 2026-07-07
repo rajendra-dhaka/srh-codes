@@ -334,11 +334,6 @@ const processingCopy = {
     amazonItems: "Line items",
     amazonPreview: "Line item preview",
     amazonHelp: "Upload Amazon Print Documents PDF. The tool separates shipping and billing pages using page text markers like Ship To, AWB, Order ID, and Tax Invoice, so multi-page invoices stay attached to the right shipping label.",
-    labelPart: "Label part",
-    fullLabel: "Full label",
-    shippingOnly: "Shipping only",
-    billingOnly: "Billing only",
-    combinedLabel: "Combined",
     layout: "Layout",
     printerType: "Printer type",
     normalPrinter: "Normal printer",
@@ -357,13 +352,17 @@ const processingCopy = {
     outputActionsHint: "Choose quantity group, output type, and printer once. Then download or print.",
     advancedBatches: "Courier-wise advanced batches",
     quantityGroup: "Quantity group",
-    outputType: "Output type",
+    outputMode: "Label format",
+    cropLabels: "Crop labels",
+    keepFullLabels: "Keep full labels",
+    cropOutput: "Crop output",
+    outputType: "Crop output",
     chooseOutput: "Choose output",
     chooseOutputHint: "Select this before processing. The generated PDF will follow these settings.",
-    croppedShipping: "Split: shipping only",
-    croppedBilling: "Split: billing only",
-    croppedCombined: "Split: shipping + billing",
-    noCropLayout: "No crop: print layout",
+    croppedShipping: "Shipping only",
+    croppedBilling: "Billing only",
+    croppedCombined: "Shipping + billing",
+    noCropLayout: "Full-label print layout",
     outputReady: "Ready output",
     outputReadyHint: "Uses your selected sorting and quantity group.",
     courierGroups: "Courier-wise label actions",
@@ -425,11 +424,6 @@ const processingCopy = {
     amazonItems: "Line items",
     amazonPreview: "Line item preview",
     amazonHelp: "Amazon Print Documents PDF upload करो. Tool Ship To, AWB, Order ID और Tax Invoice जैसे markers से shipping और billing pages separate करता है, इसलिए multi-page invoice सही shipping label के साथ रहता है.",
-    labelPart: "Label part",
-    fullLabel: "Full label",
-    shippingOnly: "Shipping only",
-    billingOnly: "Billing only",
-    combinedLabel: "Combined",
     layout: "Layout",
     printerType: "Printer type",
     normalPrinter: "Normal printer",
@@ -448,13 +442,17 @@ const processingCopy = {
     outputActionsHint: "Quantity group, output type aur printer ek baar select करो. फिर download या print करो.",
     advancedBatches: "Courier-wise advanced batches",
     quantityGroup: "Quantity group",
-    outputType: "Output type",
+    outputMode: "Label format",
+    cropLabels: "Labels crop करो",
+    keepFullLabels: "Full labels रखो",
+    cropOutput: "Crop output",
+    outputType: "Crop output",
     chooseOutput: "Output choose करो",
     chooseOutputHint: "Process से पहले select करो. Generated PDF इन्हीं settings से बनेगा.",
-    croppedShipping: "Split: shipping only",
-    croppedBilling: "Split: billing only",
-    croppedCombined: "Split: shipping + billing",
-    noCropLayout: "No crop: print layout",
+    croppedShipping: "Shipping only",
+    croppedBilling: "Billing only",
+    croppedCombined: "Shipping + billing",
+    noCropLayout: "Full-label print layout",
     outputReady: "Ready output",
     outputReadyHint: "Selected sorting aur quantity group use होगा.",
     courierGroups: "Courier-wise label actions",
@@ -4089,8 +4087,8 @@ function LabelProcessingTool() {
   const [uploadInputKey, setUploadInputKey] = useState(0);
   const [labelSortMode, setLabelSortMode] = useState("auto");
   const [labelQuantityGroup, setLabelQuantityGroup] = useState("all");
-  const [labelOutputType, setLabelOutputType] = useState("shipping");
-  const [labelLayoutSection, setLabelLayoutSection] = useState("full");
+  const [labelOutputMode, setLabelOutputMode] = useState("crop");
+  const [labelOutputType, setLabelOutputType] = useState("combined");
   const [labelPrinterType, setLabelPrinterType] = useState("normal");
   const [labelNormalLayout, setLabelNormalLayout] = useState("4");
   const [labelThermalLayout, setLabelThermalLayout] = useState("4x6");
@@ -4116,27 +4114,27 @@ function LabelProcessingTool() {
       : labelQuantityGroup === "multi"
         ? groups.multi
         : groups.all;
-    if (platform === "meesho" && labelOutputType === "billing") {
+    if (platform === "meesho" && labelOutputMode === "crop" && labelOutputType === "billing") {
       return selected.filter((item) => item.taxInvoiceBox);
     }
     return selected;
   };
   const getConfiguredOutputKind = () => {
     if (platform === "meesho") {
+      if (labelOutputMode === "layout") {
+        const layout = labelPrinterType === "thermal" ? labelThermalLayout : labelNormalLayout;
+        return meeshoOutputKind("full", layout);
+      }
       if (labelOutputType === "shipping") return meeshoOutputKind("shipping", "1");
       if (labelOutputType === "billing") return meeshoOutputKind("billing", "1");
       if (labelOutputType === "combined") return meeshoOutputKind("full", "1");
-      if (labelOutputType === "layout") {
-        const layout = labelPrinterType === "thermal" ? labelThermalLayout : labelNormalLayout;
-        return meeshoOutputKind(labelLayoutSection, layout);
-      }
       return "labels";
     }
     if (labelOutputType === "shipping" || labelOutputType === "billing") return labelOutputType;
     return "labels";
   };
   const quantityLabel = labelQuantityGroup === "single" ? t.singleQty : labelQuantityGroup === "multi" ? t.multiQty : t.allLabels;
-  const selectedOutputRows = useMemo(() => getConfiguredRows(sortedItems), [sortedItems, labelQuantityGroup]);
+  const selectedOutputRows = useMemo(() => getConfiguredRows(sortedItems), [sortedItems, labelQuantityGroup, labelOutputMode, labelOutputType]);
 
   const onFiles = (selectedFiles) => {
     const pdfFiles = Array.from(selectedFiles || []).filter((file) => /\.pdf$/i.test(file.name) || file.type === "application/pdf");
@@ -4219,7 +4217,7 @@ function LabelProcessingTool() {
 
   const runConfiguredOutputAction = (rows, action, scopeName = t.allCouriers) => {
     const selectedRows = getConfiguredRows(rows);
-    if (labelOutputType === "picklist") {
+    if (labelOutputMode === "crop" && labelOutputType === "picklist") {
       runOutputAction(selectedRows, "picklist", scopeName, quantityLabel);
       return;
     }
@@ -4286,7 +4284,8 @@ function LabelProcessingTool() {
               setItems([]);
               setError("");
               setToast("");
-              setLabelOutputType("shipping");
+              setLabelOutputMode("crop");
+              setLabelOutputType("combined");
               setUploadInputKey((key) => key + 1);
             }}>
               {marketplaceIcons[id] ? <img src={marketplaceIcons[id]} alt="" /> : null}
@@ -4482,10 +4481,10 @@ function LabelProcessingTool() {
               platform={platform}
               quantityGroup={labelQuantityGroup}
               setQuantityGroup={setLabelQuantityGroup}
+              outputMode={labelOutputMode}
+              setOutputMode={setLabelOutputMode}
               outputType={labelOutputType}
               setOutputType={setLabelOutputType}
-              layoutSection={labelLayoutSection}
-              setLayoutSection={setLabelLayoutSection}
               printerType={labelPrinterType}
               setPrinterType={setLabelPrinterType}
               normalLayout={labelNormalLayout}
@@ -4525,6 +4524,7 @@ function LabelProcessingTool() {
                   t={t}
                   rows={selectedOutputRows}
                   busy={busy}
+                  outputMode={labelOutputMode}
                   outputType={labelOutputType}
                   onAction={(action) => runConfiguredOutputAction(sortedItems, action, t.allCouriers)}
                 />
@@ -4561,6 +4561,7 @@ function LabelProcessingTool() {
                   t={t}
                   rows={getConfiguredRows(group.rows)}
                   busy={busy}
+                  outputMode={labelOutputMode}
                   outputType={labelOutputType}
                   onAction={(action) => runConfiguredOutputAction(group.rows, action, group.courier)}
                 />
@@ -4580,10 +4581,10 @@ function LabelOutputOptions({
   platform,
   quantityGroup,
   setQuantityGroup,
+  outputMode,
+  setOutputMode,
   outputType,
   setOutputType,
-  layoutSection,
-  setLayoutSection,
   printerType,
   setPrinterType,
   normalLayout,
@@ -4597,20 +4598,24 @@ function LabelOutputOptions({
     { key: "single", label: t.singleQty },
     { key: "multi", label: t.multiQty },
   ];
-  const outputOptions = platform === "meesho"
+  const formatOptions = platform === "meesho"
     ? [
-        { key: "shipping", label: t.croppedShipping },
-        { key: "billing", label: t.croppedBilling },
-        { key: "combined", label: t.croppedCombined },
-        { key: "layout", label: t.noCropLayout },
-        { key: "picklist", label: t.downloadPicklist },
+        { key: "crop", label: t.cropLabels },
+        { key: "layout", label: t.keepFullLabels },
       ]
-    : [
-        { key: "shipping", label: t.croppedShipping },
-        { key: "billing", label: t.croppedBilling },
-        { key: "combined", label: t.croppedCombined },
-        { key: "picklist", label: t.downloadPicklist },
-      ];
+    : [{ key: "crop", label: t.cropLabels }];
+  const outputOptions = [
+    { key: "combined", label: t.croppedCombined },
+    { key: "shipping", label: t.croppedShipping },
+    { key: "billing", label: t.croppedBilling },
+    { key: "picklist", label: t.downloadPicklist },
+  ];
+  const changeOutputMode = (nextMode) => {
+    setOutputMode(nextMode);
+    if (nextMode === "crop") {
+      setOutputType((current) => current === "picklist" ? "combined" : current);
+    }
+  };
 
   return (
     <div className="label-output-options">
@@ -4628,24 +4633,27 @@ function LabelOutputOptions({
           options={quantityOptions}
           disabled={busy}
         />
-        <OptionRadioGroup
-          title={t.outputType}
-          value={outputType}
-          onChange={setOutputType}
-          options={outputOptions}
-          disabled={busy}
-        />
+        {formatOptions.length > 1 ? (
+          <OptionRadioGroup
+            title={t.outputMode}
+            value={outputMode}
+            onChange={changeOutputMode}
+            options={formatOptions}
+            disabled={busy}
+          />
+        ) : null}
+        {outputMode === "crop" ? (
+          <OptionRadioGroup
+            title={t.cropOutput || t.outputType}
+            value={outputType}
+            onChange={setOutputType}
+            options={outputOptions}
+            disabled={busy}
+          />
+        ) : null}
       </div>
-      {platform === "meesho" && outputType === "layout" ? (
-        <div className="output-setup-grid output-layout-grid">
-          <label>
-            <span>{t.labelPart}</span>
-            <select value={layoutSection} onChange={(event) => setLayoutSection(event.target.value)} disabled={busy}>
-              <option value="full">{t.fullLabel}</option>
-              <option value="shipping">{t.shippingOnly}</option>
-              <option value="billing">{t.billingOnly}</option>
-            </select>
-          </label>
+      {platform === "meesho" && outputMode === "layout" ? (
+        <div className="output-setup-grid output-layout-grid compact-layout-grid">
           <label>
             <span>{t.printerType}</span>
             <select value={printerType} onChange={(event) => setPrinterType(event.target.value)} disabled={busy}>
@@ -4697,7 +4705,7 @@ function OptionRadioGroup({ title, value, onChange, options, disabled }) {
   );
 }
 
-function ReadyOutputActions({ t, rows, busy, outputType, onAction }) {
+function ReadyOutputActions({ t, rows, busy, outputMode, outputType, onAction }) {
   const disabled = busy || !rows.length;
   return (
     <article className="label-output-setup">
@@ -4706,7 +4714,7 @@ function ReadyOutputActions({ t, rows, busy, outputType, onAction }) {
           <strong>{t.outputReady}</strong>
           <small>{rows.length ? `${rows.length} labels selected · ${t.outputReadyHint}` : t.noSubset}</small>
         </div>
-        {outputType === "picklist" ? (
+        {outputMode === "crop" && outputType === "picklist" ? (
           <button disabled={disabled} onClick={() => onAction("download")}>
             <ClipboardList size={15} /> {t.downloadPicklist}
           </button>
