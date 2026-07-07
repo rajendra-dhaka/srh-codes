@@ -105,6 +105,11 @@ const marketplaces = [
   { id: "flipkart", label: "Flipkart" },
   { id: "amazon", label: "Amazon" },
 ];
+const marketplaceIcons = {
+  meesho: "/marketplaces/meesho.png",
+  flipkart: "/marketplaces/flipkart.jpg",
+  amazon: "/marketplaces/amazon.jpg",
+};
 
 const emptyPerformanceData = () => ({
   orders: [],
@@ -4283,7 +4288,10 @@ function LabelProcessingTool() {
               setToast("");
               setLabelOutputType("shipping");
               setUploadInputKey((key) => key + 1);
-            }}>{marketLabel(id)}</button>
+            }}>
+              {marketplaceIcons[id] ? <img src={marketplaceIcons[id]} alt="" /> : null}
+              {marketLabel(id)}
+            </button>
           ))}
         </div>
       </div>

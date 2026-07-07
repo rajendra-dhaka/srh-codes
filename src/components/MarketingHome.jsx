@@ -65,6 +65,12 @@ const products = [
   },
 ];
 
+const marketplaces = [
+  { name: "Meesho", src: "/marketplaces/meesho.png" },
+  { name: "Flipkart", src: "/marketplaces/flipkart.jpg" },
+  { name: "Amazon", src: "/marketplaces/amazon.jpg" },
+];
+
 const workflows = [
   ["Upload PDF", "Drop one or many marketplace label files. Everything runs in the browser.", UploadCloud],
   ["Choose output", "Pick shipping, billing, split, layout, quantity group, picklist, or thermal formats.", Layers3],
@@ -105,6 +111,14 @@ export default function MarketingHome() {
             <span><strong>100%</strong> browser processing</span>
             <span><strong>PDF</strong> print workflows</span>
           </div>
+          <div className="marketplace-strip" aria-label="Supported marketplaces">
+            {marketplaces.map((marketplace) => (
+              <span key={marketplace.name}>
+                <img src={marketplace.src} alt="" />
+                {marketplace.name}
+              </span>
+            ))}
+          </div>
         </div>
 
         <div className="hero-visual" aria-hidden="true">
@@ -131,6 +145,14 @@ export default function MarketingHome() {
       <section id="products" className="marketing-section">
         <div className="section-kicker">{t.products}</div>
         <h2>{t.productsTitle}</h2>
+        <div className="marketplace-card-row">
+          {marketplaces.map((marketplace) => (
+            <article key={marketplace.name}>
+              <img src={marketplace.src} alt={`${marketplace.name} marketplace`} />
+              <span>{marketplace.name}</span>
+            </article>
+          ))}
+        </div>
         <div className="product-grid">
           {products.map(({ icon: Icon, title, eyebrow, text }) => (
             <article className="product-card" key={title}>
