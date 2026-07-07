@@ -377,9 +377,21 @@ const processingCopy = {
     fullLabel: "Full label",
     shippingOnly: "Shipping only",
     billingOnly: "Billing only",
+    combinedLabel: "Combined",
     layout: "Layout",
+    printerType: "Printer type",
+    normalPrinter: "Normal printer",
+    thermalPrinter: "Thermal printer",
+    thermal3x5: "3x5 thermal",
+    thermal4x6: "4x6 thermal",
     onePerPage: "1/page",
     ninePerPage: "9/page",
+    standardOutputs: "Separate/crop",
+    layoutOutputs: "Print layout",
+    standardOutputHint: "One label per page, sorted as selected.",
+    layoutOutputHint: "Fit labels for normal or thermal printers.",
+    downloadCombined: "Combined PDF",
+    printCombined: "Print combined",
     courierGroups: "Courier-wise label actions",
     allCouriers: "All couriers",
     singleQty: "Qty 1",
@@ -443,9 +455,21 @@ const processingCopy = {
     fullLabel: "Full label",
     shippingOnly: "Shipping only",
     billingOnly: "Billing only",
+    combinedLabel: "Combined",
     layout: "Layout",
+    printerType: "Printer type",
+    normalPrinter: "Normal printer",
+    thermalPrinter: "Thermal printer",
+    thermal3x5: "3x5 thermal",
+    thermal4x6: "4x6 thermal",
     onePerPage: "1/page",
     ninePerPage: "9/page",
+    standardOutputs: "Separate/crop",
+    layoutOutputs: "Print layout",
+    standardOutputHint: "Selected sorting ke saath one label per page.",
+    layoutOutputHint: "Normal ya thermal printer ke liye labels fit करो.",
+    downloadCombined: "Combined PDF",
+    printCombined: "Combined print",
     courierGroups: "Courier-wise label actions",
     allCouriers: "All couriers",
     singleQty: "Qty 1",
@@ -2824,6 +2848,26 @@ function sortForPacking(items) {
   });
 }
 
+function sortLabels(items, mode = "auto") {
+  if (mode === "auto") return sortForPacking(items);
+  const keysByMode = {
+    none: [],
+    courier: ["courier", "sku", "qty", "seller"],
+    sku: ["sku", "qty", "courier", "seller"],
+    courierSku: ["courier", "sku", "qty", "seller"],
+    seller: ["seller", "courier", "sku", "qty"],
+    sellerCourierSku: ["seller", "courier", "sku", "qty"],
+  };
+  const keys = keysByMode[mode] || keysByMode.auto || ["courier", "sku", "qty", "seller"];
+  return [...items].sort((a, b) => {
+    for (const key of keys) {
+      const compared = sortKey(a[key]).localeCompare(sortKey(b[key]), "en", { numeric: true });
+      if (compared) return compared;
+    }
+    return a.originalIndex - b.originalIndex;
+  });
+}
+
 async function buildOriginalSortedPdf(items) {
   const output = await PDFDocument.create();
   for (const item of items) {
@@ -3263,11 +3307,12 @@ function meeshoSectionCropBox(item, section = "full") {
 }
 
 function parseMeeshoOutputKind(outputKind) {
-  const match = String(outputKind || "").match(/^meesho:(full|shipping|billing):(\d+)$/);
+  const match = String(outputKind || "").match(/^meesho:(full|shipping|billing):([0-9]+|3x5|4x6)$/);
   if (!match) return null;
   return {
     section: match[1],
-    labelsPerPage: Number(match[2]) || 4,
+    layout: match[2],
+    labelsPerPage: Number(match[2]) || 1,
   };
 }
 
@@ -3275,8 +3320,20 @@ function meeshoOutputKind(section, labelsPerPage) {
   return `meesho:${section}:${labelsPerPage}`;
 }
 
-async function buildMeeshoOutputPdf(items, section = "full", labelsPerPage = 4) {
+async function buildMeeshoOutputPdf(items, section = "full", labelsPerPage = 4, layoutKey = String(labelsPerPage || "4")) {
   const output = await PDFDocument.create();
+  const thermalSizes = {
+    "3x5": { width: 216, height: 360 },
+    "4x6": { width: 288, height: 432 },
+  };
+  if (thermalSizes[layoutKey]) {
+    const target = thermalSizes[layoutKey];
+    for (const item of items) {
+      const cropBox = meeshoSectionCropBox(item, section);
+      await addCroppedPage(output, item.page, cropBox, target);
+    }
+    return output.save();
+  }
   if (labelsPerPage === 1) {
     for (const item of items) {
       const cropBox = meeshoSectionCropBox(item, section);
@@ -4033,8 +4090,9 @@ function LabelProcessingTool() {
   const [amazonInfoMode, setAmazonInfoMode] = useState("sku");
   const [amazonSortBySku, setAmazonSortBySku] = useState(true);
   const [uploadInputKey, setUploadInputKey] = useState(0);
+  const [labelSortMode, setLabelSortMode] = useState("auto");
 
-  const sortedItems = useMemo(() => sortForPacking(items), [items]);
+  const sortedItems = useMemo(() => sortLabels(items, labelSortMode), [items, labelSortMode]);
   const courierGroups = useMemo(() => groupItemsByCourier(sortedItems), [sortedItems]);
   const amazonOrders = useMemo(() => platform === "amazon" ? pairAmazonOrders(items) : [], [items, platform]);
   const counts = useMemo(() => ({
@@ -4086,7 +4144,7 @@ function LabelProcessingTool() {
     setBusy(true);
     setError("");
     try {
-      const sorted = sortForPacking(rows);
+      const sorted = sortLabels(rows, labelSortMode);
       const scope = safeFilename(scopeName);
       const subset = safeFilename(subsetName);
       if (action === "picklist") {
@@ -4097,12 +4155,12 @@ function LabelProcessingTool() {
       } else {
         const meeshoOutput = platform === "meesho" ? parseMeeshoOutputKind(outputKind) : null;
         const bytes = meeshoOutput
-          ? await buildMeeshoOutputPdf(sorted, meeshoOutput.section, meeshoOutput.labelsPerPage)
+          ? await buildMeeshoOutputPdf(sorted, meeshoOutput.section, meeshoOutput.labelsPerPage, meeshoOutput.layout)
           : platform === "flipkart" && outputKind !== "labels"
             ? await buildFlipkartCroppedPdf(sorted, outputKind)
             : await buildOriginalSortedPdf(sorted);
         const filename = meeshoOutput
-          ? `${scope}-${subset}-${meeshoOutput.section}-${meeshoOutput.labelsPerPage}-per-page-labels.pdf`
+          ? `${scope}-${subset}-${meeshoOutput.section}-${meeshoOutput.layout}-labels.pdf`
           : platform === "flipkart" && outputKind !== "labels"
             ? `${scope}-${subset}-${outputKind}.pdf`
             : `${scope}-${subset}-labels.pdf`;
@@ -4362,6 +4420,18 @@ function LabelProcessingTool() {
             <em>{files.length ? files.map((file) => file.name).join(", ") : t.uploadHint} <HelpTip text={t.uploadHelp} /></em>
           </label>
 
+          <label className="label-sort-control">
+            <span>{t.sortBy}</span>
+            <select value={labelSortMode} onChange={(event) => setLabelSortMode(event.target.value)}>
+              <option value="auto">{t.none}</option>
+              <option value="courier">{t.courier}</option>
+              <option value="sku">{t.sku}</option>
+              <option value="courierSku">{t.courierSku}</option>
+              <option value="seller">{t.seller}</option>
+              <option value="sellerCourierSku">{t.sellerCourierSku}</option>
+            </select>
+          </label>
+
           {error && <div className="error"><AlertTriangle size={18} />{error}</div>}
           <button className="primary-action label-process" onClick={analyze} disabled={busy}>
             {busy ? t.analyzing : t.analyze}
@@ -4485,38 +4555,86 @@ function CourierActionCard({ title, rows, t, busy, onAction, platform, featured 
 }
 
 function MeeshoActionControls({ option, title, t, busy, onAction }) {
-  const [section, setSection] = useState("full");
-  const [labelsPerPage, setLabelsPerPage] = useState("4");
-  const outputKind = meeshoOutputKind(section, labelsPerPage);
+  const [layoutSection, setLayoutSection] = useState("full");
+  const [printerType, setPrinterType] = useState("normal");
+  const [normalLayout, setNormalLayout] = useState("4");
+  const [thermalLayout, setThermalLayout] = useState("4x6");
+  const selectedLayout = printerType === "thermal" ? thermalLayout : normalLayout;
+  const outputKind = meeshoOutputKind(layoutSection, selectedLayout);
   const disabled = busy || !option.rows.length;
 
   return (
     <>
-      <div className="mini-select-row">
-        <label>
-          <span>{t.labelPart}</span>
-          <select value={section} onChange={(event) => setSection(event.target.value)} disabled={disabled}>
-            <option value="full">{t.fullLabel}</option>
-            <option value="shipping">{t.shippingOnly}</option>
-            <option value="billing">{t.billingOnly}</option>
-          </select>
-        </label>
-        <label>
-          <span>{t.layout}</span>
-          <select value={labelsPerPage} onChange={(event) => setLabelsPerPage(event.target.value)} disabled={disabled}>
-            <option value="1">{t.onePerPage}</option>
-            <option value="4">{t.downloadFour}</option>
-            <option value="6">{t.downloadSix}</option>
-            <option value="9">{t.ninePerPage}</option>
-          </select>
-        </label>
+      <div className="meesho-output-block">
+        <strong>{t.standardOutputs}</strong>
+        <small>{t.standardOutputHint}</small>
+        <div className="mini-action-row two-col">
+          <button disabled={disabled} onClick={() => onAction(option.rows, "download", title, option.label, meeshoOutputKind("shipping", "1"))}>
+            <Download size={15} /> {t.downloadShipping}
+          </button>
+          <button disabled={disabled} onClick={() => onAction(option.rows, "print", title, option.label, meeshoOutputKind("shipping", "1"))}>
+            <Printer size={15} /> {t.printShipping}
+          </button>
+          <button disabled={disabled} onClick={() => onAction(option.rows, "download", title, option.label, meeshoOutputKind("billing", "1"))}>
+            <Download size={15} /> {t.downloadBilling}
+          </button>
+          <button disabled={disabled} onClick={() => onAction(option.rows, "print", title, option.label, meeshoOutputKind("billing", "1"))}>
+            <Printer size={15} /> {t.printBilling}
+          </button>
+          <button disabled={disabled} onClick={() => onAction(option.rows, "download", title, option.label, meeshoOutputKind("full", "1"))}>
+            <Download size={15} /> {t.downloadCombined}
+          </button>
+          <button disabled={disabled} onClick={() => onAction(option.rows, "print", title, option.label, meeshoOutputKind("full", "1"))}>
+            <Printer size={15} /> {t.printCombined}
+          </button>
+        </div>
       </div>
-      <button disabled={disabled} onClick={() => onAction(option.rows, "download", title, option.label, outputKind)}>
-        <Download size={15} /> {t.downloadPdf}
-      </button>
-      <button disabled={disabled} onClick={() => onAction(option.rows, "print", title, option.label, outputKind)}>
-        <Printer size={15} /> {t.printPdf}
-      </button>
+
+      <div className="meesho-output-block">
+        <strong>{t.layoutOutputs}</strong>
+        <small>{t.layoutOutputHint}</small>
+        <div className="mini-select-row two-col">
+          <label>
+            <span>{t.labelPart}</span>
+            <select value={layoutSection} onChange={(event) => setLayoutSection(event.target.value)} disabled={disabled}>
+              <option value="full">{t.fullLabel}</option>
+              <option value="shipping">{t.shippingOnly}</option>
+              <option value="billing">{t.billingOnly}</option>
+            </select>
+          </label>
+          <label>
+            <span>{t.printerType}</span>
+            <select value={printerType} onChange={(event) => setPrinterType(event.target.value)} disabled={disabled}>
+              <option value="normal">{t.normalPrinter}</option>
+              <option value="thermal">{t.thermalPrinter}</option>
+            </select>
+          </label>
+          <label>
+            <span>{t.layout}</span>
+            {printerType === "thermal" ? (
+              <select value={thermalLayout} onChange={(event) => setThermalLayout(event.target.value)} disabled={disabled}>
+                <option value="3x5">{t.thermal3x5}</option>
+                <option value="4x6">{t.thermal4x6}</option>
+              </select>
+            ) : (
+              <select value={normalLayout} onChange={(event) => setNormalLayout(event.target.value)} disabled={disabled}>
+                <option value="1">{t.onePerPage}</option>
+                <option value="4">{t.downloadFour}</option>
+                <option value="6">{t.downloadSix}</option>
+                <option value="9">{t.ninePerPage}</option>
+              </select>
+            )}
+          </label>
+        </div>
+        <div className="mini-action-row two-col">
+          <button disabled={disabled} onClick={() => onAction(option.rows, "download", title, option.label, outputKind)}>
+            <Download size={15} /> {t.downloadPdf}
+          </button>
+          <button disabled={disabled} onClick={() => onAction(option.rows, "print", title, option.label, outputKind)}>
+            <Printer size={15} /> {t.printPdf}
+          </button>
+        </div>
+      </div>
     </>
   );
 }

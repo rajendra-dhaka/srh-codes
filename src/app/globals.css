@@ -2426,7 +2426,7 @@ main {
 
 .qty-action-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 10px;
 }
 
@@ -2465,6 +2465,11 @@ main {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 7px;
+}
+
+.mini-select-row.two-col,
+.mini-action-row.two-col {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .mini-select-row label {
@@ -2512,6 +2517,57 @@ main {
 .mini-action-row button:disabled {
   cursor: not-allowed;
   opacity: 0.48;
+}
+
+.label-sort-control {
+  display: grid;
+  gap: 7px;
+  border: 1px solid #d9e4f2;
+  border-radius: 8px;
+  background: #fbfdff;
+  padding: 12px;
+}
+
+.label-sort-control span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.label-sort-control select {
+  width: 100%;
+  border: 1px solid #d9e4f2;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #17324d;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.meesho-output-block {
+  display: grid;
+  gap: 8px;
+  border: 1px solid #e5edf6;
+  border-radius: 8px;
+  background: #f8fbff;
+  padding: 9px;
+}
+
+.meesho-output-block + .meesho-output-block {
+  margin-top: 10px;
+}
+
+.meesho-output-block > strong {
+  color: #17324d;
+  font-size: 13px;
+}
+
+.meesho-output-block > small {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 800;
 }
 
 .count-row strong {
@@ -3730,11 +3786,15 @@ tr:nth-child(even) td {
 .theme-dark .print-modal,
 .theme-dark .courier-action-card,
 .theme-dark .qty-action-group,
+.theme-dark .label-sort-control,
+.theme-dark .meesho-output-block,
 .theme-dark .split-options button,
 .theme-dark .layout-select,
 .theme-dark .workflow-note,
 .theme-dark .download-grid button,
 .theme-dark .mini-action-row button,
+.theme-dark .label-sort-control select,
+.theme-dark .mini-select-row select,
 .theme-dark .business-hero,
 .theme-dark .tabs,
 .theme-dark .kpi,
