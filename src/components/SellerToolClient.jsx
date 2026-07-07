@@ -3082,13 +3082,28 @@ function wrapPdfText(text, maxChars = 70, maxLines = 2) {
   return lines.slice(0, maxLines);
 }
 
+function drawThermalBoldText(page, text, options) {
+  const offsets = [
+    [0, 0],
+    [0.24, 0],
+    [0, 0.16],
+  ];
+  offsets.forEach(([dx, dy]) => {
+    page.drawText(text, {
+      ...options,
+      x: options.x + dx,
+      y: options.y + dy,
+    });
+  });
+}
+
 function drawAmazonInfoBox(page, fonts, order, mode) {
   if (mode === "clean") return;
   const { width, height } = page.getSize();
   const x = 44;
   const boxWidth = width - 88;
   const noteLines = amazonPackingNoteLines(order, mode);
-  const bodyLineHeight = mode === "description" ? 13.6 : 10.2;
+  const bodyLineHeight = mode === "description" ? 14.2 : 12.4;
   const boxHeight = 22 + noteLines.length * bodyLineHeight;
   const y = Math.max(152, Math.min(164, height * 0.19));
   page.drawRectangle({
@@ -3117,11 +3132,11 @@ function drawAmazonInfoBox(page, fonts, order, mode) {
   });
 
   noteLines.forEach((line, index) => {
-    page.drawText(line, {
+    drawThermalBoldText(page, line, {
       x: x + 10,
-      y: y + boxHeight - 25.5 - index * bodyLineHeight,
-      size: mode === "description" ? (line.length > 132 ? 9.8 : line.length > 112 ? 10.2 : 10.7) : 7.6,
-      font: mode === "description" || line.startsWith("+") ? fonts.bold : fonts.regular,
+      y: y + boxHeight - 26 - index * bodyLineHeight,
+      size: mode === "description" ? (line.length > 132 ? 10.2 : line.length > 112 ? 10.6 : 11.1) : 9.6,
+      font: fonts.bold,
       color: rgb(0, 0, 0),
     });
   });
@@ -4017,6 +4032,7 @@ function LabelProcessingTool() {
   const [toast, setToast] = useState("");
   const [amazonInfoMode, setAmazonInfoMode] = useState("sku");
   const [amazonSortBySku, setAmazonSortBySku] = useState(true);
+  const [uploadInputKey, setUploadInputKey] = useState(0);
 
   const sortedItems = useMemo(() => sortForPacking(items), [items]);
   const courierGroups = useMemo(() => groupItemsByCourier(sortedItems), [sortedItems]);
@@ -4172,6 +4188,7 @@ function LabelProcessingTool() {
               setItems([]);
               setError("");
               setToast("");
+              setUploadInputKey((key) => key + 1);
             }}>{marketLabel(id)}</button>
           ))}
         </div>
@@ -4181,7 +4198,16 @@ function LabelProcessingTool() {
         <section className="processing-layout amazon-processing-layout">
           <div className="label-workbench amazon-label-workbench">
             <label className="label-dropzone compact">
-              <input type="file" accept="application/pdf,.pdf" multiple onChange={(e) => onFiles(e.target.files)} />
+              <input
+                key={`amazon-${uploadInputKey}`}
+                type="file"
+                accept="application/pdf,.pdf"
+                multiple
+                onClick={(event) => {
+                  event.currentTarget.value = "";
+                }}
+                onChange={(e) => onFiles(e.target.files)}
+              />
               <span className="label-drop-icon"><Upload size={26} /></span>
               <strong>{files.length ? `${files.length} Amazon PDF file${files.length > 1 ? "s" : ""} selected` : t.uploadTitle}</strong>
               <em>{files.length ? files.map((file) => file.name).join(", ") : "Upload Amazon Print Documents PDF"} <HelpTip text={t.amazonHelp} /></em>
@@ -4321,7 +4347,16 @@ function LabelProcessingTool() {
       <section className="processing-layout">
         <div className="label-workbench">
           <label className="label-dropzone compact">
-            <input type="file" accept="application/pdf,.pdf" multiple onChange={(e) => onFiles(e.target.files)} />
+            <input
+              key={`${platform}-${uploadInputKey}`}
+              type="file"
+              accept="application/pdf,.pdf"
+              multiple
+              onClick={(event) => {
+                event.currentTarget.value = "";
+              }}
+              onChange={(e) => onFiles(e.target.files)}
+            />
             <span className="label-drop-icon"><Upload size={26} /></span>
             <strong>{files.length ? `${files.length} PDF file${files.length > 1 ? "s" : ""} selected` : t.uploadTitle}</strong>
             <em>{files.length ? files.map((file) => file.name).join(", ") : t.uploadHint} <HelpTip text={t.uploadHelp} /></em>
