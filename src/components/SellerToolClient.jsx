@@ -392,6 +392,9 @@ const processingCopy = {
     layoutOutputHint: "Fit labels for normal or thermal printers.",
     downloadCombined: "Combined PDF",
     printCombined: "Print combined",
+    outputActions: "Print & download",
+    outputActionsHint: "Direct output for the selected sort order. Courier-wise advanced batches are below.",
+    advancedBatches: "Courier-wise advanced batches",
     courierGroups: "Courier-wise label actions",
     allCouriers: "All couriers",
     singleQty: "Qty 1",
@@ -470,6 +473,9 @@ const processingCopy = {
     layoutOutputHint: "Normal ya thermal printer ke liye labels fit करो.",
     downloadCombined: "Combined PDF",
     printCombined: "Combined print",
+    outputActions: "Print & download",
+    outputActionsHint: "Selected sort order ke हिसाब से direct output. Courier-wise advanced batches नीचे हैं.",
+    advancedBatches: "Courier-wise advanced batches",
     courierGroups: "Courier-wise label actions",
     allCouriers: "All couriers",
     singleQty: "Qty 1",
@@ -4449,10 +4455,30 @@ function LabelProcessingTool() {
                 <MiniMetric label="Couriers" value={counts.courier.length} tone="orange" />
                 <MiniMetric label="SKUs" value={counts.sku.length} tone="purple" />
               </div>
-              <CountList title={t.courierCounts} rows={counts.courier} />
-              <CountList title={t.sellerCounts} rows={counts.seller} />
-              <CountList title={t.qtyCounts} rows={counts.skuQty} />
-              <CountList title={t.skuCounts} rows={counts.sku} />
+              <div className="quick-output-panel">
+                <div className="quick-output-head">
+                  <div>
+                    <h3>{t.outputActions}</h3>
+                    <p>{t.outputActionsHint}</p>
+                  </div>
+                  <span>{sortedItems.length} labels</span>
+                </div>
+                <CourierActionCard
+                  title={t.allCouriers}
+                  rows={sortedItems}
+                  t={t}
+                  busy={busy}
+                  platform={platform}
+                  onAction={runOutputAction}
+                  compact
+                />
+              </div>
+              <div className="summary-accordion-stack">
+                <CountList title={t.courierCounts} rows={counts.courier} initialOpen />
+                <CountList title={t.sellerCounts} rows={counts.seller} />
+                <CountList title={t.qtyCounts} rows={counts.skuQty} />
+                <CountList title={t.skuCounts} rows={counts.sku} />
+              </div>
             </>
           ) : (
             <div className="placeholder compact"><ClipboardList size={28} /><p>{t.noData}</p></div>
@@ -4464,27 +4490,27 @@ function LabelProcessingTool() {
 
       {["meesho", "flipkart"].includes(platform) && sortedItems.length ? (
         <section className="portal-card courier-actions-panel">
-          <h2>{t.courierGroups}</h2>
-          <CourierActionCard
-            title={t.allCouriers}
-            rows={sortedItems}
-            t={t}
-            busy={busy}
-            platform={platform}
-            featured
-            onAction={runOutputAction}
-          />
+          <div className="section-title-row">
+            <h2>{t.advancedBatches}</h2>
+            <span>{courierGroups.length} couriers</span>
+          </div>
           <div className="courier-card-grid">
             {courierGroups.map((group) => (
-              <CourierActionCard
-                key={group.courier}
-                title={group.courier}
-                rows={group.rows}
-                t={t}
-                busy={busy}
-                platform={platform}
-                onAction={runOutputAction}
-              />
+              <details className="courier-accordion-card" key={group.courier}>
+                <summary>
+                  <span>{group.courier}</span>
+                  <em>{group.rows.length} labels</em>
+                </summary>
+                <CourierActionCard
+                  title={group.courier}
+                  rows={group.rows}
+                  t={t}
+                  busy={busy}
+                  platform={platform}
+                  onAction={runOutputAction}
+                  compact
+                />
+              </details>
             ))}
           </div>
         </section>
@@ -4495,7 +4521,7 @@ function LabelProcessingTool() {
   );
 }
 
-function CourierActionCard({ title, rows, t, busy, onAction, platform, featured = false }) {
+function CourierActionCard({ title, rows, t, busy, onAction, platform, featured = false, compact = false }) {
   const groups = splitByQuantity(rows);
   const options = [
     { key: "single", label: t.singleQty, rows: groups.single },
@@ -4505,7 +4531,7 @@ function CourierActionCard({ title, rows, t, busy, onAction, platform, featured 
   const pieces = rows.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
 
   return (
-    <article className={featured ? "courier-action-card featured" : "courier-action-card"}>
+    <article className={`${featured ? "courier-action-card featured" : "courier-action-card"} ${compact ? "compact" : ""}`}>
       <div className="courier-card-head">
         <div>
           <h3>{title}</h3>
@@ -4673,17 +4699,22 @@ function truncate(value, max = 40) {
   return text.length > max ? `${text.slice(0, Math.max(0, max - 3))}...` : text;
 }
 
-function CountList({ title, rows }) {
+function CountList({ title, rows, initialOpen = false }) {
   return (
-    <div className="count-list">
-      <h3>{title}</h3>
-      {rows.length ? rows.map((row) => (
-        <div key={row.name} className="count-row">
-          <span>{row.name}</span>
-          <strong>{row.count}</strong>
-        </div>
-      )) : <p>No rows yet.</p>}
-    </div>
+    <details className="count-list count-accordion" open={initialOpen}>
+      <summary>
+        <span>{title}</span>
+        <em>{rows.length} rows</em>
+      </summary>
+      <div className="count-list-scroll">
+        {rows.length ? rows.map((row) => (
+          <div key={row.name} className="count-row">
+            <span>{row.name}</span>
+            <strong>{row.count}</strong>
+          </div>
+        )) : <p>No rows yet.</p>}
+      </div>
+    </details>
   );
 }
 
