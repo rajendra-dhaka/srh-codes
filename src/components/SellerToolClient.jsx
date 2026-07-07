@@ -3319,6 +3319,9 @@ function meeshoSectionCropBox(item, section = "full") {
   const full = normalizeCropBox(item.textBounds || meeshoFilledCropBox(width, height), width, height);
 
   if (section === "shipping" || section === "billing") {
+    if (!item.taxInvoiceBox) {
+      return section === "billing" ? null : full;
+    }
     const splitY = item.taxInvoiceBox
       ? clamp(item.taxInvoiceBox.top + 8, full.bottom + 30, full.top - 30)
       : clamp(height * 0.58, full.bottom + 30, full.top - 30);
@@ -3348,21 +3351,27 @@ function meeshoOutputKind(section, labelsPerPage) {
 
 async function buildMeeshoOutputPdf(items, section = "full", labelsPerPage = 4, layoutKey = String(labelsPerPage || "4")) {
   const output = await PDFDocument.create();
+  const printableItems = section === "billing" ? items.filter((item) => item.taxInvoiceBox) : items;
+  if (!printableItems.length) {
+    throw new Error("No billing section found for the selected labels.");
+  }
   const thermalSizes = {
     "3x5": { width: 216, height: 360 },
     "4x6": { width: 288, height: 432 },
   };
   if (thermalSizes[layoutKey]) {
     const target = thermalSizes[layoutKey];
-    for (const item of items) {
+    for (const item of printableItems) {
       const cropBox = meeshoSectionCropBox(item, section);
+      if (!cropBox) continue;
       await addCroppedPage(output, item.page, cropBox, target);
     }
     return output.save();
   }
   if (labelsPerPage === 1) {
-    for (const item of items) {
+    for (const item of printableItems) {
       const cropBox = meeshoSectionCropBox(item, section);
+      if (!cropBox) continue;
       await addCroppedPage(output, item.page, cropBox, {
         width: cropBox.right - cropBox.left,
         height: cropBox.top - cropBox.bottom,
@@ -3384,12 +3393,13 @@ async function buildMeeshoOutputPdf(items, section = "full", labelsPerPage = 4, 
     };
   });
 
-  for (let i = 0; i < items.length; i += labelsPerPage) {
+  for (let i = 0; i < printableItems.length; i += labelsPerPage) {
     const page = output.addPage([A4.width, A4.height]);
     for (let offset = 0; offset < labelsPerPage; offset += 1) {
-      const item = items[i + offset];
+      const item = printableItems[i + offset];
       if (!item) continue;
       const cropBox = meeshoSectionCropBox(item, section);
+      if (!cropBox) continue;
       const embedded = await output.embedPage(item.page, cropBox);
       const croppedWidth = cropBox.right - cropBox.left;
       const croppedHeight = cropBox.top - cropBox.bottom;
@@ -4140,9 +4150,15 @@ function LabelProcessingTool() {
   const amazonLineItems = useMemo(() => flattenAmazonLineItems(amazonOrders), [amazonOrders]);
   const getConfiguredRows = (sourceRows) => {
     const groups = splitByQuantity(sourceRows);
-    if (labelQuantityGroup === "single") return groups.single;
-    if (labelQuantityGroup === "multi") return groups.multi;
-    return groups.all;
+    const selected = labelQuantityGroup === "single"
+      ? groups.single
+      : labelQuantityGroup === "multi"
+        ? groups.multi
+        : groups.all;
+    if (platform === "meesho" && labelOutputType === "billing") {
+      return selected.filter((item) => item.taxInvoiceBox);
+    }
+    return selected;
   };
   const getConfiguredOutputKind = () => {
     if (platform === "meesho") {
