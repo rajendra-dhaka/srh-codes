@@ -1,19 +1,26 @@
 "use client";
 
+import { useState } from "react";
 import {
   ArrowRight,
   BadgeCheck,
   Boxes,
   FileText,
   Layers3,
+  Lightbulb,
+  Mail,
+  MessageSquareText,
   PackageCheck,
   Printer,
   ReceiptText,
+  Send,
   ShieldCheck,
   Sparkles,
   UploadCloud,
 } from "lucide-react";
 import { useLanguage } from "./LanguageProvider";
+
+const feedbackEmail = "shree.anjaneya.1304@gmail.com";
 
 const copy = {
   en: {
@@ -28,6 +35,15 @@ const copy = {
     productsTitle: "One workspace for the jobs sellers repeat every day",
     workflows: "Workflows",
     workflowsTitle: "From upload to print-ready output without messy steps",
+    feedback: "Feedback",
+    feedbackTitle: "Tell us what sellers need next",
+    feedbackText:
+      "Share improvements, missing marketplace workflows, printer formats, GST report needs, or packing desk issues. Useful requests will be considered for SRH Codes.",
+    feedbackName: "Your name",
+    feedbackContact: "Email or WhatsApp",
+    feedbackMessage: "What should we improve or build?",
+    feedbackButton: "Send feedback",
+    feedbackMailHint: "Opens your mail app with a ready email.",
   },
   hi: {
     badge: "Browser-first seller tools",
@@ -41,6 +57,15 @@ const copy = {
     productsTitle: "Daily seller kaam ke liye one clean workspace",
     workflows: "Workflows",
     workflowsTitle: "Upload se print-ready output tak clean flow",
+    feedback: "Feedback",
+    feedbackTitle: "Sellers ko next kya chahiye?",
+    feedbackText:
+      "Improvement, missing marketplace workflow, printer format, GST report need, ya packing desk issue bhejo. Useful requests ko SRH Codes par laane ki koshish karenge.",
+    feedbackName: "Aapka naam",
+    feedbackContact: "Email ya WhatsApp",
+    feedbackMessage: "Kya improve/build karna chahiye?",
+    feedbackButton: "Feedback bhejo",
+    feedbackMailHint: "Aapke mail app me ready email open hoga.",
   },
 };
 
@@ -80,6 +105,30 @@ const workflows = [
 export default function MarketingHome() {
   const { lang } = useLanguage();
   const t = copy[lang] || copy.en;
+  const [feedback, setFeedback] = useState({
+    name: "",
+    contact: "",
+    message: "",
+  });
+
+  const updateFeedback = (field) => (event) => {
+    setFeedback((current) => ({ ...current, [field]: event.target.value }));
+  };
+
+  const feedbackHref = (() => {
+    const subject = `SRH Codes feedback${feedback.name ? ` from ${feedback.name}` : ""}`;
+    const body = [
+      "Hi SRH Codes team,",
+      "",
+      feedback.message || "I want to share this improvement/request:",
+      "",
+      `Name: ${feedback.name || "-"}`,
+      `Contact: ${feedback.contact || "-"}`,
+      "",
+      "Sent from SRH Codes website feedback form.",
+    ].join("\n");
+    return `mailto:${feedbackEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  })();
 
   return (
     <div className="marketing-site">
@@ -92,6 +141,7 @@ export default function MarketingHome() {
           <a href="#products">Products</a>
           <a href="#tool">Workspace</a>
           <a href="/guides">Guides</a>
+          <a href="#feedback">{t.feedback}</a>
           <a href="/contact">Contact</a>
         </nav>
         <a className="nav-cta" href="#tool">Start free <ArrowRight size={17} /></a>
@@ -188,6 +238,44 @@ export default function MarketingHome() {
           <p>Upload first, choose output options before processing, then keep final download and print actions minimal.</p>
         </div>
         <FileText size={44} aria-hidden="true" />
+      </section>
+
+      <section id="feedback" className="feedback-section">
+        <div className="feedback-copy">
+          <span className="section-kicker">{t.feedback}</span>
+          <h2>{t.feedbackTitle}</h2>
+          <p>{t.feedbackText}</p>
+          <div className="feedback-contact-card">
+            <Mail size={18} />
+            <span>{feedbackEmail}</span>
+          </div>
+        </div>
+        <form className="feedback-form">
+          <label>
+            <span>{t.feedbackName}</span>
+            <input value={feedback.name} onChange={updateFeedback("name")} placeholder="Raj / Store name" />
+          </label>
+          <label>
+            <span>{t.feedbackContact}</span>
+            <input value={feedback.contact} onChange={updateFeedback("contact")} placeholder="seller@example.com" />
+          </label>
+          <label className="full">
+            <span>{t.feedbackMessage}</span>
+            <textarea
+              value={feedback.message}
+              onChange={updateFeedback("message")}
+              placeholder="Example: Need Myntra label crop, thermal 2-up layout, GST report import..."
+              rows={5}
+            />
+          </label>
+          <div className="feedback-actions">
+            <p><Lightbulb size={16} />{t.feedbackMailHint}</p>
+            <a className="primary-link" href={feedbackHref}>
+              <Send size={18} />{t.feedbackButton}
+            </a>
+          </div>
+        </form>
+        <MessageSquareText className="feedback-watermark" size={180} aria-hidden="true" />
       </section>
     </div>
   );

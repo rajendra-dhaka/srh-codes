@@ -19,6 +19,7 @@ export const shellCopy = {
     privacy: "Privacy",
     terms: "Terms",
     guides: "Guides",
+    feedback: "Feedback",
   },
   hi: {
     command: "कमांड सेंटर",
@@ -40,5 +41,6 @@ export const shellCopy = {
     privacy: "प्राइवेसी",
     terms: "टर्म्स",
     guides: "गाइड्स",
+    feedback: "फीडबैक",
   },
 };

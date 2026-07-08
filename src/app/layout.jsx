@@ -1,6 +1,7 @@
 import "./globals.css";
 import GoogleAnalytics from "../components/GoogleAnalytics";
 import { LanguageProvider } from "../components/LanguageProvider";
+import FeedbackFab from "../components/FeedbackFab";
 import { site, absoluteUrl } from "../lib/site";
 
 const adsenseClientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
@@ -80,6 +81,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <LanguageProvider>{children}</LanguageProvider>
+        <FeedbackFab />
         <GoogleAnalytics measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
       </body>
     </html>

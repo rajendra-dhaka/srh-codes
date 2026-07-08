@@ -3717,6 +3717,7 @@ function CommandBar({ activeNav, lang, setLang }) {
         </div>
         <nav className="legal-links" aria-label="Site information">
           <a href="/guides">{s.guides}</a>
+          <a href="/#feedback">{s.feedback}</a>
           <a href="/about">{s.about}</a>
           <a href="/contact">{s.contact}</a>
           <a href="/privacy">{s.privacy}</a>
