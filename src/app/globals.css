@@ -5524,6 +5524,183 @@ h1 {
   transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
 }
 
+.tool-shell .theme-dark {
+  --ink: #eef6ff;
+  --muted: #b8c7dc;
+  --line: #2f4058;
+  --surface: #172033;
+  --surface-soft: #111c2e;
+  --brand: #38bdf8;
+  --brand-strong: #0ea5e9;
+  --accent: #e0f2fe;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(56, 189, 248, 0.14), transparent 34%),
+    rgba(15, 23, 42, 0.92);
+  border-color: rgba(47, 64, 88, 0.96);
+  color: var(--ink);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+.tool-shell .theme-dark .super-sidebar {
+  background: linear-gradient(180deg, #07111f 0%, #050b14 100%);
+  border-color: #1e293b;
+}
+
+.tool-shell .theme-dark .command-bar {
+  border-color: rgba(47, 64, 88, 0.9);
+  background: rgba(15, 23, 42, 0.88);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.22);
+}
+
+.tool-shell .theme-dark .command-bar h1,
+.tool-shell .theme-dark .module-header h1,
+.tool-shell .theme-dark h1,
+.tool-shell .theme-dark h2,
+.tool-shell .theme-dark h3,
+.tool-shell .theme-dark strong,
+.tool-shell .theme-dark label,
+.tool-shell .theme-dark legend {
+  color: var(--ink);
+}
+
+.tool-shell .theme-dark p,
+.tool-shell .theme-dark small,
+.tool-shell .theme-dark em,
+.tool-shell .theme-dark td,
+.tool-shell .theme-dark .file-list,
+.tool-shell .theme-dark .check-line,
+.tool-shell .theme-dark .quick-output-head p,
+.tool-shell .theme-dark .output-ready-line small,
+.tool-shell .theme-dark .option-radio-group legend {
+  color: var(--muted);
+}
+
+.tool-shell .theme-dark .upload-box,
+.tool-shell .theme-dark .workspace-card,
+.tool-shell .theme-dark .label-workbench,
+.tool-shell .theme-dark .label-preview-panel,
+.tool-shell .theme-dark .download-panel,
+.tool-shell .theme-dark .processing-summary,
+.tool-shell .theme-dark .label-output-setup,
+.tool-shell .theme-dark .label-output-options,
+.tool-shell .theme-dark .quick-output-panel,
+.tool-shell .theme-dark .courier-action-card,
+.tool-shell .theme-dark .courier-accordion-card,
+.tool-shell .theme-dark .meesho-output-block,
+.tool-shell .theme-dark .amazon-option-card,
+.tool-shell .theme-dark .amazon-toggle-line,
+.tool-shell .theme-dark .amazon-action-panel,
+.tool-shell .theme-dark .amazon-preview-table,
+.tool-shell .theme-dark .business-hero,
+.tool-shell .theme-dark .chart-panel,
+.tool-shell .theme-dark .table-panel,
+.tool-shell .theme-dark .decision-card,
+.tool-shell .theme-dark .accordion-card,
+.tool-shell .theme-dark .gst-upload-panel,
+.tool-shell .theme-dark .gst-guidance,
+.tool-shell .theme-dark .portal-card,
+.tool-shell .theme-dark .platform-switch,
+.tool-shell .theme-dark .market-tabs,
+.tool-shell .theme-dark .tabs,
+.tool-shell .theme-dark .placeholder,
+.tool-shell .theme-dark .output-ready-line,
+.tool-shell .theme-dark .qty-action-group,
+.tool-shell .theme-dark .label-sort-control,
+.tool-shell .theme-dark .workflow-note,
+.tool-shell .theme-dark .count-list {
+  border-color: var(--line);
+  background: rgba(23, 32, 51, 0.94);
+  box-shadow: none;
+}
+
+.tool-shell .theme-dark .label-dropzone,
+.tool-shell .theme-dark .doc-upload,
+.tool-shell .theme-dark .workspace-icon,
+.tool-shell .theme-dark .label-mock,
+.tool-shell .theme-dark .mock-grid,
+.tool-shell .theme-dark .mock-split,
+.tool-shell .theme-dark .summary-main,
+.tool-shell .theme-dark .summary-split > div,
+.tool-shell .theme-dark .note-box,
+.tool-shell .theme-dark .state-field,
+.tool-shell .theme-dark .layout-select,
+.tool-shell .theme-dark .soft-note,
+.tool-shell .theme-dark .amazon-toggle-row {
+  border-color: var(--line);
+  background: rgba(17, 28, 46, 0.96);
+}
+
+.tool-shell .theme-dark input,
+.tool-shell .theme-dark select,
+.tool-shell .theme-dark textarea,
+.tool-shell .theme-dark .search-pill,
+.tool-shell .theme-dark .global-lang,
+.tool-shell .theme-dark .layout-select select,
+.tool-shell .theme-dark .label-sort-control select,
+.tool-shell .theme-dark .mini-select-row select,
+.tool-shell .theme-dark .output-setup-grid select,
+.tool-shell .theme-dark .calculator-field input,
+.tool-shell .theme-dark .calculator-field select {
+  border-color: var(--line);
+  background: #0f1a2b;
+  color: var(--ink);
+}
+
+.tool-shell .theme-dark input::placeholder,
+.tool-shell .theme-dark textarea::placeholder,
+.tool-shell .theme-dark .search-pill input::placeholder {
+  color: #7f90a8;
+}
+
+.tool-shell .theme-dark .legal-links a,
+.tool-shell .theme-dark .icon-btn,
+.tool-shell .theme-dark .download-grid button,
+.tool-shell .theme-dark .mini-action-row button,
+.tool-shell .theme-dark .amazon-action-row button,
+.tool-shell .theme-dark .option-radio-group label,
+.tool-shell .theme-dark .split-options button,
+.tool-shell .theme-dark .tabs button,
+.tool-shell .theme-dark .market-tabs button,
+.tool-shell .theme-dark .platform-switch button,
+.tool-shell .theme-dark .global-lang button,
+.tool-shell .theme-dark .pill-selector button {
+  border-color: var(--line);
+  background: #111c2e;
+  color: #dbeafe;
+}
+
+.tool-shell .theme-dark .legal-links a:hover,
+.tool-shell .theme-dark .icon-btn:hover,
+.tool-shell .theme-dark .download-grid button:hover,
+.tool-shell .theme-dark .mini-action-row button:hover:not(:disabled),
+.tool-shell .theme-dark .amazon-action-row button:hover:not(:disabled) {
+  background: #172033;
+  border-color: #49617c;
+}
+
+.tool-shell .theme-dark .primary-action,
+.tool-shell .theme-dark .platform-switch button.active,
+.tool-shell .theme-dark .market-tabs button.active,
+.tool-shell .theme-dark .tabs button.active,
+.tool-shell .theme-dark .global-lang button.active,
+.tool-shell .theme-dark .output-ready-line button,
+.tool-shell .theme-dark .count-row strong,
+.tool-shell .theme-dark .quick-output-head > span,
+.tool-shell .theme-dark .section-title-row > span,
+.tool-shell .theme-dark .courier-card-head > span,
+.tool-shell .theme-dark .option-radio-group label.active,
+.tool-shell .theme-dark .split-options button.active {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #04111f;
+}
+
+.tool-shell .theme-dark .label-dropzone {
+  background:
+    linear-gradient(180deg, rgba(56, 189, 248, 0.08), rgba(15, 23, 42, 0.94)),
+    #0f172a;
+}
+
 .primary-action:hover:not(:disabled),
 .output-ready-line button:hover:not(:disabled),
 .download-grid button:hover,
