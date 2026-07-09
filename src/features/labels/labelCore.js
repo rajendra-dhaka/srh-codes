@@ -49,6 +49,15 @@ export function normalizeCropBox(cropBox, width, height) {
   return { left, bottom, right, top };
 }
 
+export function meeshoFilledCropBox(width, height) {
+  return {
+    left: width * 0.012,
+    bottom: height * 0.24,
+    right: width * 0.988,
+    top: height * 0.992,
+  };
+}
+
 export function getPdfTextBounds(items, pageSize) {
   let left = Infinity;
   let bottom = Infinity;

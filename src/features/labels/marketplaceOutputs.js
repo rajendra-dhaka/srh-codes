@@ -1,5 +1,5 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import { A4, UNKNOWN, clamp, normalizeCropBox, sortKey } from "./labelCore";
+import { A4, UNKNOWN, clamp, meeshoFilledCropBox, normalizeCropBox, sortKey } from "./labelCore";
 
 export async function addCroppedPage(output, sourcePage, cropBox, targetSize) {
   const embedded = await output.embedPage(sourcePage, cropBox);
@@ -166,15 +166,6 @@ export async function buildMeeshoOutputPdf(items, section = "full", labelsPerPag
 export async function buildMeeshoLayoutFromPages(pages, labelsPerPage = 4) {
   const items = pages.map((page, index) => ({ page, originalIndex: index }));
   return buildMeeshoOutputPdf(items, "full", labelsPerPage);
-}
-
-export function meeshoFilledCropBox(width, height) {
-  return {
-    left: width * 0.012,
-    bottom: height * 0.24,
-    right: width * 0.988,
-    top: height * 0.992,
-  };
 }
 
 export async function buildPicklistPdf(items, mode = "none") {

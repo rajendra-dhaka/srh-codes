@@ -3,7 +3,7 @@ import { AlertTriangle, FileSpreadsheet, Upload } from "lucide-react";
 import { performanceCopy } from "../../i18n/tool";
 import { trackEvent } from "../../lib/analytics";
 import { computeAnalytics, emptyPerformanceData, parseOrdersFiles, parsePaymentFiles } from "./processing";
-import { Dashboard, EmptyState, MarketplaceTabs, SmartStatusStrip, UploadBox } from "./components";
+import { Dashboard, EmptyState, MarketplaceTabs, SmartStatusStrip, UploadBox, marketLabel } from "./components";
 
 export function PerformanceSection({ lang }) {
   const [activeMarket, setActiveMarket] = useState("meesho");
@@ -117,4 +117,3 @@ export function PerformanceSection({ lang }) {
     </section>
   );
 }
-

@@ -66,7 +66,7 @@ export function MarketplaceTabs({ active, onChange }) {
   );
 }
 
-function marketLabel(id) {
+export function marketLabel(id) {
   return MARKETPLACES.find((market) => market.id === id)?.label || id;
 }
 
