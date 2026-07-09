@@ -8,6 +8,7 @@ import { MiniMetric } from "../../components/common/MiniMetric";
 import { asMoney, businessSummaryRows } from "./processing";
 import { DataTable } from "./DataTable";
 import { actionTips, businessText, insightParagraphs, returnExplain, translateAction } from "./copyHelpers";
+import { trackEvent } from "../../lib/analytics";
 
 export function SmartStatusStrip({ activeMarket, activeData, marketData }) {
   const loadedMarkets = Object.entries(marketData).filter(([, data]) => data.orders.length || data.payment.orderPayments.length).length;
