@@ -1,6 +1,6 @@
 "use client";
 
-import { useLanguage } from "./LanguageProvider";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const copy = {
   about: {

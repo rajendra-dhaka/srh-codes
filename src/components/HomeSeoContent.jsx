@@ -1,6 +1,6 @@
 "use client";
 
-import { useLanguage } from "./LanguageProvider";
+import { useLanguage } from "../contexts/LanguageContext";
 import { absoluteUrl } from "../lib/site";
 
 const seoLinks = [

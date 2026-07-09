@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   ArrowRight,
   BadgeCheck,
@@ -18,117 +17,25 @@ import {
   Sparkles,
   UploadCloud,
 } from "lucide-react";
-import { useLanguage } from "./LanguageProvider";
+import { useLanguage } from "../contexts/LanguageContext";
+import { MARKETING_MARKETPLACES } from "../constants/marketplaces";
+import { MARKETING_PRODUCTS, MARKETING_WORKFLOWS } from "../constants/marketing";
+import { useFeedbackMailto } from "../hooks/useFeedbackMailto";
+import { FEEDBACK_EMAIL, marketingHomeCopy } from "../i18n/marketingHome";
 
-const feedbackEmail = "shree.anjaneya.1304@gmail.com";
-
-const copy = {
-  en: {
-    badge: "Browser-first seller tools",
-    titleA: "Essential tools for",
-    titleB: "Indian marketplace sellers",
-    intro:
-      "Crop labels, split invoices, sort courier-wise PDFs, generate picklists, and check Amazon pricing from one clean workspace built for daily packing desks.",
-    primary: "Open label workspace",
-    secondary: "Explore guides",
-    products: "Products",
-    productsTitle: "One workspace for the jobs sellers repeat every day",
-    workflows: "Workflows",
-    workflowsTitle: "From upload to print-ready output without messy steps",
-    feedback: "Feedback",
-    feedbackTitle: "Tell us what sellers need next",
-    feedbackText:
-      "Share improvements, missing marketplace workflows, printer formats, GST report needs, or packing desk issues. Useful requests will be considered for SRH Codes.",
-    feedbackName: "Your name",
-    feedbackContact: "Email or WhatsApp",
-    feedbackMessage: "What should we improve or build?",
-    feedbackButton: "Send feedback",
-    feedbackMailHint: "Opens your mail app with a ready email.",
-  },
-  hi: {
-    badge: "Browser-first seller tools",
-    titleA: "Indian sellers ke liye",
-    titleB: "clean daily tools",
-    intro:
-      "Labels crop karo, invoices split karo, courier-wise PDFs sort karo, picklists banao, aur Amazon pricing check karo ek simple packing-desk workspace me.",
-    primary: "Label workspace kholo",
-    secondary: "Guides dekho",
-    products: "Products",
-    productsTitle: "Daily seller kaam ke liye one clean workspace",
-    workflows: "Workflows",
-    workflowsTitle: "Upload se print-ready output tak clean flow",
-    feedback: "Feedback",
-    feedbackTitle: "Sellers ko next kya chahiye?",
-    feedbackText:
-      "Improvement, missing marketplace workflow, printer format, GST report need, ya packing desk issue bhejo. Useful requests ko SRH Codes par laane ki koshish karenge.",
-    feedbackName: "Aapka naam",
-    feedbackContact: "Email ya WhatsApp",
-    feedbackMessage: "Kya improve/build karna chahiye?",
-    feedbackButton: "Feedback bhejo",
-    feedbackMailHint: "Aapke mail app me ready email open hoga.",
-  },
+const marketingIcons = {
+  Boxes,
+  Layers3,
+  PackageCheck,
+  Printer,
+  ReceiptText,
+  UploadCloud,
 };
-
-const products = [
-  {
-    icon: PackageCheck,
-    title: "Shipping Label Processor",
-    eyebrow: "Meesho, Flipkart, Amazon",
-    text: "Crop, split, sort, print, and download label PDFs with courier, SKU, seller account, quantity, and invoice-aware output choices.",
-  },
-  {
-    icon: ReceiptText,
-    title: "GST Filing Helper",
-    eyebrow: "GSTR-1 and 3B",
-    text: "Prepare marketplace summaries, reconcile key values, and keep GST portal work less confusing for small ecommerce teams.",
-  },
-  {
-    icon: Boxes,
-    title: "Amazon Pricing Calculator",
-    eyebrow: "Fees and margin",
-    text: "Estimate Easy Ship fees, chargeable weight, GST impact, referral fees, closing fees, profit, and break-even selling price.",
-  },
-];
-
-const marketplaces = [
-  { name: "Meesho", src: "/marketplaces/meesho.png" },
-  { name: "Flipkart", src: "/marketplaces/flipkart.png" },
-  { name: "Amazon", src: "/marketplaces/amazon.png" },
-];
-
-const workflows = [
-  ["Upload PDF", "Drop one or many marketplace label files. Everything runs in the browser.", UploadCloud],
-  ["Choose output", "Pick shipping, billing, split, layout, quantity group, picklist, or thermal formats.", Layers3],
-  ["Print or download", "Generate final PDFs with minimal buttons after processing, ready for packing desks.", Printer],
-];
 
 export default function MarketingHome() {
   const { lang } = useLanguage();
-  const t = copy[lang] || copy.en;
-  const [feedback, setFeedback] = useState({
-    name: "",
-    contact: "",
-    message: "",
-  });
-
-  const updateFeedback = (field) => (event) => {
-    setFeedback((current) => ({ ...current, [field]: event.target.value }));
-  };
-
-  const feedbackHref = (() => {
-    const subject = `SRH Codes feedback${feedback.name ? ` from ${feedback.name}` : ""}`;
-    const body = [
-      "Hi SRH Codes team,",
-      "",
-      feedback.message || "I want to share this improvement/request:",
-      "",
-      `Name: ${feedback.name || "-"}`,
-      `Contact: ${feedback.contact || "-"}`,
-      "",
-      "Sent from SRH Codes website feedback form.",
-    ].join("\n");
-    return `mailto:${feedbackEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  })();
+  const t = marketingHomeCopy[lang] || marketingHomeCopy.en;
+  const { feedback, feedbackHref, updateFeedback } = useFeedbackMailto(FEEDBACK_EMAIL);
 
   return (
     <div className="marketing-site">
@@ -162,7 +69,7 @@ export default function MarketingHome() {
             <span><strong>PDF</strong> print workflows</span>
           </div>
           <div className="marketplace-strip" aria-label="Supported marketplaces">
-            {marketplaces.map((marketplace) => (
+            {MARKETING_MARKETPLACES.map((marketplace) => (
               <span key={marketplace.name}>
                 <img src={marketplace.src} alt="" />
                 {marketplace.name}
@@ -196,7 +103,7 @@ export default function MarketingHome() {
         <div className="section-kicker">{t.products}</div>
         <h2>{t.productsTitle}</h2>
         <div className="marketplace-card-row">
-          {marketplaces.map((marketplace) => (
+          {MARKETING_MARKETPLACES.map((marketplace) => (
             <article key={marketplace.name}>
               <img src={marketplace.src} alt={`${marketplace.name} marketplace`} />
               <span>{marketplace.name}</span>
@@ -204,7 +111,9 @@ export default function MarketingHome() {
           ))}
         </div>
         <div className="product-grid">
-          {products.map(({ icon: Icon, title, eyebrow, text }) => (
+          {MARKETING_PRODUCTS.map(({ icon, title, eyebrow, text }) => {
+            const Icon = marketingIcons[icon];
+            return (
             <article className="product-card" key={title}>
               <span className="product-icon"><Icon size={28} /></span>
               <small>{eyebrow}</small>
@@ -212,7 +121,8 @@ export default function MarketingHome() {
               <p>{text}</p>
               <a href="#tool">Get started <ArrowRight size={16} /></a>
             </article>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -220,14 +130,17 @@ export default function MarketingHome() {
         <div className="section-kicker">{t.workflows}</div>
         <h2>{t.workflowsTitle}</h2>
         <div className="workflow-grid">
-          {workflows.map(([title, text, Icon], index) => (
+          {MARKETING_WORKFLOWS.map(({ icon, title, text }, index) => {
+            const Icon = marketingIcons[icon];
+            return (
             <article key={title} className="workflow-card">
               <span>{String(index + 1).padStart(2, "0")}</span>
               <Icon size={24} />
               <h3>{title}</h3>
               <p>{text}</p>
             </article>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -247,7 +160,7 @@ export default function MarketingHome() {
           <p>{t.feedbackText}</p>
           <div className="feedback-contact-card">
             <Mail size={18} />
-            <span>{feedbackEmail}</span>
+            <span>{FEEDBACK_EMAIL}</span>
           </div>
         </div>
         <form className="feedback-form">

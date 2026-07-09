@@ -1,6 +1,6 @@
 "use client";
 
-import { useLanguage } from "./LanguageProvider";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export default function GuideArticle({ guide }) {
   const { lang, setLang } = useLanguage();

@@ -1,6 +1,6 @@
 import "./globals.css";
 import GoogleAnalytics from "../components/GoogleAnalytics";
-import { LanguageProvider } from "../components/LanguageProvider";
+import { LanguageProvider } from "../contexts/LanguageContext";
 import FeedbackFab from "../components/FeedbackFab";
 import { site, absoluteUrl } from "../lib/site";
 
