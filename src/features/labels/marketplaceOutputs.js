@@ -1,5 +1,6 @@
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { degrees, PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { A4, UNKNOWN, clamp, meeshoFilledCropBox, normalizeCropBox, sortKey } from "./labelCore";
+import { countBy, countBySkuQty, truncate } from "./labelStats";
 
 export async function addCroppedPage(output, sourcePage, cropBox, targetSize) {
   const embedded = await output.embedPage(sourcePage, cropBox);

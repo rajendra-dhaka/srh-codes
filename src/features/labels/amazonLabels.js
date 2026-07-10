@@ -1,5 +1,6 @@
 import { degrees, PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { UNKNOWN, sortKey } from "./labelCore";
+import { truncate } from "./labelStats";
 
 export function normalizeAmazonText(value) {
   return String(value || "")
