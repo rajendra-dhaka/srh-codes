@@ -22,6 +22,94 @@
   text-rendering: optimizeLegibility;
 }
 
+@media (max-width: 1180px) {
+  .gst-filing-hero,
+  .gst-filing-setup,
+  .gst-layout.guided {
+    grid-template-columns: 1fr;
+  }
+
+  .filing-guide {
+    position: static;
+  }
+}
+
+@media (max-width: 760px) {
+  .gst-page .module-header h1 {
+    font-size: 27px;
+  }
+
+  .gst-filing-hero {
+    padding: 16px;
+  }
+
+  .gst-readiness-card {
+    align-items: flex-start;
+  }
+
+  .gst-readiness-ring {
+    width: 78px;
+    height: 78px;
+  }
+
+  .gst-readiness-ring strong {
+    font-size: 18px;
+  }
+
+  .gst-readiness-ring span {
+    margin-top: 30px;
+    font-size: 10px;
+  }
+
+  .gst-platform-select,
+  .gst-period-fields,
+  .gst-final-action {
+    grid-template-columns: 1fr;
+  }
+
+  .gst-platform-select button {
+    justify-content: flex-start;
+  }
+
+  .gst-table-tags {
+    margin-left: 0;
+  }
+
+  .doc-upload {
+    align-items: flex-start;
+  }
+
+  .doc-upload b {
+    align-self: center;
+  }
+
+  .gst-filing-step {
+    grid-template-columns: 26px minmax(0, 1fr);
+  }
+
+  .gst-step-icon {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .gst-readiness-card,
+  .gst-doc-card-head,
+  .doc-upload {
+    flex-direction: column;
+  }
+
+  .gst-doc-card-head em,
+  .doc-upload b {
+    margin-left: 0;
+  }
+
+  .gst-doc-card-head img {
+    width: 38px;
+    height: 38px;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
@@ -1354,6 +1442,131 @@ main {
   margin: 0 0 14px auto;
 }
 
+.gst-filing-setup {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.75fr) minmax(460px, 1.25fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.gst-period-card,
+.gst-platform-card {
+  display: grid;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #d9e4f2;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(23, 50, 77, 0.05);
+}
+
+.gst-period-card {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.gst-platform-card {
+  grid-template-columns: auto minmax(160px, 0.65fr) minmax(280px, 1.35fr);
+}
+
+.setup-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #2478ff;
+}
+
+.gst-period-card strong,
+.gst-platform-card strong {
+  display: block;
+  color: #17324d;
+  font-size: 15px;
+}
+
+.gst-period-card span,
+.gst-platform-card span {
+  display: block;
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.gst-period-fields {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.gst-period-fields select {
+  min-height: 42px;
+  border: 1px solid #d9e4f2;
+  border-radius: 8px;
+  background: #fbfdff;
+  color: #17324d;
+  font-weight: 850;
+  padding: 0 11px;
+}
+
+.gst-platform-select {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.gst-platform-select button {
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #d9e4f2;
+  border-radius: 8px;
+  background: #fbfdff;
+  color: #17324d;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.gst-platform-select button img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.gst-platform-select button span {
+  display: inline;
+  margin: 0;
+  color: inherit;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.gst-platform-select button svg {
+  color: #cbd5e1;
+}
+
+.gst-platform-select button.active {
+  background: #2478ff;
+  border-color: #2478ff;
+  color: #ffffff;
+  box-shadow: 0 12px 28px rgba(36, 120, 255, 0.18);
+}
+
+.gst-platform-select button.active span {
+  color: #ffffff;
+}
+
+.gst-platform-select button.active svg {
+  color: #ffffff;
+}
+
 .gst-layout.guided {
   grid-template-columns: minmax(360px, 0.92fr) minmax(430px, 1.08fr);
   align-items: start;
@@ -1596,6 +1809,116 @@ main {
   overflow-wrap: anywhere;
 }
 
+.gst-marketplace-upload-grid {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.gst-marketplace-upload-card {
+  padding: 14px;
+  border: 1px solid #d9e4f2;
+  border-radius: 8px;
+  background: #fbfdff;
+}
+
+.gst-marketplace-upload-card.complete {
+  border-color: #a7f3d0;
+  background: #f4fdf8;
+}
+
+.gst-doc-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.gst-doc-card-head img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e7edf5;
+}
+
+.gst-doc-card-head strong,
+.gst-doc-card-head span,
+.gst-doc-section small {
+  display: block;
+}
+
+.gst-doc-card-head strong {
+  color: #17324d;
+  font-size: 14px;
+}
+
+.gst-doc-card-head span {
+  margin-top: 2px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.gst-doc-card-head em {
+  margin-left: auto;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.gst-doc-section {
+  padding-top: 8px;
+  border-top: 1px solid #eef2f7;
+}
+
+.gst-doc-section + .gst-doc-section {
+  margin-top: 8px;
+}
+
+.gst-doc-section small {
+  margin-bottom: 2px;
+  color: #2478ff;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.gst-doc-section.optional small {
+  color: #b45309;
+}
+
+.gst-doc-section .check-line {
+  padding: 7px 0;
+  font-size: 12px;
+}
+
+.gst-marketplace-upload-card .state-field {
+  margin-bottom: 12px;
+}
+
+.doc-upload.compact {
+  margin: 8px 0 0;
+  padding: 10px;
+  border-style: solid;
+}
+
+.doc-upload.has-file {
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.doc-upload.has-file .doc-icon {
+  background: #dcfce7;
+  color: #166534;
+}
+
 .primary-action {
   width: 100%;
   border: 0;
@@ -1609,7 +1932,453 @@ main {
 
 .primary-action:disabled {
   opacity: 0.6;
-  cursor: wait;
+  cursor: not-allowed;
+}
+
+.primary-action:not(:disabled):hover {
+  background: #214565;
+}
+
+.gst-final-status {
+  margin-top: 9px;
+  color: #9a3412;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.gst-final-status.ready {
+  color: #166534;
+}
+
+.gst-page {
+  --gst-ink: #102033;
+  --gst-muted: #607086;
+  --gst-line: #dbe6f2;
+  --gst-panel: #ffffff;
+  --gst-soft: #f6f9fc;
+  --gst-teal: #008c8c;
+  --gst-blue: #2563eb;
+  --gst-green: #15803d;
+}
+
+.gst-page .module-header {
+  padding: 4px 2px 0;
+}
+
+.gst-page .module-header h1 {
+  max-width: 760px;
+  color: var(--gst-ink);
+  font-size: clamp(28px, 3vw, 44px);
+  line-height: 1.04;
+}
+
+.gst-page .module-header p {
+  max-width: 780px;
+  color: var(--gst-muted);
+  font-size: 15px;
+}
+
+.gst-filing-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 18px;
+  align-items: stretch;
+  margin-bottom: 18px;
+  padding: 20px;
+  border: 1px solid #c8e6e6;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(224, 242, 254, 0.88), rgba(240, 253, 250, 0.82)),
+    #ffffff;
+  box-shadow: 0 18px 44px rgba(23, 50, 77, 0.08);
+}
+
+.gst-kicker {
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 9px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: rgba(0, 140, 140, 0.1);
+  color: #006b6b;
+  font-size: 11px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.gst-filing-hero h2 {
+  max-width: 760px;
+  color: var(--gst-ink);
+  font-size: clamp(24px, 2.4vw, 38px);
+  line-height: 1.06;
+}
+
+.gst-filing-hero p {
+  max-width: 760px;
+  margin-top: 10px;
+  color: #46576d;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.gst-readiness-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 16px;
+  border: 1px solid rgba(37, 99, 235, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.gst-readiness-ring {
+  width: 96px;
+  height: 96px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, #ffffff 0 55%, transparent 56%),
+    conic-gradient(var(--gst-green) var(--gst-progress), #dce7f3 0);
+}
+
+.gst-readiness-ring strong,
+.gst-readiness-ring span {
+  grid-area: 1 / 1;
+}
+
+.gst-readiness-ring strong {
+  color: var(--gst-ink);
+  font-size: 22px;
+}
+
+.gst-readiness-ring span {
+  margin-top: 35px;
+  color: var(--gst-muted);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.gst-readiness-card > div:last-child span,
+.gst-readiness-card > div:last-child strong,
+.gst-readiness-card > div:last-child p {
+  display: block;
+}
+
+.gst-readiness-card > div:last-child span {
+  color: var(--gst-teal);
+  font-size: 12px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.gst-readiness-card > div:last-child strong {
+  margin-top: 5px;
+  color: var(--gst-ink);
+  font-size: 18px;
+}
+
+.gst-readiness-card > div:last-child p {
+  margin-top: 5px;
+  color: var(--gst-muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.gst-filing-setup {
+  grid-template-columns: minmax(280px, 0.82fr) minmax(460px, 1.18fr);
+  gap: 12px;
+}
+
+.gst-period-card,
+.gst-platform-card,
+.gst-upload-panel,
+.gst-guidance {
+  border-color: var(--gst-line);
+  box-shadow: 0 14px 36px rgba(23, 50, 77, 0.06);
+}
+
+.gst-period-card,
+.gst-platform-card {
+  padding: 16px;
+}
+
+.gst-period-fields select,
+.state-field select {
+  min-height: 46px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.gst-platform-select button {
+  min-height: 52px;
+  justify-content: flex-start;
+  padding: 0 12px;
+  border-color: #d5e1ee;
+  background: #ffffff;
+  transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.gst-platform-select button:hover {
+  transform: translateY(-1px);
+  border-color: #93c5fd;
+}
+
+.gst-platform-select button.active {
+  background: #17324d;
+  border-color: #17324d;
+  box-shadow: none;
+}
+
+.gst-layout.guided {
+  grid-template-columns: minmax(420px, 1.03fr) minmax(390px, 0.97fr);
+  gap: 18px;
+}
+
+.gst-upload-panel,
+.gst-guidance {
+  padding: 18px;
+}
+
+.gst-panel-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.gst-panel-title span {
+  display: block;
+  color: var(--gst-teal);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.gst-panel-title h2 {
+  margin: 3px 0 0;
+}
+
+.gst-panel-title > strong {
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.gst-marketplace-upload-grid {
+  gap: 14px;
+}
+
+.gst-marketplace-upload-card {
+  padding: 16px;
+  border-color: #d9e6f4;
+  background: linear-gradient(180deg, #ffffff, #f8fbff);
+}
+
+.gst-marketplace-upload-card.complete {
+  background: linear-gradient(180deg, #ffffff, #f2fbf5);
+}
+
+.gst-doc-card-head {
+  align-items: flex-start;
+}
+
+.gst-doc-card-head strong {
+  font-size: 16px;
+}
+
+.gst-doc-card-head em {
+  border-radius: 6px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  text-transform: uppercase;
+}
+
+.gst-table-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 12px 44px;
+}
+
+.gst-table-tags span {
+  padding: 4px 7px;
+  border: 1px solid #dbeafe;
+  border-radius: 6px;
+  background: #f8fbff;
+  color: #1e3a8a;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.gst-doc-section {
+  padding-top: 12px;
+}
+
+.gst-doc-section small {
+  margin-bottom: 6px;
+  color: #1d4ed8;
+}
+
+.doc-upload.compact {
+  min-height: 64px;
+  margin-top: 9px;
+  padding: 10px 11px;
+  background: #ffffff;
+}
+
+.doc-upload:hover {
+  border-color: #60a5fa;
+  background: #f8fbff;
+}
+
+.doc-upload strong {
+  font-size: 13px;
+}
+
+.doc-upload span {
+  font-size: 12px;
+}
+
+.doc-upload b {
+  margin-left: auto;
+  padding: 7px 9px;
+  border-radius: 7px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.doc-upload.has-file b {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.gst-final-action {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 240px);
+  gap: 12px;
+  align-items: center;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  background: #fff7ed;
+}
+
+.gst-final-action.ready {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.gst-final-action span,
+.gst-final-action strong {
+  display: block;
+}
+
+.gst-final-action span {
+  color: #9a3412;
+  font-size: 11px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.gst-final-action.ready span {
+  color: #166534;
+}
+
+.gst-final-action strong {
+  margin-top: 3px;
+  color: #7c2d12;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.gst-final-action.ready strong {
+  color: #14532d;
+}
+
+.gst-final-action .primary-action {
+  min-height: 44px;
+}
+
+.filing-guide {
+  top: 88px;
+}
+
+.filing-steps {
+  gap: 10px;
+}
+
+.gst-filing-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 26px 36px minmax(0, 1fr);
+  gap: 10px;
+  padding: 13px;
+  border: 1px solid #dbe6f2;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.gst-filing-step::before {
+  content: "";
+  position: absolute;
+  left: 25px;
+  top: 48px;
+  bottom: -11px;
+  width: 1px;
+  background: #dbe6f2;
+}
+
+.gst-filing-step:last-child::before {
+  display: none;
+}
+
+.gst-step-number {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #17324d;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.gst-step-icon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.gst-filing-step strong {
+  display: block;
+  color: var(--gst-ink);
+  font-size: 14px;
+}
+
+.gst-filing-step p {
+  margin-top: 4px;
+  color: #526277;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .check-line {
@@ -4032,6 +4801,7 @@ tr:nth-child(even) td {
   }
 
   .gst-layout,
+  .gst-filing-setup,
   .portal-grid,
   .overall-strip,
   .label-layout,
@@ -4044,6 +4814,14 @@ tr:nth-child(even) td {
 
   .gst-layout.guided {
     grid-template-columns: 1fr;
+  }
+
+  .gst-platform-card {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .gst-platform-select {
+    grid-column: 1 / -1;
   }
 
   .filing-guide {
@@ -4154,6 +4932,9 @@ tr:nth-child(even) td {
 .theme-dark .portal-card h2,
 .theme-dark .gst-upload-panel h2,
 .theme-dark .gst-guidance h2,
+.theme-dark .gst-period-card strong,
+.theme-dark .gst-platform-card strong,
+.theme-dark .gst-doc-card-head strong,
 .theme-dark .doc-upload strong,
 .theme-dark .overall-strip strong {
   color: #eef6ff;
@@ -4202,6 +4983,8 @@ tr:nth-child(even) td {
 .theme-dark .gst-upload-panel,
 .theme-dark .gst-guidance,
 .theme-dark .portal-card,
+.theme-dark .gst-period-card,
+.theme-dark .gst-platform-card,
 .theme-dark .platform-switch,
 .theme-dark .market-tabs,
 .theme-dark .overall-strip div,
@@ -4216,6 +4999,8 @@ tr:nth-child(even) td {
 }
 
 .theme-dark .doc-upload,
+.theme-dark .gst-marketplace-upload-card,
+.theme-dark .setup-icon,
 .theme-dark .workspace-icon,
 .theme-dark .label-dropzone,
 .theme-dark .label-mock,
@@ -4275,6 +5060,162 @@ tr:nth-child(even) td {
   background: #172033;
   border-color: #2f4058;
   color: #eef6ff;
+}
+
+.theme-dark .gst-period-fields select,
+.theme-dark .gst-platform-select button {
+  background: #111c2e;
+  border-color: #2f4058;
+  color: #eef6ff;
+}
+
+.theme-dark .gst-platform-select button.active {
+  background: #00a6a6;
+  border-color: #00a6a6;
+  color: #06202a;
+}
+
+.theme-dark .gst-platform-select button.active span {
+  color: #06202a;
+}
+
+.theme-dark .gst-platform-select button.active svg {
+  color: #06202a;
+}
+
+.theme-dark .gst-doc-card-head img {
+  background: #ffffff;
+  border-color: #2f4058;
+}
+
+.theme-dark .gst-period-card span,
+.theme-dark .gst-platform-card span,
+.theme-dark .gst-doc-card-head span {
+  color: #b8c7dc;
+}
+
+.theme-dark .gst-doc-section {
+  border-top-color: #2f4058;
+}
+
+.theme-dark .gst-marketplace-upload-card.complete,
+.theme-dark .doc-upload.has-file {
+  background: rgba(22, 101, 52, 0.16);
+  border-color: #15803d;
+}
+
+.theme-dark .doc-upload.has-file .doc-icon {
+  background: rgba(34, 197, 94, 0.16);
+  color: #86efac;
+}
+
+.theme-dark .gst-doc-card-head em {
+  background: #10243a;
+  color: #7dd3fc;
+}
+
+.theme-dark .gst-final-status {
+  color: #fdba74;
+}
+
+.theme-dark .gst-final-status.ready {
+  color: #86efac;
+}
+
+.theme-dark .gst-page {
+  --gst-ink: #eef6ff;
+  --gst-muted: #b8c7dc;
+  --gst-line: #2f4058;
+  --gst-panel: #172033;
+  --gst-soft: #111c2e;
+}
+
+.theme-dark .gst-filing-hero {
+  border-color: #2f4058;
+  background: #172033;
+  box-shadow: none;
+}
+
+.theme-dark .gst-kicker,
+.theme-dark .gst-panel-title span,
+.theme-dark .gst-readiness-card > div:last-child span {
+  color: #67e8f9;
+  background: rgba(103, 232, 249, 0.1);
+}
+
+.theme-dark .gst-filing-hero p,
+.theme-dark .gst-readiness-card > div:last-child p,
+.theme-dark .gst-filing-step p {
+  color: #b8c7dc;
+}
+
+.theme-dark .gst-readiness-card,
+.theme-dark .gst-filing-step,
+.theme-dark .doc-upload.compact,
+.theme-dark .gst-table-tags span {
+  background: #111c2e;
+  border-color: #2f4058;
+}
+
+.theme-dark .gst-readiness-ring {
+  background:
+    radial-gradient(circle at center, #172033 0 55%, transparent 56%),
+    conic-gradient(#22c55e var(--gst-progress), #334155 0);
+}
+
+.theme-dark .gst-readiness-ring span,
+.theme-dark .gst-doc-card-head span {
+  color: #b8c7dc;
+}
+
+.theme-dark .gst-marketplace-upload-card {
+  background: #111c2e;
+  border-color: #2f4058;
+}
+
+.theme-dark .gst-marketplace-upload-card.complete {
+  background: rgba(22, 101, 52, 0.16);
+}
+
+.theme-dark .gst-table-tags span {
+  color: #bfdbfe;
+}
+
+.theme-dark .doc-upload b {
+  background: #10243a;
+  color: #93c5fd;
+}
+
+.theme-dark .gst-final-action {
+  background: rgba(154, 52, 18, 0.18);
+  border-color: #9a3412;
+}
+
+.theme-dark .gst-final-action.ready {
+  background: rgba(22, 101, 52, 0.16);
+  border-color: #15803d;
+}
+
+.theme-dark .gst-final-action strong {
+  color: #fed7aa;
+}
+
+.theme-dark .gst-final-action.ready strong {
+  color: #bbf7d0;
+}
+
+.theme-dark .gst-step-number {
+  background: #00a6a6;
+  color: #06202a;
+}
+
+.theme-dark .gst-step-icon {
+  background: #10243a;
+  color: #7dd3fc;
+}
+
+.theme-dark .gst-filing-step::before {
+  background: #2f4058;
 }
 
 .theme-dark .layout-select {
@@ -4599,6 +5540,17 @@ tr:nth-child(even) td {
 
   .gst-return-switch {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gst-filing-setup,
+  .gst-period-fields,
+  .gst-platform-select {
+    grid-template-columns: 1fr;
+  }
+
+  .gst-platform-card,
+  .gst-period-card {
+    align-items: flex-start;
   }
 
   .platform-switch {
@@ -6164,5 +7116,93 @@ h1 {
 
   .feedback-fab span {
     display: none;
+  }
+}
+
+@media (max-width: 1180px) {
+  .gst-filing-hero,
+  .gst-filing-setup,
+  .gst-layout.guided {
+    grid-template-columns: 1fr;
+  }
+
+  .filing-guide {
+    position: static;
+  }
+}
+
+@media (max-width: 760px) {
+  .gst-page .module-header h1 {
+    font-size: 27px;
+  }
+
+  .gst-filing-hero {
+    padding: 16px;
+  }
+
+  .gst-readiness-card {
+    align-items: flex-start;
+  }
+
+  .gst-readiness-ring {
+    width: 78px;
+    height: 78px;
+  }
+
+  .gst-readiness-ring strong {
+    font-size: 18px;
+  }
+
+  .gst-readiness-ring span {
+    margin-top: 30px;
+    font-size: 10px;
+  }
+
+  .gst-platform-select,
+  .gst-period-fields,
+  .gst-final-action {
+    grid-template-columns: 1fr;
+  }
+
+  .gst-platform-select button {
+    justify-content: flex-start;
+  }
+
+  .gst-table-tags {
+    margin-left: 0;
+  }
+
+  .doc-upload {
+    align-items: flex-start;
+  }
+
+  .doc-upload b {
+    align-self: center;
+  }
+
+  .gst-filing-step {
+    grid-template-columns: 26px minmax(0, 1fr);
+  }
+
+  .gst-step-icon {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .gst-readiness-card,
+  .gst-doc-card-head,
+  .doc-upload {
+    flex-direction: column;
+  }
+
+  .gst-doc-card-head em,
+  .doc-upload b {
+    margin-left: 0;
+  }
+
+  .gst-doc-card-head img {
+    width: 38px;
+    height: 38px;
   }
 }
